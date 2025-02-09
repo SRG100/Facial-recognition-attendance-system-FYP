@@ -1,7 +1,9 @@
 import React, {useState} from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 const Register=()=>{
+
+    const errorMessage=''
     const [values,setValues]=useState({
         studentId:'',
         studentName:'',
@@ -26,54 +28,56 @@ const Register=()=>{
             })
     }
 }
+    //when the admin presses add student
     const handleSubmit = async (e)=>{
         e.preventDefault()
         try{
-            const response = await axios.post('http://localhost:3000/auth/register',values)
-            console.log(response)
-
+            const response = await axios.post('http://localhost:3000/auth/registerStudent',values)
+            console.log(response.message)
+            errorMessage=response.data.message
+            
         }catch(err){
             console.log(err)
         }
-
-    }
+ 
+    } 
     return(
         <div>Register Student
             <div>
-                <form action={handleSubmit}>
+                <form onSubmit={handleSubmit}>
                     <div>
                         <label htmlFor='studentId'>Student Id</label>
                         <input type='text' placeholder="Student's Id"
-                        name="studentId" oncChange={handleChanges}/>
+                        name="studentId" onChange={handleChanges}/>
                     </div>
                     
                     <div>
                         <label htmlFor='studentName'>Student Name</label>
                         <input type='text' placeholder="Student's name"
-                        name="studentName" oncChange={handleChanges}/>
+                        name="studentName" onChange={handleChanges}/>
                     </div>
                     <div>
                         <label htmlFor='studentAddress'>Student Address</label>
                         <input type='text' placeholder="Student's address"
-                        name="studentAddress" oncChange={handleChanges}/>
+                        name="studentAddress" onChange={handleChanges}/>
 
                     </div>
                     <div>
                         <label htmlFor='studentEmail'>Student Email</label>
                         <input type='email' placeholder="Student's email"
-                        name="studentEmail" oncChange={handleChanges}/>
+                        name="studentEmail" onChange={handleChanges}/>
 
                     </div>
                     <div>
                         <label htmlFor='studentDOB'>Student DOB</label>
                         <input type='date' placeholder="Student's DOB"
-                        name="studentDOB" oncChange={handleChanges}/>
+                        name="studentDOB" onChange={handleChanges}/>
 
                     </div>
 
                     <button> Add student</button>
                 </form>
-               
+                {errorMessage}
             </div>
         </div>
     )
