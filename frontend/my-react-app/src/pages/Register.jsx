@@ -10,7 +10,7 @@ const Register=()=>{
         studentEmail:'',
         studentAddress:'',
         studentDOB:'',
-        studentPassword:'',
+        studentPassword:''
     })
     const handleChanges =(e)=>{
         const { name, value } = e.target
@@ -35,7 +35,7 @@ const Register=()=>{
             const response = await axios.post('http://localhost:3000/auth/registerStudent',values)
             console.log(response.message)
             errorMessage=response.data.message
-            
+                       
         }catch(err){
             console.log(err)
         }
