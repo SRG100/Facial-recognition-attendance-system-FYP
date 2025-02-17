@@ -35,12 +35,11 @@ router.post('/registerStudent', async (req,res) => {
 
 //to register students 
 router.post('/login', async (req,res) => {
-    const{ email, password}=req.body;
+    const{ email, password}=req.body; 
     
     console.log('the email is ',email)
     try{
         const db=await connectDatabase()
-        console.log("Database connected successfully!");
         console.log("Database connected successfully!");
         const [rows]=await db.query('SELECT * FROM student WHERE Student_Email=?',[email])
         if(rows.length===0){
@@ -55,21 +54,31 @@ router.post('/login', async (req,res) => {
             
         }
         console.log("Login ok");
-        const token=jwt.sign({id:rows[0].studentId}
-            
-            ,process.env.JWT_KEY, 
-            {expiresIn:'1h'})
+        const token = jwt.sign(
+            { id: rows[0].studentId }, 
+            process.env.JWT_KEY,        
+            { expiresIn: "1h" }         
+        );
+        res.cookie("token", token, {
+            httpOnly: true,   
+            secure: false,     
+            sameSite: "Strict", 
+            maxAge: 3600000 ,
+            path: '/'
+        });
+        
+        console.log("Generated Token:", token);
         
         console.log("Now check face id");
 
         const Faceid=rows[0].Faceid;
         console.log(Faceid)
-        if(Faceid===null || Faceid===undefined){
-            console.log("No face id");
-            return res.status(200).json({ message: "Face ID is not registered" })
-
+        if (Faceid == null) { 
+            console.log("No face ID");
+            return res.status(201).json({ success: false, message: "Face ID is not registered", redirect: "/registerface"});
         }
-        return res.status(201).json({ message: "Login sucessful" })
+        
+        return res.status(201).json({ success: true, message: "Login successful", redirect: "/" ,token: token});
 
         
     }catch(err){
@@ -78,6 +87,19 @@ router.post('/login', async (req,res) => {
     }
 
 })
+router.post('/logout', async (req, res) => {
+    try{
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+    res.json({ success: true, message: "Logged out successfully" });
+}
+catch(err){
+
+}
+});
 
 export default router;
 

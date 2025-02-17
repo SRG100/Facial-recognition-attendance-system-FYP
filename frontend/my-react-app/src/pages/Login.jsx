@@ -1,12 +1,15 @@
 import React, {useState} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+
+// import Cookies from 'universal-cookies'
 const Login=()=>{
 
     const errorMessage=''
     const navigate=useNavigate();
 
     const [values,setValues]=useState({
+
         email:'',
         password:''
     })
@@ -22,15 +25,18 @@ const Login=()=>{
     const handleSubmit = async (e)=>{
         e.preventDefault()
         try{
-            const response = await axios.post('http://localhost:3000/auth/login',values)
-            console.log(response.status)
+            const response = await axios.post('http://localhost:3000/auth/login',values,{withCredentials:true})
+            console.log("Response:", response.data);
             if(response.status===201){
-              navigate('/')
+                console.log("the token is :",response.data.token)
+                localStorage.setItem('token',response.data.token)
+
+                console.log("sucess",response.data.redirect)
+                if (response.data.redirect) {
+                    navigate(response.data.redirect);
+                }
             }
             
-            if(response.status===200){
-              navigate('/registerface')
-            }
             console.log(response.data.message)
             // errorMessage=response.data.message
                        

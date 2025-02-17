@@ -1,18 +1,11 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import Nav from '../components/Nav'
 
 const Home = () => {
   return (
     <div>Home
-      <div>
-      <Link to="/"> Home</Link>
-      </div>
-      <div>
-      <Link to="/login">Login</Link>
-      </div>
-      <div>
-      <Link to="/register">Register</Link>
-      </div>
+      <Nav/>
     </div>
     
 

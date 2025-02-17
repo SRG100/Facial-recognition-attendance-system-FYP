@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import RegisterFace from './pages/RegisterFace'
 
 function App() {
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
     <BrowserRouter>
