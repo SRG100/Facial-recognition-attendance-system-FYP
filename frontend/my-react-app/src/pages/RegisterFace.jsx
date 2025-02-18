@@ -1,8 +1,9 @@
 import React,{useState} from 'react'
 import FaceCapture from '../components/FaceCapture.jsx'
 import axios from 'axios'
+import Nav from '../components/Nav.jsx'
 
-const RegisterFace = () => {
+const RegisterFace = (userId) => {
   const[image,setImage]=useState("");
 
   const registerFace = async (e)=>{
@@ -12,6 +13,7 @@ const RegisterFace = () => {
           
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ image }),
+          userId:userId
       })
         console.log(response.status)
         
@@ -25,6 +27,8 @@ const RegisterFace = () => {
 } 
   return (
     <div>RegisterFace
+      <Nav/>
+
       <FaceCapture image={image} setImage={setImage}/>
     
       
