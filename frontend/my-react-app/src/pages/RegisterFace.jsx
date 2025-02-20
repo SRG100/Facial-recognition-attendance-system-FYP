@@ -1,46 +1,59 @@
-import React,{useState} from 'react'
+import React, { useState } from 'react'
 import FaceCapture from '../components/FaceCapture.jsx'
 import axios from 'axios'
 import Nav from '../components/Nav.jsx'
 
-const RegisterFace = (userId) => {
-  const[image,setImage]=useState("");
+const RegisterFace = ({userId}) => {
+  const [image, setImage] = useState("");
 
-  const registerFace = async (e)=>{
-    
-    try{
-        const response = await axios.post('http://localhost:3000/face/registerFace',{
-          
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image }),
+  const base64ToFile = (base64String) => {
+    const byteCharacters = atob(base64String.split(",")[1]);
+    const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: "image/jpeg" });
+  };
+
+  const registerFace = async (e) => {
+
+    try {
+      const file = new File([base64ToFile(image)], "face_image.jpg", { type: "image/jpeg" });
+
+      const formData = new FormData();
+      formData.append("image", file); 
+      formData.append("userId", String(userId));
+
+      const response = await axios.post("http://localhost:3000/face/registerFace", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        body:{
           userId:userId
-      })
-        console.log(response.status)
-        
-        console.log(response.data.message)
-        // errorMessage=response.data.message
-                   
-    }catch(err){
-        console.log(err)
+        }
+      });
+      console.log(response.status)
+
+      console.log(response.data.message)
+      // errorMessage=response.data.message
+
+    } catch (err) {
+      console.log(err)
     }
 
-} 
+  }
   return (
     <div>RegisterFace
-      <Nav/>
-
-      <FaceCapture image={image} setImage={setImage}/>
-    
+      <Nav />
+      <div>the user id is : {userId}</div>
+      <FaceCapture image={image} setImage={setImage} />
       
-
       {image !== '' && (
-          <button onClick={registerFace} className="webcam-btn">
-              Register Face
-          </button>
+        <button onClick={registerFace} className="webcam-btn">
+          Register Face
+        </button>
       )}
 
     </div>
   )
 }
-  
+
 export default RegisterFace

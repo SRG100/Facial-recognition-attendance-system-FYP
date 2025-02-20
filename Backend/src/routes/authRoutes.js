@@ -37,30 +37,30 @@ router.post('/registerStudent', async (req, res) => {
 
 })
 
-router.post('/registerTeacher', async (req, res) => {
-    const { teacherId, teacherName, teacherEmail, teacherAddress, studentDOB, studentPassword } = req.body;
-    console.log(studentName)
-    try {
-        const db = await connectDatabase()
-        console.log("Database connected successfully!");
+// router.post('/registerTeacher', async (req, res) => {
+//     const { teacherId, teacherName, teacherEmail, teacherAddress, studentDOB, studentPassword } = req.body;
+//     console.log(studentName)
+//     try {
+//         const db = await connectDatabase()
+//         console.log("Database connected successfully!");
 
-        const [rows] = await db.query('SELECT * FROM student WHERE Student_Email=?', [studentEmail])
-        if (rows.length > 0) {
-            return res.status(409).json({ message: "Student with this email already exists" })
-        }
+//         const [rows] = await db.query('SELECT * FROM student WHERE Student_Email=?', [studentEmail])
+//         if (rows.length > 0) {
+//             return res.status(409).json({ message: "Student with this email already exists" })
+//         }
 
-        const hashPassword = await bcrypt.hash(studentPassword, 10)
+//         const hashPassword = await bcrypt.hash(studentPassword, 10)
 
-        await db.query("INSERT INTO student (Student_Id,Student_Name,Student_Address,Student_Email,Student_DOB,Password) VALUES (?,?,?,?,?,?)",
-            [studentId, studentName, studentAddress, studentEmail, studentDOB, hashPassword])
-        res.status(201).json({ message: "Student Added successfully" })
-    } catch (err) {
-        res.status(500).json(err)
+//         await db.query("INSERT INTO student (Student_Id,Student_Name,Student_Address,Student_Email,Student_DOB,Password) VALUES (?,?,?,?,?,?)",
+//             [studentId, studentName, studentAddress, studentEmail, studentDOB, hashPassword])
+//         res.status(201).json({ message: "Student Added successfully" })
+//     } catch (err) {
+//         res.status(500).json(err)
 
-        console.log("Database connected FAILED!", err);
-    }
+//         console.log("Database connected FAILED!", err);
+//     }
 
-})
+// })
 
 //to register students 
 router.post('/login', async (req, res) => {
@@ -123,7 +123,7 @@ router.post('/login', async (req, res) => {
 
         console.log("Now check face id");
 
-        const Faceid = rows[0].Faceid;
+        const Faceid = rows[0].Face_id;
 
         console.log(Faceid)
         if (Faceid == null) {

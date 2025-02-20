@@ -7,6 +7,9 @@ const Dashboard = ({ isLoggedIn, userRole, userId }) => {
     <div>Home
       <Nav/>
      
+    link to current class <br />
+    link to result prediction <br />
+    
 
     </div>
     

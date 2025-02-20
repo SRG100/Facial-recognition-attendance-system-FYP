@@ -4,6 +4,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie';
 
 
+
 const Nav = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   useEffect(() => {
@@ -34,13 +35,14 @@ const Nav = () => {
     try{
       const response = await axios.get('http://localhost:3000/auth/logout', { withCredentials: true })
       const logoutSuccess = response.data.success
-      
       console.log(logoutSuccess)
       if (logoutSuccess) {
         alert(response.data.message);
       } else {
         console.error("Logout failed:", response.data.message);
       }
+      window.location.reload();
+
     }
     catch(err){
       console.log("error while logging out", err)
