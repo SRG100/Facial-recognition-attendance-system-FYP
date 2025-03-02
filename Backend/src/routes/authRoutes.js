@@ -37,30 +37,33 @@ router.post('/registerStudent', async (req, res) => {
 
 })
 
-// router.post('/registerTeacher', async (req, res) => {
-//     const { teacherId, teacherName, teacherEmail, teacherAddress, studentDOB, studentPassword } = req.body;
-//     console.log(studentName)
-//     try {
-//         const db = await connectDatabase()
-//         console.log("Database connected successfully!");
+router.post('/registerTeacher', async (req, res) => {
+    
+    const { teacherId, teacherName, teacherEmail, teacherAddress, teacherDOB,teacherGender, teacherPassword } = req.body;
+    console.log(teacherId, teacherName, teacherEmail, teacherAddress, teacherDOB,teacherGender, teacherPassword )
+    try {
 
-//         const [rows] = await db.query('SELECT * FROM student WHERE Student_Email=?', [studentEmail])
-//         if (rows.length > 0) {
-//             return res.status(409).json({ message: "Student with this email already exists" })
-//         }
+        const db = await connectDatabase()
+        console.log("Database connected successfully!");
 
-//         const hashPassword = await bcrypt.hash(studentPassword, 10)
+        const [rows] = await db.query('SELECT * FROM teacher WHERE Teacher_Email=?', [teacherEmail])
+        if (rows.length > 0) {
+            return res.status(409).json({ message: "Teacher with this email already exists" })
+        }
+        console.log("the teacher password is:",teacherPassword )
 
-//         await db.query("INSERT INTO student (Student_Id,Student_Name,Student_Address,Student_Email,Student_DOB,Password) VALUES (?,?,?,?,?,?)",
-//             [studentId, studentName, studentAddress, studentEmail, studentDOB, hashPassword])
-//         res.status(201).json({ message: "Student Added successfully" })
-//     } catch (err) {
-//         res.status(500).json(err)
+        const hashPassword = await bcrypt.hash(teacherPassword, 10)
 
-//         console.log("Database connected FAILED!", err);
-//     }
+        await db.query("INSERT INTO teacher (Teacher_id,Teacher_Name,Teacher_Address,Teacher_DOB,Teacher_Email,Teacher_Gender,Password) VALUES (?,?,?,?,?,?,?)",
+            [teacherId, teacherName, teacherAddress, teacherDOB, teacherEmail,teacherGender, hashPassword])
+        res.status(201).json({ message: "Teacher Added successfully" })
+    } catch (err) {
+        res.status(500).json(err)
 
-// })
+        console.log("Database connected FAILED!", err);
+    }
+
+})
 
 //to register students 
 router.post('/login', async (req, res) => {
@@ -78,14 +81,13 @@ router.post('/login', async (req, res) => {
 
         }else if(role==='teacher'){
              [rows] = await db.query('SELECT * FROM teacher WHERE Teacher_Email=?', [email])
-             id =rows[0].Teacher_Id
+             id =rows[0].Teacher_id
 
         } else if (role==='admin'){
              [rows] = await db.query('SELECT * FROM admin WHERE Admin_Email=?', [email])
-             id =rows[0].Admin_Id
+             id =rows[0].Admin_id
 
         }else {
-            // If the role is not valid, handle it
             return res.status(400).json({ message: "Invalid role provided" });
         }
         console.log(rows[0])
@@ -95,13 +97,26 @@ router.post('/login', async (req, res) => {
             console.log("User with this email doesn't exists");
             return res.status(404).json({ message: "User with this email doesn't exists" })
         }
-        const isMatch = await bcrypt.compare(password, rows[0].Password)
+        let isMatch
+        console.log("The user is:",role)
+
+        if(role==='admin'){
+            console.log("inside the password check for  admin")
+            let isCorrect=false
+            if(password===rows[0].Password){
+                isCorrect=true
+            }
+            isMatch=isCorrect
+        }
+
+        else{
+            console.log("inside the password check for users except admin")
+            isMatch = await bcrypt.compare(password, rows[0].Password)
+        }
 
         if (!isMatch) {
             console.log("Wrong Password");
-
             return res.status(401).json({ message: "Wrong Password" })
-
         }
         console.log("Login ok");
         
@@ -121,22 +136,24 @@ router.post('/login', async (req, res) => {
 
         console.log("Generated Token:", token);
 
-        console.log("Now check face id");
+        if (role==="student"){
+            console.log("Now check face id");
 
-        const Faceid = rows[0].Face_id;
-
-        console.log(Faceid)
-        if (Faceid == null) {
-            console.log("No face ID");
-            return res.status(201).json({ success: false, message: "Face ID is not registered", redirect: "/registerface" });
-        }
-
+            const Faceid = rows[0].Face_id;
+    
+            console.log(Faceid)
+            if (Faceid == null) {
+                console.log("No face ID");
+                return res.status(201).json({ success: false, message: "Face ID is not registered", redirect: "/registerface" });
+            }
+    
+        }   
         return res.status(201).json({ success: true, message: "Login successful", redirect: "/", token: token });
 
 
     } catch (err) {
         res.status(500).json(err)
-        console.log("Database connected FAILED!", err);
+        console.log("The following error has occured", err);
     }
 
 })
@@ -154,8 +171,8 @@ router.get('/isAuthorized', async(req,res)=>{
         res.json({ 
             success: true, 
             message: "User is authorized", 
-            userId: decoded.id,   // Sending User ID
-            role: decoded.role    // Sending User Role
+            userId: decoded.id,
+            role: decoded.role  
         });
 
 

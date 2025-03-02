@@ -63,12 +63,12 @@ const Login = () => {
 
                     </div>
                     <div>
-                        <label htmlFor='email'>Email Address</label>
+                        <label htmlFor='email'>Email Address: </label>
                         <input type='text' placeholder="Email"
                             name="email" onChange={handleChanges} />
                     </div>
                     <div>
-                        <label htmlFor='password'>Password</label>
+                        <label htmlFor='password'>Password: </label>
                         <input type='password' placeholder="Password"
                             name="password" onChange={handleChanges} />
 
