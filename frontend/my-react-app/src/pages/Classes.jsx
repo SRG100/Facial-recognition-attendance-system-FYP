@@ -19,6 +19,34 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
         return currentTime >= startTime && currentTime <= endTime;
     };
 
+    const startClass = async (Class_Id) => {
+        try {
+            const response = await axios.post('http://localhost:3000/classes/startAttendance', { Class_Id })
+            console.log(response.message)
+
+        } catch (err) {
+            console.log(err)
+        }
+
+    }
+    const joinClass = async (classDetail) => {
+        try {
+            const attendanceData = {
+            Module_id:classDetail.Module_Id,     
+            Academic_Year_id:classDetail.Academic_Year_id,     
+            Course_id:classDetail.Course_id, 
+            Teacher_Id:classDetail.Teacher_Id,     
+            Section_Id:classDetail.Section_Id,
+            Class_Id:classDetail.Class_Id,            
+            Student_Id:userId}
+            const response = await axios.post('http://localhost:3000/classes/markAttendance', attendanceData)
+            console.log(response.message)
+
+        } catch (err) {
+            console.log(err)
+        }
+
+    }
 
     const getClassDetails = async () => {
         try {
@@ -77,19 +105,29 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                         <td className="px-6 py-4">{classDetail.Class_Day}</td>
                                         {userRole === "student" ? (
                                             <td scope="col">{classDetail.Teacher_Name}</td>
-                                        ) : (<th scope="col">Section Name</th>)}
+                                        ) : (<th scope="col">{classDetail.Section_Id}</th>)}
                                         {userRole === "student" ? (
                                             <td class="px-6 py-4 text-right">
-                                                <button href="#" class="font-medium text-blue-600 dark:text-blue-500 ">Join Class</button>
-                                            </td>) : (<td class="px-6 py-4 text-right">
-                                                {isClassLive(classDetail.Class_Start_Time, classDetail.Class_End_Time) ? (
-                                                    <button className="font-medium text-blue-600 dark:text-blue-500">Start Class</button>
+                                                {classDetail.Class_Status===1 ? (
+                                                    <button className="font-medium text-blue-600 dark:text-blue-500" onClick={() => joinClass(classDetail)}>Join Class</button>
                                                 ) : (
                                                     <span className="text-gray-400">Class not started</span>
-                                                )}                                
-                                                            </td>)}
+                                                )}
 
+                                            </td>) : (<td class="px-6 py-4 text-right">
+                                                {classDetail.Class_Status===1 ? (
+                                                    <button className="font-medium text-blue-600 dark:text-blue-500">Class Ongoing</button>
+                                                ) : (
+                                                    <button className="font-medium text-blue-600 dark:text-blue-500" onClick={() => startClass(classDetail.Class_Id)}>Start Class</button>
+                                                )}
 
+                                                {/* 
+                                                {isClassLive(classDetail.Class_Start_Time, classDetail.Class_End_Time) ? (
+                                                    <button className="font-medium text-blue-600 dark:text-blue-500" onClick={startClass}>Start Class</button>
+                                                ) : (
+                                                    <span className="text-gray-400">Class not started</span>
+                                                )} */}
+                                            </td>)}
 
                                     </tr>
                                 )
