@@ -72,11 +72,15 @@ router.get('/scheduledClass', async (req, res) => {
 })
 router.post('/startAttendance', async (req, res) => {
     try {
-        const { Class_Id } = req.body;
-        console.log("Reached the start attendance by teacher and the class id is:", Class_Id)
+        const { Class_Id, teacherLocation } = req.body;
+        console.log("teacher Location is:",teacherLocation)
+        const teacherLogitude=teacherLocation.longitude
+        const teacherLatitude=teacherLocation.latitude
+
+        console.log("Reached the start attendance by teacher and the class id is:", Class_Id,teacherLogitude, teacherLatitude)
         const db = await connectDatabase()
         console.log("Database connected successfully!");
-        await db.query("UPDATE class SET Class_Status = '1' WHERE Class_id = ?", Class_Id);
+        await db.query("UPDATE class SET Class_Status = '1' , Teacher_Longitude = ?, Teacher_Latitude = ? WHERE Class_id = ?", [teacherLogitude, teacherLatitude, Class_Id]);
         res.status(201).json({ message: "Class started sucessfully" })
     } catch (err) {
         res.status(500).json(err)

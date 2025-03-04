@@ -3,8 +3,11 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 
 const Classes = ({ isLoggedIn, userRole, userId }) => {
-    const [scheduledClasses, setScheduledClasses] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [scheduledClasses, setScheduledClasses] = useState([])
+    const [userLocationLongitude,setuserLocationLongitude]=useState(null)
+    const [userLocationLatitude,setuserLocationLatitude]=useState(null)
+    const [userLocation, setUserLocation] = useState(null)
+    const [loading, setLoading] = useState(true)
     useEffect(() => {
         if (userId) {
             getClassDetails();
@@ -18,11 +21,46 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
 
         return currentTime >= startTime && currentTime <= endTime;
     };
+    const getUserLocation = async () => {
+        return new Promise((resolve, reject) => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        
+                        setUserLocation({ latitude, longitude });
+                        setuserLocationLongitude(longitude);
+                        setuserLocationLatitude(latitude);
+                        
+                        resolve({ latitude, longitude }); // Return location
+                    },
+                    (error) => {
+                        console.error("Error getting user location:", error);
+                        reject(error);
+                    }
+                );
+            } else {
+                console.error("Geolocation is not supported by this browser.");
+                reject(new Error("Geolocation not supported"));
+            }
+        });
+    };
+    
 
     const startClass = async (Class_Id) => {
         try {
-            const response = await axios.post('http://localhost:3000/classes/startAttendance', { Class_Id })
+            const teacherLocation=await getUserLocation()
+            
+            console.log("The user location is :",teacherLocation)
+            // console.log("Sending to backend:", { Class_Id, , userLocationLongitude:userLocationLongitude});
+              
+            console.log("user Location Longitude is",userLocationLongitude)
+            console.log("user Location Longitude is",userLocationLatitude)
+
+            const response = await axios.post('http://localhost:3000/classes/startAttendance', { Class_Id,teacherLocation})
             console.log(response.message)
+            window.location.reload();
+
 
         } catch (err) {
             console.log(err)
@@ -32,13 +70,14 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
     const joinClass = async (classDetail) => {
         try {
             const attendanceData = {
-            Module_id:classDetail.Module_Id,     
-            Academic_Year_id:classDetail.Academic_Year_id,     
-            Course_id:classDetail.Course_id, 
-            Teacher_Id:classDetail.Teacher_Id,     
-            Section_Id:classDetail.Section_Id,
-            Class_Id:classDetail.Class_Id,            
-            Student_Id:userId}
+                Module_id: classDetail.Module_Id,
+                Academic_Year_id: classDetail.Academic_Year_id,
+                Course_id: classDetail.Course_id,
+                Teacher_Id: classDetail.Teacher_Id,
+                Section_Id: classDetail.Section_Id,
+                Class_Id: classDetail.Class_Id,
+                Student_Id: userId
+            }
             const response = await axios.post('http://localhost:3000/classes/markAttendance', attendanceData)
             console.log(response.message)
 
@@ -107,15 +146,15 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                             <td scope="col">{classDetail.Teacher_Name}</td>
                                         ) : (<th scope="col">{classDetail.Section_Id}</th>)}
                                         {userRole === "student" ? (
-                                            <td class="px-6 py-4 text-right">
-                                                {classDetail.Class_Status===1 ? (
+                                            <td className="px-6 py-4 text-right">
+                                                {classDetail.Class_Status === 1 ? (
                                                     <button className="font-medium text-blue-600 dark:text-blue-500" onClick={() => joinClass(classDetail)}>Join Class</button>
                                                 ) : (
                                                     <span className="text-gray-400">Class not started</span>
                                                 )}
 
-                                            </td>) : (<td class="px-6 py-4 text-right">
-                                                {classDetail.Class_Status===1 ? (
+                                            </td>) : (<td className="px-6 py-4 text-right">
+                                                {classDetail.Class_Status === 1 ? (
                                                     <button className="font-medium text-blue-600 dark:text-blue-500">Class Ongoing</button>
                                                 ) : (
                                                     <button className="font-medium text-blue-600 dark:text-blue-500" onClick={() => startClass(classDetail.Class_Id)}>Start Class</button>
@@ -135,9 +174,21 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                         }
                     </tbody>
                 </table>
+
             </div>
-
-
+            {userLocation && (
+                <div>
+                    <h2>User Location</h2>
+                    <p>Latitude: {userLocation.latitude}</p>
+                    <p>Longitude: {userLocation.longitude}</p>
+                    <div>
+                    <h2>User Location from single</h2>
+                    <p>Latitude: {userLocationLatitude}</p>
+                    <p>Longitude: {userLocationLongitude}</p>
+                </div>
+                </div>
+                
+            )}
 
         </div>
 
