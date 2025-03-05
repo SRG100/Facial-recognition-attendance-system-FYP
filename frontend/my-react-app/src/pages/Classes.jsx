@@ -4,8 +4,8 @@ import axios from 'axios'
 
 const Classes = ({ isLoggedIn, userRole, userId }) => {
     const [scheduledClasses, setScheduledClasses] = useState([])
-    const [userLocationLongitude,setuserLocationLongitude]=useState(null)
-    const [userLocationLatitude,setuserLocationLatitude]=useState(null)
+    const [userLocationLongitude, setuserLocationLongitude] = useState(null)
+    const [userLocationLatitude, setuserLocationLatitude] = useState(null)
     const [userLocation, setUserLocation] = useState(null)
     const [loading, setLoading] = useState(true)
     useEffect(() => {
@@ -16,22 +16,19 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
 
     const isClassLive = (startTime, endTime) => {
         const now = new Date();
-
         const currentTime = now.toTimeString().split(" ")[0];
-
         return currentTime >= startTime && currentTime <= endTime;
-    };
+    }
+
     const getUserLocation = async () => {
+        try{
         return new Promise((resolve, reject) => {
+            setLoading(true)
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const { latitude, longitude } = position.coords;
-                        
                         setUserLocation({ latitude, longitude });
-                        setuserLocationLongitude(longitude);
-                        setuserLocationLatitude(latitude);
-                        
                         resolve({ latitude, longitude }); // Return location
                     },
                     (error) => {
@@ -44,31 +41,38 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                 reject(new Error("Geolocation not supported"));
             }
         });
+    }
+    catch(err){
+        console.log("Error while getting location:",err)
+    }
+    finally{
+        setLoading(false)
+    }
     };
-    
+
+
 
     const startClass = async (Class_Id) => {
         try {
-            const teacherLocation=await getUserLocation()
-            
-            console.log("The user location is :",teacherLocation)
-            // console.log("Sending to backend:", { Class_Id, , userLocationLongitude:userLocationLongitude});
-              
-            console.log("user Location Longitude is",userLocationLongitude)
-            console.log("user Location Longitude is",userLocationLatitude)
+            // const teacherLocation = await getUserLocation()
+            // console.log("The user location is :", teacherLocation)
+            // console.log("Sending to backend:", { Class_Id, , userLocationLongitude:userLocationLongitude});       
+            // const response = await axios.post('http://localhost:3000/classes/startAttendance', { Class_Id, teacherLocation })
+            const response = await axios.post('http://localhost:3000/classes/startAttendance', { Class_Id })
 
-            const response = await axios.post('http://localhost:3000/classes/startAttendance', { Class_Id,teacherLocation})
             console.log(response.message)
             window.location.reload();
-
 
         } catch (err) {
             console.log(err)
         }
 
     }
+
+
     const joinClass = async (classDetail) => {
         try {
+           
             const attendanceData = {
                 Module_id: classDetail.Module_Id,
                 Academic_Year_id: classDetail.Academic_Year_id,
@@ -78,6 +82,18 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                 Class_Id: classDetail.Class_Id,
                 Student_Id: userId
             }
+            const Class_Id=classDetail.Class_Id
+            // const studentLocation = await getUserLocation()
+            // const studentLongitude=studentLocation.longitude
+            // const studentLatitude=studentLocation.latitude
+
+            // console.log("The location of the student Logitude is",studentLongitude)
+            // console.log("The location of the student Latitude is",studentLatitude)
+
+
+            // const locationVerification = await axios.get(`http://localhost:3000/location/locationVerification?Class_Id=${Class_Id}&studentLogitude=${studentLongitude}&studentLatitude=${studentLatitude}`)
+            // const locationVerified=locationVerification.data.verified
+            console.log("The location of the student is verified",locationVerified)
             const response = await axios.post('http://localhost:3000/classes/markAttendance', attendanceData)
             console.log(response.message)
 
@@ -182,12 +198,12 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                     <p>Latitude: {userLocation.latitude}</p>
                     <p>Longitude: {userLocation.longitude}</p>
                     <div>
-                    <h2>User Location from single</h2>
-                    <p>Latitude: {userLocationLatitude}</p>
-                    <p>Longitude: {userLocationLongitude}</p>
+                        <h2>User Location from single</h2>
+                        <p>Latitude: {userLocationLatitude}</p>
+                        <p>Longitude: {userLocationLongitude}</p>
+                    </div>
                 </div>
-                </div>
-                
+
             )}
 
         </div>

@@ -1,9 +1,10 @@
 import express from 'express'
 import cors from 'cors'
 import authRouter from './routes/authRoutes.js'
-import faceRoutes from './routes/Face.js'
+import faceRoutes from './routes/face.js'
 import classDetails from './routes/overallClasses.js'
 import cookieParser from "cookie-parser";
+import geolocation from './routes/geolocationVerification.js'
 
 
 
@@ -21,6 +22,8 @@ app.use(express.json())
 app.use('/auth',authRouter)
 app.use('/face',faceRoutes)
 app.use('/classes',classDetails)
+app.use('/location',geolocation)
+
 
 app.listen(process.env.PORT,()=> {
     console.log("Server is Running")
