@@ -52,7 +52,6 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
 
     const getUserLocation = async () => {
         setLoading(true)
-    
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
                 console.error("Geolocation is not supported by this browser.")

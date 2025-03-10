@@ -18,7 +18,7 @@ router.post('/registerStudent', async (req, res) => {
         const db = await connectDatabase()
         console.log("Database connected successfully!");
 
-        
+
         const [rows] = await db.query('SELECT * FROM student WHERE Student_Email=?', [studentEmail])
         if (rows.length > 0) {
             return res.status(409).json({ message: "Student with this email already exists" })
@@ -38,9 +38,9 @@ router.post('/registerStudent', async (req, res) => {
 })
 
 router.post('/registerTeacher', async (req, res) => {
-    
-    const { teacherId, teacherName, teacherEmail, teacherAddress, teacherDOB,teacherGender, teacherPassword } = req.body;
-    
+
+    const { teacherId, teacherName, teacherEmail, teacherAddress, teacherDOB, teacherGender, teacherPassword } = req.body;
+
     try {
         const db = await connectDatabase()
         console.log("Database connected successfully!");
@@ -50,7 +50,7 @@ router.post('/registerTeacher', async (req, res) => {
         }
         const hashPassword = await bcrypt.hash(teacherPassword, 10)
         await db.query("INSERT INTO teacher (Teacher_id,Teacher_Name,Teacher_Address,Teacher_DOB,Teacher_Email,Teacher_Gender,Password) VALUES (?,?,?,?,?,?,?)",
-            [teacherId, teacherName, teacherAddress, teacherDOB, teacherEmail,teacherGender, hashPassword])
+            [teacherId, teacherName, teacherAddress, teacherDOB, teacherEmail, teacherGender, hashPassword])
         res.status(201).json({ message: "Teacher Added successfully" })
     } catch (err) {
         res.status(500).json(err)
@@ -62,48 +62,44 @@ router.post('/registerTeacher', async (req, res) => {
 
 //to register students 
 router.post('/login', async (req, res) => {
-    const { email, password ,role} = req.body;
+    const { email, password, role } = req.body;
 
     let rows = [];
     let id
     try {
         const db = await connectDatabase()
         console.log("Database connected successfully!");
-        if(role==='student'){
-             [rows] = await db.query('SELECT * FROM student WHERE Student_Email=?', [email])
-             id =rows[0].Student_Id
+        if (role === 'student') {
+            [rows] = await db.query('SELECT * FROM student WHERE Student_Email=?', [email])
+            id = rows[0].Student_Id
 
-        }else if(role==='teacher'){
-             [rows] = await db.query('SELECT * FROM teacher WHERE Teacher_Email=?', [email])
-             id =rows[0].Teacher_id
+        } else if (role === 'teacher') {
+            [rows] = await db.query('SELECT * FROM teacher WHERE Teacher_Email=?', [email])
+            id = rows[0].Teacher_id
 
-        } else if (role==='admin'){
-             [rows] = await db.query('SELECT * FROM admin WHERE Admin_Email=?', [email])
-             id =rows[0].Admin_id
+        } else if (role === 'admin') {
+            [rows] = await db.query('SELECT * FROM admin WHERE Admin_Email=?', [email])
+            id = rows[0].Admin_id
 
-        }else {
+        } else {
             return res.status(400).json({ message: "Invalid role provided" });
         }
-        console.log(rows[0])
-    
+
 
         if (rows.length === 0) {
             console.log("User with this email doesn't exists");
             return res.status(404).json({ message: "User with this email doesn't exists" })
         }
         let isMatch
-        console.log("The user is:",role)
-
-        if(role==='admin'){
+        if (role === 'admin') {
             console.log("inside the password check for  admin")
-            let isCorrect=false
-            if(password===rows[0].Password){
-                isCorrect=true
+            let isCorrect = false
+            if (password === rows[0].Password) {
+                isCorrect = true
             }
-            isMatch=isCorrect
+            isMatch = isCorrect
         }
-
-        else{
+        else {
             console.log("inside the password check for users except admin")
             isMatch = await bcrypt.compare(password, rows[0].Password)
         }
@@ -113,10 +109,10 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: "Wrong Password" })
         }
         console.log("Login ok");
-        
-        console.log("the user id is:",id)
+
+        console.log("the user id is:", id)
         const token = jwt.sign(
-            { id: id, role:role },
+            { id: id, role: role },
             process.env.JWT_KEY,
             { expiresIn: "1h" }
         );
@@ -128,20 +124,15 @@ router.post('/login', async (req, res) => {
             path: '/'
         });
 
-        console.log("Generated Token:", token);
-
-        if (role==="student"){
+        if (role === "student") {
             console.log("Now check face id");
 
             const Faceid = rows[0].Face_id;
-    
-            console.log(Faceid)
             if (Faceid == null) {
                 console.log("No face ID");
                 return res.status(201).json({ success: false, message: "Face ID is not registered", redirect: "/registerface" });
             }
-    
-        }   
+        }
         return res.status(201).json({ success: true, message: "Login successful", redirect: "/", token: token });
 
 
@@ -151,29 +142,29 @@ router.post('/login', async (req, res) => {
     }
 
 })
-router.get('/isAuthorized', async(req,res)=>{
-    try{
+router.get('/isAuthorized', async (req, res) => {
+    try {
         const token = req.cookies.token;
-        if(!token){
+        if (!token) {
             return res.status(401).json({ success: false, message: "Unauthorized" });
         }
         const decoded = jwt.verify(token, process.env.JWT_KEY);
-        res.json({ 
-            success: true, 
-            message: "User is authorized", 
+        res.json({
+            success: true,
+            message: "User is authorized",
             userId: decoded.id,
-            role: decoded.role  
+            role: decoded.role
         })
 
 
-    }catch(err){
-        console.error("Authorization error:",err);
+    } catch (err) {
+        console.error("Authorization error:", err);
         res.status(500).json({ success: false, message: "Authorization Failed" });
     }
 })
 
 router.get('/logout', async (req, res) => {
-    try {  
+    try {
         res.clearCookie("token", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
