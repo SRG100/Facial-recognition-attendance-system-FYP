@@ -4,7 +4,7 @@ import authRouter from './routes/authRoutes.js'
 import faceRoutes from './routes/face.js'
 import classDetails from './routes/overallClasses.js'
 import cookieParser from "cookie-parser";
-import geolocation from './routes/geolocationVerification.js'
+import verifications from './routes/verification.js'
 
 
 
@@ -22,7 +22,7 @@ app.use(express.json())
 app.use('/auth',authRouter)
 app.use('/face',faceRoutes)
 app.use('/classes',classDetails)
-app.use('/location',geolocation)
+app.use('/verification',verifications)
 
 
 app.listen(process.env.PORT,()=> {

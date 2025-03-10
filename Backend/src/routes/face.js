@@ -23,10 +23,9 @@ router.post('/registerFace', upload.single("image"), async (req, res) => {
     const [result] = await db.execute(
       "INSERT INTO face (Face_data) VALUES (?)",
       [imageBuffer]
-    );
+    )
 
     const faceId = result.insertId;
-    console.log("Newly inserted Face_id:", faceId);
 
     await db.execute("UPDATE student SET Face_id = ? WHERE Student_Id = ?", [
       faceId,
@@ -47,18 +46,12 @@ router.post('/getFace', async (req, res) => {
 
   console.log("got to get the user's face check")
   const { userId } = req.body;
-
-  console.log("gthe user id is:", userId)
-
   if (userId === null || userId === undefined) {
     console.log("got to get the user's face check but no face id")
-
     return res.status(501).json({ message: "No face id " })
   }
-  console.log("The user id in get face is:", userId)
   const [faceResult] = await db.query('SELECT Face_id FROM student WHERE Student_Id=?', [userId])
   const Face_id = faceResult[0].Face_id
-  console.log("The user id in get face is:", Face_id)
   const [rows] = await db.query('SELECT * FROM face WHERE Face_Id=?', [Face_id])
 
   if (rows.length === 0) {
@@ -67,13 +60,8 @@ router.post('/getFace', async (req, res) => {
 
   }
   const faceData = rows[0].Face_data
-
-
-  console.log("The face data of the user is:", faceData)
   const base64FaceData = faceData.toString('base64');
-
   res.status(200).json({ faceData: base64FaceData });
-
 
 })
 export default router

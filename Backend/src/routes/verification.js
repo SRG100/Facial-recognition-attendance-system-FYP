@@ -45,4 +45,41 @@ router.get('/locationVerification', async(req,res)=>{
     }
 })
 
+router.get('/codeVerification', async(req,res)=>{
+    try{
+        const db = await connectDatabase()
+        console.log("Database connected successfully!");
+        console.log("got to the class code verification api")
+        const { Class_Id, studentClassCode , Attendance_id } = req.query
+        console.log("The class id got in code verfication is",Class_Id)
+        console.log("The attendance  in code verfication is",Attendance_id)
+        console.log("The student enterned code is",studentClassCode)
+        const [result] = await db.query("SELECT * FROM `class` WHERE Class_id=?",[Class_Id])
+        const autualClassCode=result[0].Class_Code
+        console.log("The actual code is",autualClassCode)
+        
+        if(autualClassCode===studentClassCode){
+            await db.query("UPDATE attendance SET Code = 1 WHERE attendance.Attendance_Id = ?",[Attendance_id])
+            res.json({ 
+                success: true, 
+                message: "Code is incorrect", 
+                codeVerified:true,
+            })
+            
+
+        }
+        else{
+            res.json({ 
+                success: true, 
+                message: "Code is incorrect", 
+                codeVerified:false,
+            })
+        }
+
+    }catch(err){
+        console.error("Location verification error:",err);
+        res.status(500).json({ success: false, message: "Location verificaton of student Failed" });
+    }
+})
+
 export default router

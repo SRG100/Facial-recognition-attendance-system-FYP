@@ -8,7 +8,8 @@ import RegisterFace from './pages/RegisterFace';
 import Dashboard from './pages/Dashboard';
 import CheckFace from './pages/CheckFace';
 import ProtectedRoute from './components/ProtectedRoute';
-import Classes from './pages/Classes';
+import Classes from './pages/Classes'
+import VerifyCode from './pages/verifyCode';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -46,6 +47,7 @@ function App() {
             <Route path="/checkface" element={<CheckFace userId={userId} />} />
             <Route path="/classes" element={<Classes isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} />} />
             <Route path="/registerface" element={<RegisterFace userId={userId} />} />
+            <Route path="/verifycode" element={<VerifyCode userId={userId} />} />
             <Route path="/register" element={<Navigate to="/" />} />
             <Route path="/login" element={<Navigate to="/" />} />
           </Route>

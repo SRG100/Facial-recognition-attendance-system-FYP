@@ -30,11 +30,9 @@ const Login = () => {
             console.log("Response:", response.data);
             if (response.status === 201) {
 
-                console.log("the token is :", response.data.token)
-                console.log("sucess", response.data.redirect)
                 if (response.data.redirect) {
-                    alert("Login Success");
-                    navigate(response.data.redirect);
+                    alert("Login Success")
+                    navigate(response.data.redirect)
                 }
             }
             window.location.reload();

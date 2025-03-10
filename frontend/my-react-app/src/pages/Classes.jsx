@@ -1,18 +1,38 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { Link, useNavigate } from 'react-router-dom'
+
 
 const Classes = ({ isLoggedIn, userRole, userId }) => {
     const [scheduledClasses, setScheduledClasses] = useState([])
+    const [classCode, setClassCode] = useState(false)
     const [userLocationLongitude, setuserLocationLongitude] = useState(null)
     const [userLocationLatitude, setuserLocationLatitude] = useState(null)
     const [userLocation, setUserLocation] = useState(null)
     const [loading, setLoading] = useState(true)
+    const navigate = useNavigate();
+    
+    // const [code,setCode]=useState(null)
+    const [code, setCode] = useState({
+    
+            classCode: ''
+        })
+        const handleChanges = (e) => {
+            const { name, value } = e.target
+            setCode({
+                ...code,
+                [name]: value,
+            })
+        }
+
     useEffect(() => {
         if (userId) {
             getClassDetails();
         }
     }, [userId, userRole]);
+
+    
 
     const isClassLive = (startTime, endTime) => {
         const now = new Date();
@@ -20,58 +40,76 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
         return currentTime >= startTime && currentTime <= endTime;
     }
 
-    const getUserLocation = async () => {
+    const verifyClassCode = async () =>{
         try{
+            const codeVerification = await axios.get(`http://localhost:3000/location/locationVerification?Class_Id=${Class_Id}&studentClassCode=${studentClassCode}`)
+            console.log("The code entered by student is:",code.classCode)
+        
+        }catch(err){
+            console.log("Error while verifying class:", err)
+        }
+    }
+
+    const getUserLocation = async () => {
+        setLoading(true)
+    
         return new Promise((resolve, reject) => {
-            setLoading(true)
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const { latitude, longitude } = position.coords;
-                        setUserLocation({ latitude, longitude });
-                        resolve({ latitude, longitude }); // Return location
-                    },
-                    (error) => {
-                        console.error("Error getting user location:", error);
-                        reject(error);
-                    }
-                );
-            } else {
-                console.error("Geolocation is not supported by this browser.");
-                reject(new Error("Geolocation not supported"));
+            if (!navigator.geolocation) {
+                console.error("Geolocation is not supported by this browser.")
+                setLoading(false)
+                reject(new Error("Geolocation not supported"))
+                return;
             }
-        });
+    
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords
+                    setUserLocation({ latitude, longitude })
+                    setLoading(false)
+                    resolve({ latitude, longitude })
+                },
+                (error) => {
+                    console.error("Error getting user location:", error)
+                    setLoading(false)
+                    reject(error)
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000, 
+                    maximumAge: 0 
+                }
+            )
+        })
     }
-    catch(err){
-        console.log("Error while getting location:",err)
-    }
-    finally{
-        setLoading(false)
-    }
-    };
 
-
-
-    const startClass = async (Class_Id) => {
+    const startClass = async (classDetail) => {
         try {
-            // const teacherLocation = await getUserLocation()
-            // console.log("The user location is :", teacherLocation)
-            // console.log("Sending to backend:", { Class_Id, , userLocationLongitude:userLocationLongitude});       
-            // const response = await axios.post('http://localhost:3000/classes/startAttendance', { Class_Id, teacherLocation })
-            const response = await axios.post('http://localhost:3000/classes/startAttendance', { Class_Id })
+            const teacherLocation = await getUserLocation()
+            console.log("The user location is :", teacherLocation)
+            const startClassData = {
+                
+                Section_Id: classDetail.Section_Id,
+                Class_Id: classDetail.Class_Id,
+                teacherLocation:teacherLocation
+            }
+            const response = await axios.post('http://localhost:3000/classes/startAttendance', startClassData)
+            const classCode =response.data.classCode
 
-            console.log(response.message)
-            window.location.reload();
-
+            console.log(classCode)
+            if (response.data.classCode) {
+                alert(`The class code is: ${classCode}`);
+                
+            }
+            console.log("The user location is :", teacherLocation)
+            window.location.reload()
         } catch (err) {
             console.log(err)
         }
 
     }
 
-
     const joinClass = async (classDetail) => {
-        try {
+        try {   
            
             const attendanceData = {
                 Module_id: classDetail.Module_Id,
@@ -83,19 +121,11 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                 Student_Id: userId
             }
             const Class_Id=classDetail.Class_Id
-            // const studentLocation = await getUserLocation()
-            // const studentLongitude=studentLocation.longitude
-            // const studentLatitude=studentLocation.latitude
-
-            // console.log("The location of the student Logitude is",studentLongitude)
-            // console.log("The location of the student Latitude is",studentLatitude)
-
-
-            // const locationVerification = await axios.get(`http://localhost:3000/location/locationVerification?Class_Id=${Class_Id}&studentLogitude=${studentLongitude}&studentLatitude=${studentLatitude}`)
-            // const locationVerified=locationVerification.data.verified
-            console.log("The location of the student is verified",locationVerified)
             const response = await axios.post('http://localhost:3000/classes/markAttendance', attendanceData)
             console.log(response.message)
+            const Attendance_id= response.data.Attendance_Id
+            
+            navigate("/verifycode",{state:{Class_Id, Attendance_id}})
 
         } catch (err) {
             console.log(err)
@@ -129,11 +159,25 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
     return (
         <div>Classes
             The classes of the {userRole} are as follows:
+            {classCode && (
+                <div>
+                {/* <form >  */}
+                <div>
+                        <label htmlFor='email'>Enter Class Code </label>
+                        <input type='text' placeholder="Class Code"  onChange={handleChanges}
+                            name="classCode" />
+                    </div>
+                    <button > Submit</button>
+                {/* </form> */}
+                </div>
+            )}
+
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                         <tr>
+                            <th scope="col" className="px-6 py-3">Class Id </th>
                             <th scope="col" className="px-6 py-3">Module Name </th>
                             <th scope="col" className="px-6 py-3">Class Start Time </th>
                             <th scope="col" className="px-6 py-3">Class End Time </th>
@@ -153,6 +197,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                             scheduledClasses.map((classDetail, i) => {
                                 return (
                                     <tr key={i}>
+                                        <td className="px-6 py-2">{classDetail.Class_Id}</td>
                                         <td className="px-6 py-4">{classDetail.Module_Name}</td>
                                         <td className="px-6 py-4">{classDetail.Class_Start_Time}</td>
                                         <td className="px-6 py-4">{classDetail.Class_End_Time}</td>
@@ -173,7 +218,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                                 {classDetail.Class_Status === 1 ? (
                                                     <button className="font-medium text-blue-600 dark:text-blue-500">Class Ongoing</button>
                                                 ) : (
-                                                    <button className="font-medium text-blue-600 dark:text-blue-500" onClick={() => startClass(classDetail.Class_Id)}>Start Class</button>
+                                                    <button className="font-medium text-blue-600 dark:text-blue-500" onClick={() => startClass(classDetail)}>Start Class</button>
                                                 )}
 
                                                 {/* 

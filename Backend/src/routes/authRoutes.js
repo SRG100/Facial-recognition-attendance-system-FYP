@@ -40,20 +40,15 @@ router.post('/registerStudent', async (req, res) => {
 router.post('/registerTeacher', async (req, res) => {
     
     const { teacherId, teacherName, teacherEmail, teacherAddress, teacherDOB,teacherGender, teacherPassword } = req.body;
-    console.log(teacherId, teacherName, teacherEmail, teacherAddress, teacherDOB,teacherGender, teacherPassword )
+    
     try {
-
         const db = await connectDatabase()
         console.log("Database connected successfully!");
-
         const [rows] = await db.query('SELECT * FROM teacher WHERE Teacher_Email=?', [teacherEmail])
         if (rows.length > 0) {
             return res.status(409).json({ message: "Teacher with this email already exists" })
         }
-        console.log("the teacher password is:",teacherPassword )
-
         const hashPassword = await bcrypt.hash(teacherPassword, 10)
-
         await db.query("INSERT INTO teacher (Teacher_id,Teacher_Name,Teacher_Address,Teacher_DOB,Teacher_Email,Teacher_Gender,Password) VALUES (?,?,?,?,?,?,?)",
             [teacherId, teacherName, teacherAddress, teacherDOB, teacherEmail,teacherGender, hashPassword])
         res.status(201).json({ message: "Teacher Added successfully" })
@@ -69,7 +64,6 @@ router.post('/registerTeacher', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password ,role} = req.body;
 
-    console.log('the role is ', role)
     let rows = [];
     let id
     try {
@@ -159,21 +153,17 @@ router.post('/login', async (req, res) => {
 })
 router.get('/isAuthorized', async(req,res)=>{
     try{
-        console.log('Cookies:', req.cookies);
         const token = req.cookies.token;
-        console.log(token)
         if(!token){
             return res.status(401).json({ success: false, message: "Unauthorized" });
         }
-        console.log("Got Token")
         const decoded = jwt.verify(token, process.env.JWT_KEY);
-        console.log("the user id is ",decoded.id)
         res.json({ 
             success: true, 
             message: "User is authorized", 
             userId: decoded.id,
             role: decoded.role  
-        });
+        })
 
 
     }catch(err){

@@ -1,19 +1,14 @@
 import express from 'express'
 import { connectDatabase } from '../config/database.js'
-const app = express();
+const app = express()
 
 
 const router = express.Router()
 
 router.get('/scheduledClass', async (req, res) => {
     try {
-        console.log("got to get the scheduled classes api")
-
-
         const { userId, userRole } = req.query
         const db = await connectDatabase()
-        console.log("the user id is:", userId)
-        console.log("the user role is:", userRole)
         let classes = [];
         if (userRole === 'student') {
             const [result] = await db.query(`SELECT s.Student_Id, s.Student_Name, sec.Section_Id, c.Class_Id, m.Module_Id, m.Module_Name,  
@@ -59,11 +54,8 @@ router.get('/scheduledClass', async (req, res) => {
         } else {
             res.status(500).json({ success: false, message: "Wrong user" });
         }
-
-        console.log("The scheduled class are:", classes)
+        console.log("Got the scheduled classes")
         res.status(200).json(classes);
-
-
 
     } catch (err) {
         console.error("Overall Class js error:", err);
@@ -73,19 +65,23 @@ router.get('/scheduledClass', async (req, res) => {
 router.post('/startAttendance', async (req, res) => {
     try {
         // const { Class_Id, teacherLocation } = req.body;
-        const { Class_Id } = req.body;
-
-        // console.log("teacher Location is:",teacherLocation)
-        // const teacherLongitude=teacherLocation.longitude
-        // const teacherLatitude=teacherLocation.latitude
+        const { Class_Id , Section_Id ,teacherLocation} = req.body;
+        console.log("teacher Location is:",teacherLocation)
+        const teacherLongitude=teacherLocation.longitude
+        const teacherLatitude=teacherLocation.latitude
 
         // console.log("Reached the start attendance by teacher and the class id is:", Class_Id,teacherLongitude, teacherLatitude)
         const db = await connectDatabase()
-        console.log("Database connected successfully!");
-        // await db.query("UPDATE class SET Class_Status = '1' , Teacher_Longitude = ?, Teacher_Latitude = ? WHERE Class_id = ?", [teacherLongitude, teacherLatitude, Class_Id]);
-        await db.query("UPDATE class SET Class_Status = '1'  WHERE Class_id = ?", [ Class_Id]);
+        console.log("Database connected successfully!")
+        //generation of random number for the class code
+        const randomNumber=Math.floor(Math.random()*10000)
+        const Class_Code= String(Section_Id) + "-"+ String(Class_Id) + "-" + String(randomNumber) ;
+        console.log("The class Code is:",Class_Code)
 
-        res.status(201).json({ message: "Class started sucessfully" })
+        await db.query("UPDATE class SET Class_Status = '1' , Teacher_Longitude = ?, Teacher_Latitude = ? ,Class_Code=? WHERE Class_id = ?", [teacherLongitude, teacherLatitude, Class_Code,Class_Id]);
+        await db.query("UPDATE class SET Class_Status = '1',Class_Code=?  WHERE Class_id = ?", [Class_Code, Class_Id]);
+
+        res.status(201).json({ message: "Class started sucessfully", classCode:Class_Code })
     } catch (err) {
         res.status(500).json(err)
         console.log("Error occurred", err);
@@ -93,8 +89,6 @@ router.post('/startAttendance', async (req, res) => {
 })
 
 router.post('/markAttendance', async (req, res) => {
-
-
     try {
         const { Module_id,     
             Academic_Year_id,     
@@ -105,29 +99,21 @@ router.post('/markAttendance', async (req, res) => {
             Student_Id } = req.body;
         console.log(Class_Id)
         const Attendance_Id = String(Section_Id) + "_" + String(Class_Id) + "_" + String(Student_Id);
-        const Geolocation_Status = 1
-        const Attendance_Status = 1
-        const Code = 1
+        const Attendance_Status = "Not Verified"
         const db = await connectDatabase()
-        const Geolocation_latitude = "27.7172"
-        const Geolocation_longitude = "27.7172"
         const Attendance_Date = new Date().toISOString().split('T')[0];
         const Attendance_Time = new Date().toTimeString().split(' ')[0];
 
         console.log("Database connected successfully!");
         await db.query(
-            "INSERT INTO attendance (Attendance_Id, Attendance_Date, Attendance_Status, Geolocation_Status, Geolocation_latitude, Geolocation_longitude, Code, Attendance_Time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO attendance (Attendance_Id, Attendance_Date, Attendance_Status, Attendance_Time) VALUES (?, ?, ?, ?)",
             [
                 Attendance_Id,
                 Attendance_Date,
                 Attendance_Status,
-                Geolocation_Status,
-                Geolocation_latitude,
-                Geolocation_longitude,
-                Code,
                 Attendance_Time
             ]
-        );
+        )
         await db.query(
             "INSERT INTO attendance_association (Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id, Class_id, Student_Id, Attendance_Id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [
@@ -140,10 +126,8 @@ router.post('/markAttendance', async (req, res) => {
                 Student_Id,       
                 Attendance_Id
             ]
-        );
-
-
-        res.status(201).json({ message: "Marked Attendance sucessfully" })
+        )
+        res.status(201).json({ message: "Marked Attendance sucessfully", Attendance_Id:Attendance_Id })
     } catch (err) {
         res.status(500).json(err)
         console.log("Error occurred", err);
