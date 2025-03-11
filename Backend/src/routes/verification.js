@@ -14,8 +14,11 @@ const calculateDistance = (studentLat, studentLon, teacherLat, teacherLon) => {
               Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
+
     let distance = R * c
-    return distance.toFixed(2)
+    console.log(`Calculated Distance: ${distance} meters`)
+
+    return parseFloat(distance.toFixed(2))
 }
 
 
@@ -31,18 +34,28 @@ router.get('/locationVerification', async(req,res)=>{
         const teacherLatitude=result[0].Teacher_Latitude
         const distance =calculateDistance(studentLatitude,studentLongitude,teacherLatitude,teacherLongitude)
         console.log("The distance between teacher and student is:",distance)
-        // if(distance<15)
-        await db.query(
-            "UPDATE attendance SET Geolocation_Status = 1, Geolocation_latitude = ?, Geolocation_longitude = ? WHERE Attendance_Id = ?",
-            [studentLatitude, studentLongitude, Attendance_id]
-        )
-        // await db.query("UPDATE attendance SET Geolocation_Status = 1 ,Geolocation_latitude = ?, `Geolocation_longitude = ? WHERE attendance.Attendance_Id = ?",[studentLatitude,studentLongitude,Attendance_id])
-        res.json({ 
-            success: true, 
-            message: "User is authorized", 
-            verified:true,
-            distance:distance
-        });
+        if(distance<50 ||distance===0 ){
+            await db.query(
+                "UPDATE attendance SET Geolocation_Status = 1, Geolocation_latitude = ?, Geolocation_longitude = ? WHERE Attendance_Id = ?",
+                [studentLatitude, studentLongitude, Attendance_id]
+            )
+            // await db.query("UPDATE attendance SET Geolocation_Status = 1 ,Geolocation_latitude = ?, `Geolocation_longitude = ? WHERE attendance.Attendance_Id = ?",[studentLatitude,studentLongitude,Attendance_id])
+            res.json({ 
+                success: true, 
+                message: "Location is authorized", 
+                verified:true,
+                distance:distance
+            });
+        }
+        else{
+            res.json({ 
+                success: false, 
+                message: "Loaction is not authorized", 
+                verified:false,
+                distance:distance
+            });
+        }
+        
 
     }catch(err){
         console.error("Location verification error:",err);

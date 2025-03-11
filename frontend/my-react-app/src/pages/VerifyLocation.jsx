@@ -72,7 +72,7 @@ const VerifyLocation = ({ userId }) => {
 
             }
             else {
-                alert("The code is not correct please try again")
+                alert("You are too far from the teacher")
 
             }
 
