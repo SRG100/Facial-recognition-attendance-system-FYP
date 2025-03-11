@@ -60,6 +60,7 @@ router.post('/getFace', async (req, res) => {
 
   }
   const faceData = rows[0].Face_data
+  
   const base64FaceData = faceData.toString('base64');
   res.status(200).json({ faceData: base64FaceData });
 

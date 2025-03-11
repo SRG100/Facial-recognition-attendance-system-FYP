@@ -11,7 +11,7 @@ const RegisterFace = ({userId}) => {
     const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
     const byteArray = new Uint8Array(byteNumbers);
     return new Blob([byteArray], { type: "image/jpeg" });
-  };
+  }
 
   const registerFace = async (e) => {
 
@@ -29,7 +29,7 @@ const RegisterFace = ({userId}) => {
         body:{
           userId:userId
         }
-      });
+      })
       console.log(response.status)
 
       console.log(response.data.message)

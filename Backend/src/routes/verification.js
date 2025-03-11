@@ -24,7 +24,7 @@ router.get('/locationVerification', async(req,res)=>{
         const db = await connectDatabase()
         console.log("Database connected successfully!");
         console.log("got to get the location verification api")
-        const { Class_Id, studentLongitude ,studentLatitude } = req.query
+        const { Class_Id, studentLongitude ,studentLatitude,Attendance_id } = req.query
         console.log("The student longitufe is:",studentLongitude)
         const [result] = await db.query("SELECT * FROM `class` WHERE Class_id=?",[Class_Id])
         const teacherLongitude=result[0].Teacher_Longitude
@@ -32,11 +32,16 @@ router.get('/locationVerification', async(req,res)=>{
         const distance =calculateDistance(studentLatitude,studentLongitude,teacherLatitude,teacherLongitude)
         console.log("The distance between teacher and student is:",distance)
         // if(distance<15)
-
+        await db.query(
+            "UPDATE attendance SET Geolocation_Status = 1, Geolocation_latitude = ?, Geolocation_longitude = ? WHERE Attendance_Id = ?",
+            [studentLatitude, studentLongitude, Attendance_id]
+        )
+        // await db.query("UPDATE attendance SET Geolocation_Status = 1 ,Geolocation_latitude = ?, `Geolocation_longitude = ? WHERE attendance.Attendance_Id = ?",[studentLatitude,studentLongitude,Attendance_id])
         res.json({ 
             success: true, 
             message: "User is authorized", 
             verified:true,
+            distance:distance
         });
 
     }catch(err){

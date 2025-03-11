@@ -9,16 +9,13 @@ import FaceCapture from '../components/FaceCapture.jsx'
 const CheckFace = ({ userId }) => {
   const [faceImgRegister, setFaceImgRegister] = useState('')
   const [image, setImage] = useState("")
+  const [registeredFace, setRegisteredFace] = useState(null)
+  // const [verified, setVerified] = useState(null);
   const navigate = useNavigate()
   const location = useLocation()
   const Class_Id = location.state?.Class_Id
   const Attendance_id = location.state?.Attendance_id
-  const base64ToFile = (base64String) => {
-    const byteCharacters = atob(base64String.split(",")[1])
-    const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i))
-    const byteArray = new Uint8Array(byteNumbers)
-    return new Blob([byteArray], { type: "image/jpeg" })
-  };
+
 
   useEffect(() => {
     const getFaceDetails = async () => {
@@ -28,9 +25,12 @@ const CheckFace = ({ userId }) => {
           { userId: userId },
         )
         const faceData = response.data
-        console.log("The face data is:", faceData)
+        // console.log("The face data is:", faceData)
         const base64Image = `data:image/jpeg;base64,${response.data.faceData}`
+        const base64Img = faceData.faceData
         setFaceImgRegister(base64Image)
+        setRegisteredFace(base64Img)
+
 
       } catch (error) {
         console.error('Error while getting the  face details:', error)
@@ -43,13 +43,32 @@ const CheckFace = ({ userId }) => {
 
   }, [userId])
 
-  const VerifyFace = () => {
+  const VerifyFace = async () => {
     try {
       console.log("Now verifying the face")
-      const faceVerification = true
-      if (faceVerification) {
+      const uploadedImage = image
+      const registeredImage = registeredFace
+
+      const formData = {
+        uploadedImage: uploadedImage,
+        registeredImage: registeredImage
+      }
+
+      const response = await axios.post("http://127.0.0.1:5000/verifyFace", formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      const verified = response.data.verified
+
+      console.log("The face verification is:", verified)
+      
+      const faceverification = true
+      if (verified) {
         alert("Your face has been verified")
         navigate("/verifylocation", { state: { Class_Id, Attendance_id } })
+      } else {
+        alert("Your face has not been verified")
       }
     } catch (error) {
       console.error('Error while getting the  face details:', error)
