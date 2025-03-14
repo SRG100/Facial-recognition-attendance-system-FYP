@@ -6,6 +6,7 @@ import classDetails from './routes/overallClasses.js'
 import cookieParser from "cookie-parser";
 import verifications from './routes/verification.js'
 import reviewForm from './routes/reviewForm.js'
+import crud from './routes/adminCRUD.js'
 
 
 
@@ -25,6 +26,8 @@ app.use('/face',faceRoutes)
 app.use('/classes',classDetails)
 app.use('/verification',verifications)
 app.use('/review',reviewForm)
+app.use('/crud',crud)
+
 
 
 app.listen(process.env.PORT,()=> {
