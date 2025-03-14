@@ -56,12 +56,12 @@ router.get('/scheduledClass', async (req, res) => {
         }
         console.log("Got the scheduled classes")
         res.status(200).json(classes);
-
     } catch (err) {
         console.error("Overall Class js error:", err);
         res.status(500).json({ success: false, message: "Failed to get classes" });
     }
 })
+
 router.post('/startAttendance', async (req, res) => {
     try {
         // const { Class_Id, teacherLocation } = req.body;
@@ -123,7 +123,7 @@ router.post('/markAttendance', async (req, res) => {
                 Teacher_Id,     
                 Section_Id,
                 Class_Id,            
-                Student_Id,       
+                Student_Id,
                 Attendance_Id
             ]
         )
@@ -132,6 +132,5 @@ router.post('/markAttendance', async (req, res) => {
         res.status(500).json(err)
         console.log("Error occurred", err);
     }
-
 })
 export default router

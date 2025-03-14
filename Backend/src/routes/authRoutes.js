@@ -51,7 +51,7 @@ router.post('/registerTeacher', async (req, res) => {
         const hashPassword = await bcrypt.hash(teacherPassword, 10)
         await db.query("INSERT INTO teacher (Teacher_id,Teacher_Name,Teacher_Address,Teacher_DOB,Teacher_Email,Teacher_Gender,Password) VALUES (?,?,?,?,?,?,?)",
             [teacherId, teacherName, teacherAddress, teacherDOB, teacherEmail, teacherGender, hashPassword])
-        res.status(201).json({ message: "Teacher Added successfully" })
+        res.status(201).json({ message: "Teacher Added successfully"})
     } catch (err) {
         res.status(500).json(err)
 

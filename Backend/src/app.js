@@ -5,6 +5,7 @@ import faceRoutes from './routes/face.js'
 import classDetails from './routes/overallClasses.js'
 import cookieParser from "cookie-parser";
 import verifications from './routes/verification.js'
+import reviewForm from './routes/reviewForm.js'
 
 
 
@@ -23,6 +24,7 @@ app.use('/auth',authRouter)
 app.use('/face',faceRoutes)
 app.use('/classes',classDetails)
 app.use('/verification',verifications)
+app.use('/review',reviewForm)
 
 
 app.listen(process.env.PORT,()=> {
