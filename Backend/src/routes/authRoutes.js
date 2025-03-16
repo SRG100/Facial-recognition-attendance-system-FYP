@@ -28,6 +28,7 @@ router.post('/registerStudent', async (req, res) => {
 
         await db.query("INSERT INTO student (Student_Id,Student_Name,Student_Address,Student_Email,Student_DOB,Password) VALUES (?,?,?,?,?,?)",
             [studentId, studentName, studentAddress, studentEmail, studentDOB, hashPassword])
+        console.log("Sucessfully regiosterd student")
         res.status(201).json({ message: "Student Added successfully" })
     } catch (err) {
         res.status(500).json(err)
@@ -133,12 +134,13 @@ router.post('/login', async (req, res) => {
                 return res.status(201).json({ success: false, message: "Face ID is not registered", redirect: "/registerface" });
             }
         }
+        console.log("Login")
         return res.status(201).json({ success: true, message: "Login successful", redirect: "/", token: token });
 
 
     } catch (err) {
-        res.status(500).json(err)
         console.log("The following error has occured", err);
+        res.status(500).json(err)
     }
 
 })

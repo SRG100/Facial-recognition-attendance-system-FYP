@@ -21,25 +21,28 @@ def base64_to_image(base64_string):
     return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
 
 def verify_face(registeredFace,providedFace):
-    try:
+    # try:
 
         #rgb image
         registeredRGB=cv2.cvtColor(registeredFace, cv2.COLOR_BGR2RGB)
         uploadedFaceRGB=cv2.cvtColor(providedFace, cv2.COLOR_BGR2RGB)
 
+        
+
         # encodings
         registeredFaceEncoding =face_recognition.face_encodings(registeredRGB)
         uploadedFaceEncoding = face_recognition.face_encodings(uploadedFaceRGB)
 
-        if not registeredFaceEncoding or not uploadedFaceEncoding:
+        if not registeredFaceEncoding :
             return False, "No face detected in one or both images"
 
 
         result = face_recognition.compare_faces([registeredFaceEncoding[0]],uploadedFaceEncoding[0])
+        print(result)
 
-        return result
-    except Exception as e:
-        return False, str(e)
+        return result[0], "Face match" if result[0] else "Face does not match"
+    # except Exception as e:
+    #     return False, str(e)
 
 
 @app.route("/verifyFace", methods=['POST'])

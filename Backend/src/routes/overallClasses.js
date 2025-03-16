@@ -99,6 +99,7 @@ router.post('/markAttendance', async (req, res) => {
             Student_Id } = req.body;
         console.log(Class_Id)
         const Attendance_Id = String(Section_Id) + "_" + String(Class_Id) + "_" + String(Student_Id);
+        console.log(Attendance_Id)
         const Attendance_Status = "Not Verified"
         const db = await connectDatabase()
         const Attendance_Date = new Date().toISOString().split('T')[0];

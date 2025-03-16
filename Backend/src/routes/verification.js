@@ -21,6 +21,29 @@ const calculateDistance = (studentLat, studentLon, teacherLat, teacherLon) => {
     return parseFloat(distance.toFixed(2))
 }
 
+router.post('/faceVerified',async(req,res)=>{
+    try{
+        const db = await connectDatabase()
+        console.log("Database connected successfully in face verified!");
+        const face = req.body.verified
+        const Attendance_id = req.body.Attendance_id
+        await db.query(
+            "UPDATE attendance SET Face_Verified = ? WHERE Attendance_Id = ?",
+                [face, Attendance_id]
+        )
+        res.json({ 
+            success: true, 
+            message: "Face is authorized", 
+            verified:true
+            
+        })    }
+    catch(err){
+        console.log("The error is :",err)
+        res.json({success: true, 
+            message: "Face is authorized", 
+            verified:true})
+    }
+})
 
 router.get('/locationVerification', async(req,res)=>{
     try{

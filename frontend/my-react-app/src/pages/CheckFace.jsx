@@ -60,11 +60,19 @@ const CheckFace = ({ userId }) => {
         },
       })
       const verified = response.data.verified
-
       console.log("The face verification is:", verified)
       
-      const faceverification = true
+      const formData1 = new FormData();
+      formData1.append("verified", verified)
+      formData1.append("Attendance_id", Attendance_id)
+
       if (verified) {
+        
+        await axios.post("http://localhost:3000/verification/faceVerified", formData1, {
+          headers: {
+            "Content-Type": "application/formdata",
+          },
+        })
         alert("Your face has been verified")
         navigate("/verifylocation", { state: { Class_Id, Attendance_id } })
       } else {
