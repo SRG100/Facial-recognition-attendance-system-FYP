@@ -45,12 +45,10 @@ const Login = () => {
 
     }
     return (
-        <div>Login 
+        <div>
             <div>
                 <form onSubmit={handleSubmit}> 
-                    {/* when the form is submitted */}
                     <div> 
-                        {/* //for the role selection */}
                         <label htmlFor='role'>Role:</label>
                         <select name="role" value={values.role} onChange={handleChanges}>
                             <option value="">Select Role</option>
@@ -63,6 +61,7 @@ const Login = () => {
                     <div>
                         <label htmlFor='email'>Email Address: </label>
                         <input type='text' placeholder="Email"
+
                             name="email" onChange={handleChanges} />
                     </div>
                     <div>
@@ -77,6 +76,8 @@ const Login = () => {
                 </form>
                 {errorMessage}
             </div>
+
+            
         </div>
     )
 }

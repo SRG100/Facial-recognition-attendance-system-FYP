@@ -11,6 +11,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Classes from './pages/Classes'
 import VerifyCode from './pages/verifyCode'
 import VerifyLocation from './pages/VerifyLocation';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import RegisterTeacher from './pages/RegisterTeacher';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -41,6 +44,7 @@ function App() {
       <>
         <Routes>
           <Route path="/register" element={isLoggedIn ?  <Navigate to="/" /> : <Register />  } />
+          <Route path="/registerTeacher" element={isLoggedIn ?  <Navigate to="/" /> : <RegisterTeacher />  } />
           <Route path="/login" element={isLoggedIn ?  <Navigate to="/" /> : <Login /> } />
 
           <Route element={<ProtectedRoute isLoggedIn={isLoggedIn} />}>

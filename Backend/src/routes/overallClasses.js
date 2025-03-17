@@ -21,13 +21,14 @@ router.get('/scheduledClass', async (req, res) => {
                 FROM student s
                 JOIN student_association sa ON s.Student_Id = sa.Student_Id
                 JOIN section sec ON sa.Section_Id = sec.Section_Id
-                JOIN section_association sec_a ON sec.Section_Id = sec_a.Section_Id
-                JOIN class_association ca ON sec_a.Section_Id = ca.Section_Id
+                JOIN section_association sec_a ON sec.Section_Id = sec_a.Section_Id 
+                JOIN class_association ca ON sec_a.Section_Id = ca.Section_Id AND sa.Course_id = ca.Course_id AND sa.Module_id = ca.Module_id
                 JOIN class c ON ca.Class_Id = c.Class_Id
                 JOIN module m ON ca.Module_Id = m.Module_Id
-                JOIN teacher_association ta ON ca.Teacher_Id = ta.Teacher_Id
+                JOIN teacher_association ta ON ca.Teacher_Id = ta.Teacher_Id AND sa.Course_id = ta.Course_id
                 JOIN teacher t ON ta.Teacher_Id = t.Teacher_Id
                 WHERE s.Student_Id = ?`, [userId])
+                
             classes = result
         }
         else if (userRole === 'teacher') {
@@ -44,7 +45,8 @@ router.get('/scheduledClass', async (req, res) => {
                                                 c.Class_Day
                                             FROM teacher t
                                             JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id
-                                            JOIN class_association ca ON ta.Module_id = ca.Module_Id
+                                            JOIN class_association ca ON ta.Module_id = ca.Module_Id 
+                                                                        AND ta.Course_id = ca.Course_id 
                                             JOIN class c ON ca.Class_Id = c.Class_Id 
                                             JOIN section sec ON ca.Section_Id = sec.Section_Id  
                                             JOIN module m ON ca.Module_Id = m.Module_Id 

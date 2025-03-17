@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import "../assets/Register.css"
 const Register = () => {
 
     const errorMessage = ''
@@ -30,34 +31,6 @@ const Register = () => {
             })
         }
     }
-    const [teacherValues, setTeacherValues] = useState({
-        teacherId: '',
-        teacherName: '',
-        teacherEmail: '',
-        teacherAddress: '',
-        teacherDOB: '',
-        teacherGender: '',
-        
-        teacherPassword: ''
-    })
-
-    const handleChangesTeacher = (e) => {
-        const { name, value } = e.target
-        if (name === 'teacherDOB') {
-            
-            setTeacherValues({
-                ...teacherValues,
-                [name]: value,
-                teacherPassword: value,
-            })
-        }
-        else {
-            setTeacherValues({
-                ...teacherValues,
-                [name]: value,
-            })
-        }
-    }
     //when the admin presses add student
     const handleSubmitStudent = async (e) => {
         e.preventDefault()
@@ -70,106 +43,52 @@ const Register = () => {
         }
 
     }
-    const handleSubmitTeacher = async (e) => {
-        e.preventDefault()
-        try {
-            const response = await axios.post('http://localhost:3000/auth/registerTeacher', teacherValues)
-            console.log(response.message)
-
-        } catch (err) {
-            console.log(err)
-        }
-
-    }
     return (
         <div>
-            <div>Register Student
-                <form onSubmit={handleSubmitStudent}>
-                    <div>
-                        <label htmlFor='studentId'>Student Id</label>
-                        <input type='text' placeholder="Student's Id"
-                            name="studentId" onChange={handleChanges} />
-                    </div>
 
-                    <div>
-                        <label htmlFor='studentName'>Student Name</label>
-                        <input type='text' placeholder="Student's name"
-                            name="studentName" onChange={handleChanges} />
-                    </div>
-                    <div>
-                        <label htmlFor='studentAddress'>Student Address</label>
-                        <input type='text' placeholder="Student's address"
-                            name="studentAddress" onChange={handleChanges} />
+            <div className="container-fluid px-1 py-5 mx-auto">
+                <div className="row d-flex justify-content-center">
+                    <div className="col-xl-7 col-lg-8 col-md-9 col-11 text-center">
+                        <div className="card">
+                            <h5 className="text-center mb-4">Register Students</h5>
+                            <form className="form-card" onSubmit={handleSubmitStudent}>
+                                <div className="row justify-content-between text-left">
+                                    <div className="form-group col-sm-6 flex-column d-flex">
+                                        <label className="form-control-label px-3">Student Id <span className="text-danger"> *</span></label>
+                                        <input type="text" placeholder="Enter the Student's Id name" name="studentId" onChange={handleChanges} />
+                                    </div>
+                                    <div className="form-group col-sm-6 flex-column d-flex">
+                                        <label className="form-control-label px-3">Student Name<span className="text-danger"> *</span></label>
+                                        <input type="text" name="studentName" placeholder="Enter the students name" onChange={handleChanges} />
+                                    </div>
+                                </div>
+                                <div className="row justify-content-between text-left">
+                                    <div className="form-group col-sm-6 flex-column d-flex">
+                                        <label className="form-control-label px-3">Student's Loaction<span className="text-danger"> *</span></label>
+                                        <input type="text" name="studentAddress" onChange={handleChanges} placeholder="Student's Location" />
+                                    </div>
+                                    <div className="form-group col-sm-6 flex-column d-flex">
+                                        <label className="form-control-label px-3">Student's Email<span className="text-danger"> *</span></label>
+                                        <input type="text" placeholder="Student's email" name="studentEmail" onChange={handleChanges} />
+                                    </div>
+                                </div>
+                                <div className="row justify-content-between text-left">
+                                    <div className="form-group col-sm-6 flex-column d-flex">
+                                        <label className="form-control-label px-3">Student's DOB<span className="text-danger"> *</span></label>
+                                        <input type='date' placeholder="Student's DOB" name="studentDOB" onChange={handleChanges} />
+                                    </div>
+                                    
+                                </div>
 
+                                <div className="row justify-content-end">
+                                    <div className="form-group col-sm-6"> <button type="submit" className="btn btn-outline-primary">Add Student</button> </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <div>
-                        <label htmlFor='studentEmail'>Student Email</label>
-                        <input type='email' placeholder="Student's email"
-                            name="studentEmail" onChange={handleChanges} />
-
-                    </div>
-                    <div>
-                        <label htmlFor='studentDOB'>Student DOB</label>
-                        <input type='date' placeholder="Student's DOB"
-                            name="studentDOB" onChange={handleChanges} />
-
-                    </div>
-                
-                    <div>
-                        <label htmlFor='studentGender'>Teacher Gender</label>
-                        <input type="radio" name="studentGender" value="Male" onChange={handleChanges} /> Male
-                        <input type="radio" name="studentGender" value="Female" onChange={handleChanges} /> Female
-
-                    </div>
-
-                    <button> Add student</button>
-                </form>
-                {errorMessage}
+                </div>
             </div>
-            <div>Register Teacher
-                <form onSubmit={handleSubmitTeacher}>
 
-                    <div>
-                        <label htmlFor='teacherId'>Teacher Id</label>
-                        <input type='text' placeholder="Teacher's Id"
-                            name="teacherId" value={teacherValues.teacherId} onChange={handleChangesTeacher} />
-                    </div>
-
-                    <div>
-                        <label htmlFor='teacherName'>Teacher Name</label>
-                        <input type='text' placeholder="Teacher's name"
-                            name="teacherName" value={teacherValues.teacherName} onChange={handleChangesTeacher} />
-                    </div>
-                    <div>
-                        <label htmlFor='teacherAddress'>Teacher Address </label>
-                        <input type='text' placeholder="teacher's address"
-                            name="teacherAddress" value={teacherValues.teacherAddress} onChange={handleChangesTeacher} />
-
-                    </div>
-                    <div>
-                        <label htmlFor='teacherEmail'>Teacher Email</label>
-                        <input type='email' placeholder="Teacher's email"
-                            name="teacherEmail" value={teacherValues.teacherEmail} onChange={handleChangesTeacher} />
-
-                    </div>
-                    <div>
-                        <label htmlFor='teacherDOB'>Teacher DOB</label>
-                        <input type='date' placeholder="Teacher's DOB"
-                            name="teacherDOB" value={teacherValues.teacherDOB} onChange={handleChangesTeacher} />
-
-                    </div>
-                    <div>
-                        <label htmlFor='teacherGender'>Teacher Gender</label>
-                        <input type="radio" name="teacherGender" value="Male" onChange={handleChangesTeacher} /> Male
-                        <input type="radio" name="teacherGender" value="Female" onChange={handleChangesTeacher} /> Female
-
-
-                    </div>
-
-                    <button> Add Teacher</button>
-                </form>
-                {errorMessage}
-            </div>
         </div>
     )
 }
