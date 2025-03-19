@@ -38,28 +38,7 @@ router.post('/registerStudent', async (req, res) => {
 
 })
 
-router.post('/registerTeacher', async (req, res) => {
 
-    const { teacherId, teacherName, teacherEmail, teacherAddress, teacherDOB, teacherGender, teacherPassword } = req.body;
-
-    try {
-        const db = await connectDatabase()
-        console.log("Database connected successfully!");
-        const [rows] = await db.query('SELECT * FROM teacher WHERE Teacher_Email=?', [teacherEmail])
-        if (rows.length > 0) {
-            return res.status(409).json({ message: "Teacher with this email already exists" })
-        }
-        const hashPassword = await bcrypt.hash(teacherPassword, 10)
-        await db.query("INSERT INTO teacher (Teacher_id,Teacher_Name,Teacher_Address,Teacher_DOB,Teacher_Email,Teacher_Gender,Password) VALUES (?,?,?,?,?,?,?)",
-            [teacherId, teacherName, teacherAddress, teacherDOB, teacherEmail, teacherGender, hashPassword])
-        res.status(201).json({ message: "Teacher Added successfully"})
-    } catch (err) {
-        res.status(500).json(err)
-
-        console.log("Database connected FAILED!", err);
-    }
-
-})
 
 //to register students 
 router.post('/login', async (req, res) => {

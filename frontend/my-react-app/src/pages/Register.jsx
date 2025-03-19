@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import "../assets/Register.css"
 import SidebarComponent from '../components/SideBar'
-const Register = () => {
+const Register = ({userRole}) => {
 
     const errorMessage = ''
     const [values, setValues] = useState({
@@ -46,7 +46,7 @@ const Register = () => {
     }
     return (
         <div>
-            <SidebarComponent/>
+            <SidebarComponent userRole={userRole}/>
             <div className="container-fluid px-1 py-5 mx-auto">
                 <div className="row d-flex justify-content-center">
                     <div className="col-xl-7 col-lg-8 col-md-9 col-11 text-center">

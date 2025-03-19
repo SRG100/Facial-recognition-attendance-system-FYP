@@ -14,6 +14,11 @@ import VerifyLocation from './pages/VerifyLocation';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import RegisterTeacher from './pages/RegisterTeacher';
+import Sections from './pages/Sections';
+import Teachers from './pages/Teachers';
+import Students from './pages/Students';
+import Modules from './pages/Modules';
+import Attendance from './pages/Attendance';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -43,18 +48,25 @@ function App() {
     <BrowserRouter>
       <>
         <Routes>
-          <Route path="/register" element={isLoggedIn ?  <Navigate to="/" /> : <Register />  } />
-          <Route path="/registerTeacher" element={isLoggedIn ?  <Navigate to="/" /> : <RegisterTeacher />  } />
           <Route path="/login" element={isLoggedIn ?  <Navigate to="/" /> : <Login /> } />
 
           <Route element={<ProtectedRoute isLoggedIn={isLoggedIn} />}>
+            <Route path="/register" element={ <Register userRole={userRole}/>  } />
+            <Route path="/registerTeacher" element={<RegisterTeacher userRole={userRole} />  } />
+          
             <Route path="/" element={<Dashboard isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} />} />
-            <Route path="/checkface" element={<CheckFace userId={userId} />} />
+            <Route path="/checkface" element={<CheckFace userId={userId} userRole={userRole}/>} />
             <Route path="/classes" element={<Classes isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} />} />
-            <Route path="/registerface" element={<RegisterFace userId={userId} />} />
-            <Route path="/verifycode" element={<VerifyCode userId={userId} />} />
-            <Route path="/verifylocation" element={<VerifyLocation userId={userId} />} />
-            <Route path="/register" element={<Navigate to="/" />} />
+            <Route path="/registerface" element={<RegisterFace userId={userId} userRole={userRole} />} />
+            <Route path="/verifycode" element={<VerifyCode userId={userId} userRole={userRole} />} />
+            <Route path="/verifylocation" element={<VerifyLocation userId={userId} userRole={userRole} />} />
+
+            <Route path="/viewAttendance" element={<Attendance userId={userId} userRole={userRole}/>} />
+            <Route path="/viewModules" element={<Modules isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} />} />
+            <Route path="/viewStudents" element={<Students userId={userId} userRole={userRole} />} />
+            <Route path="/viewTeachers" element={<Teachers userId={userId} userRole={userRole} />} />
+            <Route path="/viewSections" element={<Sections userId={userId} userRole={userRole} />} />
+
             <Route path="/login" element={<Navigate to="/" />} />
           </Route>
         </Routes>

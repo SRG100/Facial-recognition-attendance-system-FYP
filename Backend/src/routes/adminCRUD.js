@@ -8,7 +8,7 @@ router.post('/addModule', async (req, res) => {
     try {
         const { Module_id, Module_Name, Module_details, Module_Credits, Academic_Year_id, Course_id } = req.body
         const db = await connectDatabase()
-        console.log( Module_id, Module_Name, Module_details, Module_Credits, Academic_Year_id, Course_id)
+        console.log(Module_id, Module_Name, Module_details, Module_Credits, Academic_Year_id, Course_id)
         console.log("Database connected successfully in add module';!");
         await db.execute(
             "INSERT INTO `module` (`Module_id`, `Module_Name`, `Module_details`, `Module_Credits`) VALUES (?, ?, ?, ?)",
@@ -33,7 +33,7 @@ router.post('/addModuleAssociation', async (req, res) => {
     try {
         const { Module_id, Academic_Year_id, Course_id } = req.body
         const db = await connectDatabase()
-        console.log( Module_id, Academic_Year_id, Course_id)
+        console.log(Module_id, Academic_Year_id, Course_id)
         console.log("Database connected successfully in add module associations!");
         await db.execute("INSERT INTO `module_course_academic` (`Module_id`, `Academic_Year_id`, `Course_id`) VALUES (?, ?, ?)", [Module_id, Academic_Year_id, Course_id])
         console.log("Sucessfully added the module association.")
@@ -72,10 +72,10 @@ router.post('/addSection', async (req, res) => {
 })
 router.post('/addSectionAssociations', async (req, res) => {
     try {
-        const { Module_id,Academic_Year_id,Course_id,Teacher_id,Section_id } = req.body
+        const { Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id } = req.body
         const db = await connectDatabase()
         console.log("Database connected successfully in add sections !");
-        await db.execute("INSERT INTO `section_association` (`Module_id`, `Academic_Year_id`, `Course_id`, `Teacher_id`, `Section_id`) VALUES (?, ?, ?, ?, ?)", [Module_id,Academic_Year_id,Course_id,Teacher_id,Section_id ])
+        await db.execute("INSERT INTO `section_association` (`Module_id`, `Academic_Year_id`, `Course_id`, `Teacher_id`, `Section_id`) VALUES (?, ?, ?, ?, ?)", [Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id])
         console.log("Sucessfully added the sections.")
         res.json({
             success: true,
@@ -93,17 +93,17 @@ router.post('/addSectionAssociations', async (req, res) => {
 
 router.post('/addClass', async (req, res) => {
     try {
-        const { Section_id , Class_id,Class_Start_Time,Class_End_Time,Class_Day,Class_Date,Class_Type,Teacher_id} = req.body
+        const { Section_id, Class_id, Class_Start_Time, Class_End_Time, Class_Day, Class_Date, Class_Type, Teacher_id } = req.body
         const db = await connectDatabase()
         console.log("Database connected successfully in add course !");
-        const [section_association]= await db.execute("Select * from section_association where section_id=? AND teacher_id=?",[Section_id,Teacher_id])
+        const [section_association] = await db.execute("Select * from section_association where section_id=? AND teacher_id=?", [Section_id, Teacher_id])
         console.log(section_association[0].Module_id)
-        const Module_id=section_association[0].Module_id
+        const Module_id = section_association[0].Module_id
         const Academic_Year_id = section_association[0].Academic_Year_id
         const Course_id = section_association[0].Course_id
 
-        const [newClass]=await db.execute("INSERT INTO `class` (`Class_id`, `Class_Start_Time`, `Class_End_Time`, `Class_Day`, `Class_Date`, `Class_Type`) VALUES (?, ?, ?, ?,?, ?)",[Class_id,Class_Start_Time,Class_End_Time,Class_Day,Class_Date,Class_Type])
-       await db.execute("INSERT INTO `class_association` (`Module_id`, `Academic_Year_id`, `Course_id`, `Teacher_id`, `Section_id`, `Class_id`) VALUES (?, ?, ?, ?,?, ?)",[Module_id,Academic_Year_id,Course_id,Teacher_id,Section_id,Class_id])
+        const [newClass] = await db.execute("INSERT INTO `class` (`Class_id`, `Class_Start_Time`, `Class_End_Time`, `Class_Day`, `Class_Date`, `Class_Type`) VALUES (?, ?, ?, ?,?, ?)", [Class_id, Class_Start_Time, Class_End_Time, Class_Day, Class_Date, Class_Type])
+        await db.execute("INSERT INTO `class_association` (`Module_id`, `Academic_Year_id`, `Course_id`, `Teacher_id`, `Section_id`, `Class_id`) VALUES (?, ?, ?, ?,?, ?)", [Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id, Class_id])
         // await db.execute("INSERT INTO `section` (`Section_id`) VALUES (?)", [Section_id])
         console.log("Sucessfully added the classes and its associations")
         res.json({
@@ -119,5 +119,7 @@ router.post('/addClass', async (req, res) => {
         })
     }
 })
+
+
 
 export default router

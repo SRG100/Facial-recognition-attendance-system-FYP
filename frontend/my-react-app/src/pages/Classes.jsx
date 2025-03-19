@@ -41,15 +41,6 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
         return currentTime >= startTime && currentTime <= endTime;
     }
 
-    const verifyClassCode = async () =>{
-        try{
-            const codeVerification = await axios.get(`http://localhost:3000/location/locationVerification?Class_Id=${Class_Id}&studentClassCode=${studentClassCode}`)
-            console.log("The code entered by student is:",code.classCode)
-        
-        }catch(err){
-            console.log("Error while verifying class:", err)
-        }
-    }
 
     const getUserLocation = async () => {
         setLoading(true)
@@ -107,7 +98,12 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
         }
 
     }
-
+    const viewAttendance=async(classDetail)=>{
+        const viewAttendnace = {
+            Section_Id: classDetail.Section_Id,
+            Class_Id: classDetail.Class_Id
+        }
+    }
     const joinClass = async (classDetail) => {
         try {   
            
@@ -158,38 +154,27 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
     }
     return (
         <div>
-            <SidebarComponent/>
+            <SidebarComponent userRole={userRole}/>
 
             Classes
             The classes of the {userRole} are as follows:
-            {classCode && (
-                <div>
-                {/* <form >  */}
-                <div>
-                        <label htmlFor='email'>Enter Class Code </label>
-                        <input type='text' placeholder="Class Code"  onChange={handleChanges}
-                            name="classCode" />
-                    </div>
-                    <button > Submit</button>
-                {/* </form> */}
-                </div>
-            )}
+            
 
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <div className="container p-0 m-0">
+                <table className="table table-dark table-hover text-center table-responsive">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                         <tr>
-                            <th scope="col" className="px-6 py-3">Class Id </th>
-                            <th scope="col" className="px-6 py-3">Module Name </th>
-                            <th scope="col" className="px-6 py-3">Class Start Time </th>
-                            <th scope="col" className="px-6 py-3">Class End Time </th>
-                            <th scope="col" className="px-6 py-3">Class Type </th>
-                            <th scope="col" className="px-6 py-3">Class Day </th>
+                            <th scope="col" >Class Id </th>
+                            <th scope="col" >Module Name </th>
+                            <th scope="col" >Class Start Time </th>
+                            <th scope="col" >Class End Time </th>
+                            <th scope="col" >Class Type </th>
+                            <th scope="col" >Class Day </th>
                             {userRole === "student" ? (
                                 <th scope="col">Teacher Name</th>
                             ) : (<th scope="col">Section Name</th>)}
-                            <th scope="col" className="px-6 py-3">
+                            <th scope="col" >
                                 <span className="sr-only"> Class </span>
                             </th>
                         </tr>
@@ -199,29 +184,31 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                         {
                             scheduledClasses.map((classDetail, i) => {
                                 return (
-                                    <tr key={i}>
-                                        <td className="px-6 py-2">{classDetail.Class_Id}</td>
-                                        <td className="px-6 py-4">{classDetail.Module_Name}</td>
-                                        <td className="px-6 py-4">{classDetail.Class_Start_Time}</td>
-                                        <td className="px-6 py-4">{classDetail.Class_End_Time}</td>
-                                        <td className="px-6 py-4">{classDetail.Class_Type}</td>
-                                        <td className="px-6 py-4">{classDetail.Class_Day}</td>
+                                    <tr scope="row" key={i}>
+                                        <td className="align-middle" >{classDetail.Class_Id}</td>
+                                        <td  className="align-middle">{classDetail.Module_Name}</td>
+                                        <td className="align-middle">{classDetail.Class_Start_Time}</td>
+                                        <td className="align-middle">{classDetail.Class_End_Time}</td>
+                                        <td className="align-middle">{classDetail.Class_Type}</td>
+                                        <td className="align-middle">{classDetail.Class_Day}</td>
+                                        
                                         {userRole === "student" ? (
-                                            <td scope="col">{classDetail.Teacher_Name}</td>
-                                        ) : (<th scope="col">{classDetail.Section_Id}</th>)}
+                                            <td className="align-middle" >{classDetail.Teacher_Name}</td>
+                                        ) : (<td  className="align-middle">{classDetail.Section_Id}</td>)}
+
                                         {userRole === "student" ? (
-                                            <td className="px-6 py-4 text-right">
+                                            <td >
                                                 {classDetail.Class_Status === 1 ? (
-                                                    <button className="font-medium text-blue-600 dark:text-blue-500" onClick={() => joinClass(classDetail)}>Join Class</button>
+                                                    <button className="btn btn-outline-success" onClick={() => joinClass(classDetail)}>Join Class</button>
                                                 ) : (
                                                     <span className="text-gray-400">Class not started</span>
                                                 )}
 
-                                            </td>) : (<td className="px-6 py-4 text-right">
+                                            </td>) :userRole === "teacher" ?  (<td >
                                                 {classDetail.Class_Status === 1 ? (
-                                                    <button className="font-medium text-blue-600 dark:text-blue-500">Class Ongoing</button>
+                                                    <button className="btn btn-outline-success">Class Ongoing</button>
                                                 ) : (
-                                                    <button className="font-medium text-blue-600 dark:text-blue-500" onClick={() => startClass(classDetail)}>Start Class</button>
+                                                    <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
                                                 )}
 
                                                 {/* 
@@ -230,6 +217,13 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                                 ) : (
                                                     <span className="text-gray-400">Class not started</span>
                                                 )} */}
+                                            </td>):(<td>
+                                                {classDetail.Class_Status === 1 ? (
+                                                    <button className="btn btn-outline-success"  onClick={() => viewAttendance(classDetail)}>View Attendance</button>
+
+                                                ) : (
+                                                    <button className="btn btn-outline-success" >No Class Yet</button>
+                                                )}
                                             </td>)}
 
                                     </tr>

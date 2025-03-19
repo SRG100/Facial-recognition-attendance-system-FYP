@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import SidebarComponent from '../components/SideBar'
 
-const VerifyCode = ({ userId }) => {
+const VerifyCode = ({ userId,userRole }) => {
     // const [loading, setLoading] = useState(true)
     // const [code,setCode]=useState(null)
     const navigate = useNavigate()
@@ -51,7 +51,7 @@ const VerifyCode = ({ userId }) => {
 
     return (
         <div>
-            <SidebarComponent/>
+            <SidebarComponent userRole={userRole}/>
             Code Verification <br />
             Now, code verification step
 

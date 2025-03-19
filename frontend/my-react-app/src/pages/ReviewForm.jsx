@@ -1,10 +1,10 @@
 import React from 'react'
 import SidebarComponent from '../components/SideBar'
 
-function ReviewForm() {
+function ReviewForm({userRole}) {
   return (
     <div>
-      <SidebarComponent/>
+      <SidebarComponent userRole={userRole}/>
       ReviewForm</div>
   )
 }

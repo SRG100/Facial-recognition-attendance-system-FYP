@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Nav from '../components/Nav'
 import SidebarComponent from '../components/SideBar'
-const RegisterTeacher = () => {
+const RegisterTeacher = ({userRole}) => {
 
-    const errorMessage = ''
+    
     const [teacherValues, setTeacherValues] = useState({
         teacherId: '',
         teacherName: '',
@@ -38,7 +38,7 @@ const RegisterTeacher = () => {
     const handleSubmitTeacher = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.post('http://localhost:3000/auth/registerTeacher', teacherValues)
+            const response = await axios.post('http://localhost:3000/teachers/registerTeacher', teacherValues)
             console.log(response.message)
 
         } catch (err) {
@@ -48,7 +48,7 @@ const RegisterTeacher = () => {
     }
     return (
         <div>
-            <SidebarComponent/>
+            <SidebarComponent userRole={userRole}/>
 
             <div className="container-fluid px-1 py-5 mx-auto">
                 <div className="row d-flex justify-content-center">

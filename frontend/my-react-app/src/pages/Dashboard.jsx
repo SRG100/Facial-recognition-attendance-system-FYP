@@ -8,7 +8,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId }) => {
   return (
     <div>Home
       {/* <Nav /> */}
-      <SidebarComponent/>
+      <SidebarComponent userRole={userRole}/>
       {userRole === "admin" ?
         <p>Admin Condition</p>
         : userRole === "student" ? <p>Student Condition</p>

@@ -53,8 +53,29 @@ router.get('/scheduledClass', async (req, res) => {
                                             WHERE t.Teacher_Id = ?`, [userId])
 
             classes = result
-        } else {
-            res.status(500).json({ success: false, message: "Wrong user" });
+        } else if(userRole === 'admin') {
+            const [result]=await db.query(`SELECT 
+                                                t.Teacher_Id, 
+                                                t.Teacher_Name, 
+                                                sec.Section_Id, 
+                                                c.Class_Id, 
+                                                m.Module_Name,  
+                                                c.Class_Start_Time, 
+                                                c.Class_End_Time, 
+                                                c.Class_Type, 
+                                                c.Class_Status, 
+                                                c.Class_Day
+                                            FROM teacher t
+                                            JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id
+                                            JOIN class_association ca ON ta.Module_id = ca.Module_Id 
+                                                                        AND ta.Course_id = ca.Course_id 
+                                            JOIN class c ON ca.Class_Id = c.Class_Id 
+                                            JOIN section sec ON ca.Section_Id = sec.Section_Id  
+                                            JOIN module m ON ca.Module_Id = m.Module_Id `)
+                                            classes = result
+        }
+        else{
+            res.status(500).json({ success: false, message: "Wrong" });
         }
         console.log("Got the scheduled classes")
         res.status(200).json(classes);

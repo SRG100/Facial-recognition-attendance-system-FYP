@@ -43,7 +43,7 @@ const RegisterFace = ({userId}) => {
   }
   return (
     <div>RegisterFace
-      <SidebarComponent/>
+      <SidebarComponent userRole={userRole}/>
       <div>the user id is : {userId}</div>
       <FaceCapture image={image} setImage={setImage} />
       

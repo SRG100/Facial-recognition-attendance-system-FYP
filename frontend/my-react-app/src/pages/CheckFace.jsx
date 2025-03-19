@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import FaceCapture from '../components/FaceCapture.jsx'
+import SidebarComponent from '../components/SideBar.jsx'
 
 
-
-const CheckFace = ({ userId }) => {
+const CheckFace = ({ userId ,userRole }) => {
   const [faceImgRegister, setFaceImgRegister] = useState('')
   const [image, setImage] = useState("")
   const [registeredFace, setRegisteredFace] = useState(null)
@@ -86,9 +86,11 @@ const CheckFace = ({ userId }) => {
 
 
   return (
-    <div>CheckFace
+    <div>
+      <SidebarComponent userRole={userRole}/>
+      CheckFace
       the registered face is :
-      <img src={faceImgRegister} alt="User Face" />
+      {/* <img src={faceImgRegister} alt="User Face" /> */}
       <FaceCapture image={image} setImage={setImage} />
 
       {image !== '' && (
