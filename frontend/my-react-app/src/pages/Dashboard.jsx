@@ -1,12 +1,14 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Nav from '../components/Nav'
+import SidebarComponent from '../components/SideBar'
 
 const Dashboard = ({ isLoggedIn, userRole, userId }) => {
 
   return (
     <div>Home
-      <Nav />
+      {/* <Nav /> */}
+      <SidebarComponent/>
       {userRole === "admin" ?
         <p>Admin Condition</p>
         : userRole === "student" ? <p>Student Condition</p>

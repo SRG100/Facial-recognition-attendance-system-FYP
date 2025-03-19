@@ -26,6 +26,7 @@ router.post('/faceVerified',async(req,res)=>{
         const db = await connectDatabase()
         console.log("Database connected successfully in face verified!");
         const face = req.body.verified
+        console.log(face)
         const Attendance_id = req.body.Attendance_id
         await db.query(
             "UPDATE attendance SET Face_Verified = ? WHERE Attendance_Id = ?",
@@ -62,7 +63,17 @@ router.get('/locationVerification', async(req,res)=>{
                 "UPDATE attendance SET Geolocation_Status = 1, Geolocation_latitude = ?, Geolocation_longitude = ? WHERE Attendance_Id = ?",
                 [studentLatitude, studentLongitude, Attendance_id]
             )
-            // await db.query("UPDATE attendance SET Geolocation_Status = 1 ,Geolocation_latitude = ?, `Geolocation_longitude = ? WHERE attendance.Attendance_Id = ?",[studentLatitude,studentLongitude,Attendance_id])
+            const [finalVerification]=await db.query("Select Geolocation_Status, Face_Verified,Code from attendance where attendance_id =?",[Attendance_id])
+            const Face_Verified=finalVerification[0].Face_Verified
+            const Code_Verified = finalVerification[0].Code
+            const Geolocation_Verified =finalVerification[0].Geolocation_Status
+
+            if(Face_Verified==Code_Verified==Geolocation_Verified==1){
+                await db.query(
+                    "UPDATE attendance SET Attendance_Status = 'Verified WHERE Attendance_Id = ?",
+                    [ Attendance_id]
+                )
+            }
             res.json({ 
                 success: true, 
                 message: "Location is authorized", 

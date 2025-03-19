@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import FaceCapture from '../components/FaceCapture.jsx'
 import axios from 'axios'
 import Nav from '../components/Nav.jsx'
+import SidebarComponent from '../components/SideBar.jsx'
 
 const RegisterFace = ({userId}) => {
   const [image, setImage] = useState("");
@@ -42,7 +43,7 @@ const RegisterFace = ({userId}) => {
   }
   return (
     <div>RegisterFace
-      <Nav />
+      <SidebarComponent/>
       <div>the user id is : {userId}</div>
       <FaceCapture image={image} setImage={setImage} />
       

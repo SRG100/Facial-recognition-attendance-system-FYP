@@ -24,6 +24,8 @@ export const FaceCapture = ({image,setImage}) => {
 
 
     return (
+        <div className="d-flex flex-column justify-content-center align-items-center vh-100">
+
         <div className="webcam-container">
             <div className="webcam-img">
 
@@ -48,9 +50,10 @@ export const FaceCapture = ({image,setImage}) => {
                         e.preventDefault();
                         capture();
                     }}
-                        className="webcam-btn">Capture</button>
+                        className="webcam-btn"> <i class='bx bxs-camera' style={{ fontSize: "30px" }}></i> Capture</button>
                 }
             </div>
+        </div>
         </div>
     );
 };

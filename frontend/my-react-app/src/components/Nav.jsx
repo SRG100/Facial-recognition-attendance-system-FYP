@@ -32,7 +32,7 @@ const Nav = () => {
   }, []);
 
   const handleLogout = async () => {
-    try{
+    try {
       const response = await axios.get('http://localhost:3000/auth/logout', { withCredentials: true })
       const logoutSuccess = response.data.success
       console.log(logoutSuccess)
@@ -44,24 +44,16 @@ const Nav = () => {
       window.location.reload();
 
     }
-    catch(err){
+    catch (err) {
       console.log("error while logging out", err)
     }
-    
+
 
   };
 
   return (
 
     <div>
-      <div>
-        <Link to="/"> Dashboard</Link>
-        <Link to="/login"> Login</Link> <br></br>
-        <Link to="/register"> Register</Link>
-      </div>
-      <div>
-
-
         <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
           <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
             <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -115,10 +107,8 @@ const Nav = () => {
             </div>
           </div>
         </nav>
-
-      </div>
-      
-    </div>
+        
+    </div >
 
 
 

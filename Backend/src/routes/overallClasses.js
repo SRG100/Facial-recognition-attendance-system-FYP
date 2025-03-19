@@ -11,7 +11,7 @@ router.get('/scheduledClass', async (req, res) => {
         const db = await connectDatabase()
         let classes = [];
         if (userRole === 'student') {
-            const [result] = await db.query(`SELECT s.Student_Id, s.Student_Name, sec.Section_Id, c.Class_Id, m.Module_Id, m.Module_Name,  
+            const [result] = await db.query(`SELECT DISTINCT s.Student_Id, s.Student_Name, sec.Section_Id, c.Class_Id, m.Module_Id, m.Module_Name,  
                 c.Class_Start_Time, c.Class_End_Time, c.Class_Type, 
                 sa.Academic_Year_id,sa.Course_id,
                     c.Class_Day, 

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Nav from '../components/Nav'
+import SidebarComponent from '../components/SideBar'
 const RegisterTeacher = () => {
 
     const errorMessage = ''
@@ -47,7 +48,7 @@ const RegisterTeacher = () => {
     }
     return (
         <div>
-            <Nav/>
+            <SidebarComponent/>
 
             <div className="container-fluid px-1 py-5 mx-auto">
                 <div className="row d-flex justify-content-center">

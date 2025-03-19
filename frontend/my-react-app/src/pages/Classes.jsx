@@ -2,7 +2,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
-import Nav from '../components/Nav'
+import SidebarComponent from '../components/SideBar'
 
 
 const Classes = ({ isLoggedIn, userRole, userId }) => {
@@ -158,7 +158,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
     }
     return (
         <div>
-                    <Nav />
+            <SidebarComponent/>
 
             Classes
             The classes of the {userRole} are as follows:

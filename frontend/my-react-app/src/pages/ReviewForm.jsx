@@ -1,8 +1,11 @@
 import React from 'react'
+import SidebarComponent from '../components/SideBar'
 
 function ReviewForm() {
   return (
-    <div>ReviewForm</div>
+    <div>
+      <SidebarComponent/>
+      ReviewForm</div>
   )
 }
 
