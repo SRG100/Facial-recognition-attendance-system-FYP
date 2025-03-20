@@ -2,17 +2,17 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import SidebarComponent from '../components/SideBar'
 import axios from 'axios'
-import { useNavigate  } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const Teachers = ({ userRole, userId }) => {
     const navigate = useNavigate();
     const [teachers, setTeachers] = useState([])
     useEffect(() => {
-            if (userId) {
-                getTeacherDetails();
-            }
-        }, [userId, userRole]);
-    
+        if (userId) {
+            getTeacherDetails();
+        }
+    }, [userId, userRole]);
+
 
     const getTeacherDetails = async () => {
         try {
@@ -21,7 +21,7 @@ const Teachers = ({ userRole, userId }) => {
 
         } catch (error) {
             console.error('Error while getting the teachers', error);
-        } 
+        }
     }
     return (
         <div>Teachers
@@ -33,28 +33,57 @@ const Teachers = ({ userRole, userId }) => {
                         <tr>
                             <th scope="col" >Teacher id</th>
                             <th scope="col" >Teacher name </th>
-                            <th scope="col" >Module id </th>
-                            <th scope="col" >Courses</th>
-                            <th scope="col" >Sections </th>
+                            {userRole == "admin" ? (
+                                <>
+                                    <th scope="col" >Module id </th>
+                                    <th scope="col" >Courses</th>
+                                    <th scope="col" >Sections </th>
+                                </>
+                            ) : (
+                                <>
+                                    <th scope="col" >Teacher Email</th>
+                                    <th scope="col" >Teacher Gender</th>
+                                    <th scope="col" >Section </th>
+                                    <th scope="col" >Review </th>
+                                </>
+                            )}
+
                         </tr>
-                    </thead> 
+                    </thead>
+
                     <tbody>
                         {
                             teachers.map((teachers, i) => {
                                 return (
                                     <tr scope="row" key={i}>
+
                                         <td className="align-middle" >{teachers.Teacher_id}</td>
                                         <td className="align-middle">{teachers.Teacher_Name}</td>
-                                        <td className="align-middle">{teachers.Module_id}</td>
-                                        <td className="align-middle">{teachers.Courses}</td>
-                                        <td className="align-middle">{teachers.Sections}</td>
+                                        {userRole == "admin" ? (
+                                            <>
+                                                <td className="align-middle">{teachers.Module_id}</td>
+                                                <td className="align-middle">{teachers.Courses}</td>
+                                                <td className="align-middle">{teachers.Sections}</td>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <td className="align-middle">{teachers.Teacher_Email}</td>
+                                                <td className="align-middle">{teachers.Teacher_Gender}</td>
+                                                <td className="align-middle">{teachers.Section_id}</td>
+                                                <td className="align-middle">
+                                                    <button  className="btn btn-outline-warning">Review Teacher</button>
+                                                </td>
+                                            </>
+                                        )}
+
+
                                     </tr>
                                 )
-                            })}     
+                            })}
                     </tbody>
                 </table>
             </div>
-            {userRole=="admin" &&(
+            {userRole == "admin" && (
                 // console.log("User Role:", userRole)
                 <button className="btn btn-success" onClick={() => navigate("/RegisterTeacher")}>Add Teacher</button>
             )}

@@ -8,7 +8,7 @@ import verifications from './routes/verification.js'
 import reviewForm from './routes/reviewForm.js'
 import crud from './routes/adminCRUD.js'
 import teacher from './controllers/TeachersController.js'
-
+import module from './controllers/ModuleController.js'
 
 
 const app = express()
@@ -29,7 +29,7 @@ app.use('/verification',verifications)
 app.use('/review',reviewForm)
 app.use('/crud',crud)
 app.use('/teachers',teacher)
-
+app.use('/modules',module)
 
 
 app.listen(process.env.PORT,()=> {

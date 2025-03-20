@@ -4,7 +4,7 @@ import axios from 'axios'
 import Nav from '../components/Nav.jsx'
 import SidebarComponent from '../components/SideBar.jsx'
 
-const RegisterFace = ({userId}) => {
+const RegisterFace = ({userId,userRole}) => {
   const [image, setImage] = useState("");
 
   const base64ToFile = (base64String) => {
