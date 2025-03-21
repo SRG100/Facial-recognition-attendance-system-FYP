@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 function ReviewForm({ userId, userRole }) {
   const location = useLocation()
   const ReviewOf = location.state?.ReviewOf
-  const Id =location.state?.ReviewOf
+  const Id =location.state?.Id
   const [values, setValues] = useState({
     suggestions: '',
     rating: ''
@@ -31,7 +31,7 @@ function ReviewForm({ userId, userRole }) {
   const handleSubmitTeacherReview = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post('http://localhost:3000/reviews/studentReview', reviewData)
+      const response = await axios.post('http://localhost:3000/reviews/teacherReview', reviewData)
       console.log(response.message)
 
     } catch (err) {
