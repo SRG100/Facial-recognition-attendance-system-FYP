@@ -1,10 +1,10 @@
-import { useState ,useEffect} from 'react'
-import React  from 'react'
+import { useState, useEffect } from 'react'
+import React from 'react'
 import axios from 'axios'
 import SidebarComponent from '../components/SideBar'
 import { Link, useNavigate } from 'react-router-dom'
 
-const Modules = ({ userId,userRole }) => {
+const Modules = ({ userId, userRole }) => {
   const navigate = useNavigate();
   const [modules, serModules] = useState([])
   useEffect(() => {
@@ -34,12 +34,8 @@ const Modules = ({ userId,userRole }) => {
               <th scope="col" >Module name </th>
               <th scope="col" >Module Credits </th>
               <th scope="col" >Module Details </th>
-              {userRole == "student" && (
-                
-                                <th scope="col" >Review </th>
 
-                
-              )}
+              <th scope="col" >Review </th>
 
 
             </tr>
@@ -55,15 +51,17 @@ const Modules = ({ userId,userRole }) => {
                     <td className="align-middle">{module.Module_Name}</td>
                     <td className="align-middle">{module.Module_details}</td>
                     <td className="align-middle">{module.Module_Credits}</td>
-
-                    {userRole == "student" && (
-                      <>
-                                          <td className="align-middle"><button className="btn btn-outline-warning" >Review</button></td>
-
-                      
-                      </>
-                    ) }
-
+                    <td className="align-middle">
+                      {userRole == "student" ? (
+                        <>
+                          <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: module.Module_id, userRole, ReviewOf: "Module" } })}>Review Module</button>
+                        </>
+                      ) : (
+                        <>
+                          <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: module.Module_id } })}>View Reviews</button>
+                        </>
+                      )}
+                    </td>
 
                   </tr>
                 )

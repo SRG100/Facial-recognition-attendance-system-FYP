@@ -5,7 +5,6 @@ import "../assets/Register.css"
 import SidebarComponent from '../components/SideBar'
 const Register = ({userRole}) => {
 
-    const errorMessage = ''
     const [values, setValues] = useState({
         studentId: '',
         studentName: '',
@@ -36,7 +35,7 @@ const Register = ({userRole}) => {
     const handleSubmitStudent = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.post('http://localhost:3000/auth/registerStudent', values)
+            const response = await axios.post('http://localhost:3000/students/registerStudent', values)
             console.log(response.message)
 
         } catch (err) {

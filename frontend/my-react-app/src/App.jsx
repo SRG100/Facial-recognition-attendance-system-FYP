@@ -9,9 +9,10 @@ import Dashboard from './pages/Dashboard';
 import CheckFace from './pages/CheckFace';
 import ProtectedRoute from './components/ProtectedRoute';
 import Classes from './pages/Classes'
-import VerifyCode from './pages/verifyCode'
+import VerifyCode from './pages/VerifyCode';
 import VerifyLocation from './pages/VerifyLocation';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ReviewForm from './pages/ReviewForm';
 
 import RegisterTeacher from './pages/RegisterTeacher';
 import Sections from './pages/Sections';
@@ -66,6 +67,7 @@ function App() {
             <Route path="/viewStudents" element={<Students userId={userId} userRole={userRole} />} />
             <Route path="/viewTeachers" element={<Teachers userId={userId} userRole={userRole} />} />
             <Route path="/viewSections" element={<Sections userId={userId} userRole={userRole} />} />
+            <Route path="/ReviewForm" element={<ReviewForm userId={userId} userRole={userRole} />} />
 
             <Route path="/login" element={<Navigate to="/" />} />
           </Route>

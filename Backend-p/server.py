@@ -27,8 +27,6 @@ def verify_face(registeredFace,providedFace):
         registeredRGB=cv2.cvtColor(registeredFace, cv2.COLOR_BGR2RGB)
         uploadedFaceRGB=cv2.cvtColor(providedFace, cv2.COLOR_BGR2RGB)
 
-        
-
         # encodings
         registeredFaceEncoding =face_recognition.face_encodings(registeredRGB)
         uploadedFaceEncoding = face_recognition.face_encodings(uploadedFaceRGB)
@@ -62,11 +60,6 @@ def verifyFace():
         print(f"The face verification result is:",verified)
         return jsonify({"verified": bool(verified[0])})
 
-                    
-    # except Exception as e:
-    #     print(f"Error: {e}")
-    #     return jsonify({"error": str(e)}), 500
-            
-
+   
 if __name__ == "__main__":
     app.run(debug=True)

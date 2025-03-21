@@ -4,6 +4,7 @@ import { connectDatabase } from '../config/database.js'
 const router = express.Router()
 
 router.post('/studentReview', async (req, res) => {
+    
     try {
         const { Student_id,User_id, Rating, Suggestions } = req.body
         const db = await connectDatabase()
@@ -67,7 +68,7 @@ router.post('/moduleReview', async (req, res) => {
 
 router.post('/teacherReview', async (req, res) => {
     try {
-        const { Teacher_id, Rating, Suggestions } = req.body
+        const { Teacher_id, Rating, Suggestions,User_id } = req.body
         const db = await connectDatabase()
         console.log("Database connected successfully in teacher review!");
         const [rows] = await db.query('SELECT * FROM  teacher_association WHERE Teacher_id=?', [Teacher_id])
@@ -82,7 +83,7 @@ router.post('/teacherReview', async (req, res) => {
         )
 
         const Teacher_review_id = result.insertId
-        await db.execute("INSERT INTO `teacher_review_association` (`Module_id`, `Academic_Year_id`, `Course_id`, `Teacher_id`, `Teacher_review_id`) VALUES (?, ?, ?, ?, ?)",[Module_id,Academic_Year_id,Course_id,Teacher_id,Teacher_review_id])
+        await db.execute("INSERT INTO `teacher_review_association` (`Module_id`, `Academic_Year_id`, `Course_id`, `Teacher_id`, `Teacher_review_id`,`review_by_Student_id	`) VALUES (?, ?, ?, ?,?, ?)",[Module_id,Academic_Year_id,Course_id,Teacher_id,Teacher_review_id, User_id])
         console.log("Sucessfully reviewd the teacher")
         res.json({ 
             success: true, 

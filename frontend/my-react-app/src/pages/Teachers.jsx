@@ -44,10 +44,10 @@ const Teachers = ({ userRole, userId }) => {
                                     <th scope="col" >Teacher Email</th>
                                     <th scope="col" >Teacher Gender</th>
                                     <th scope="col" >Section </th>
-                                    <th scope="col" >Review </th>
+
                                 </>
                             )}
-
+                            <th scope="col" >Review </th>
                         </tr>
                     </thead>
 
@@ -64,6 +64,9 @@ const Teachers = ({ userRole, userId }) => {
                                                 <td className="align-middle">{teachers.Module_id}</td>
                                                 <td className="align-middle">{teachers.Courses}</td>
                                                 <td className="align-middle">{teachers.Sections}</td>
+                                                <td className="align-middle">
+                                                    <button className="btn btn-outline-warning" > View Reviews </button>
+                                                </td>
                                             </>
                                         ) : (
                                             <>
@@ -71,7 +74,7 @@ const Teachers = ({ userRole, userId }) => {
                                                 <td className="align-middle">{teachers.Teacher_Gender}</td>
                                                 <td className="align-middle">{teachers.Section_id}</td>
                                                 <td className="align-middle">
-                                                    <button  className="btn btn-outline-warning">Review Teacher</button>
+                                                    <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: teachers.Teacher_id, userRole } })}>Review Teachers</button>
                                                 </td>
                                             </>
                                         )}

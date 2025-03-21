@@ -5,12 +5,11 @@ import faceRoutes from './routes/face.js'
 import classDetails from './routes/overallClasses.js'
 import cookieParser from "cookie-parser";
 import verifications from './routes/verification.js'
-import reviewForm from './routes/reviewForm.js'
 import crud from './routes/adminCRUD.js'
 import teacher from './controllers/TeachersController.js'
 import module from './controllers/ModuleController.js'
-
-
+import student from './controllers/StudentsController.js'
+import review from './controllers/ModuleController.js'
 const app = express()
 
 app.use(cookieParser());
@@ -26,10 +25,11 @@ app.use('/auth',authRouter)
 app.use('/face',faceRoutes)
 app.use('/classes',classDetails)
 app.use('/verification',verifications)
-app.use('/review',reviewForm)
 app.use('/crud',crud)
 app.use('/teachers',teacher)
 app.use('/modules',module)
+app.use('/students',student)
+app.use('/reviews',review)
 
 
 app.listen(process.env.PORT,()=> {
