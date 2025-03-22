@@ -11,7 +11,7 @@ const Students
     const [section, setSection] = useState([])
     const location = useLocation()
 
-    const Section_id = location.state?.Class_Id
+    const Section_id = location.state?.Section_id
     useEffect(() => {
       if (userId) {
         getStudentDetails();
@@ -25,7 +25,9 @@ const Students
           setSection(null)
         }else {
           setSection(Section_id)
+          console.log("Got to getting student based on the section",Section_id)
         }
+        
         const response = await axios.get(`http://localhost:3000/students/getStudentDetail?userId=${userId}&userRole=${userRole}&section_id=${section}`);
         setStudents(Array.isArray(response.data) ? response.data : []);
 

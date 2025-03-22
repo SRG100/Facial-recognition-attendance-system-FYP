@@ -10,6 +10,7 @@ import teacher from './controllers/TeachersController.js'
 import module from './controllers/ModuleController.js'
 import student from './controllers/StudentsController.js'
 import review from './routes/reviewForm.js'
+import section from './controllers/SectionController.js'
 const app = express()
 
 app.use(cookieParser());
@@ -29,6 +30,7 @@ app.use('/crud',crud)
 app.use('/teachers',teacher)
 app.use('/modules',module)
 app.use('/students',student)
+app.use('/sections',section)
 app.use('/reviews',review)
 
 
