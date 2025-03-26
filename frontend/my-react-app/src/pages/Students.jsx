@@ -2,43 +2,49 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import SidebarComponent from '../components/SideBar'
 import axios from 'axios'
-import { useNavigate ,useLocation} from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
-const Students
-  = ({ userRole , userId  }) => {
+const Students = ({ userRole, userId }) => {
     const navigate = useNavigate();
     const [students, setStudents] = useState([])
-    const [section, setSection] = useState([])
+    const [section, setSection] = useState(null)
     const location = useLocation()
 
     const Section_id = location.state?.Section_id
     useEffect(() => {
-      if (userId) {
+      if (userRole === "admin") {
+        setSection(null);
+      } else if (Section_id) {
+        console.log("Setting section:", Section_id);
+        setSection(Section_id);
+      }
+    }, [userRole, Section_id]);
+    
+    useEffect(() => {
+      console.log("Checking before fetching students. Section:", section);
+      if (userId && userRole=="teacher" && section) {
         getStudentDetails();
       }
-    }, [userId, userRole]);
-
-
+      else if (userId && userRole=="admin") {
+        getStudentDetails();
+      }
+    }, [section]);
+    
     const getStudentDetails = async () => {
       try {
-        if (userRole =="admin"){
-          setSection(null)
-        }else {
-          setSection(Section_id)
-          console.log("Got to getting student based on the section",Section_id)
-        }
-        
+
         const response = await axios.get(`http://localhost:3000/students/getStudentDetail?userId=${userId}&userRole=${userRole}&section_id=${section}`);
         setStudents(Array.isArray(response.data) ? response.data : []);
 
       } catch (error) {
-        console.error('Error while getting the teachers', error);
+        console.error('Error while getting the student', error);
       }
     }
     return (
       <div>Students
         <SidebarComponent userRole={userRole} />
         <div className="container p-0 m-0">
+
           <table className="table table-dark table-hover text-center table-responsive">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
@@ -49,8 +55,6 @@ const Students
                 <th scope="col" >Courses</th>
                 <th scope="col" >Sections </th>
                 <th scope="col" >Review </th>
-
-
               </tr>
             </thead>
 
@@ -63,24 +67,24 @@ const Students
                       <td className="align-middle" >{student.Student_Id}</td>
                       <td className="align-middle">{student.Student_Name}</td>
                       <td className="align-middle">{student.Modules}</td>
-                          <td className="align-middle">{student.Course}</td>
-                          <td className="align-middle">{student.Section}</td>
+                      <td className="align-middle">{student.Courses}</td>
+                      <td className="align-middle">{student.section_id}</td>
                       {userRole == "admin" ? (
                         <>
-                           <td className="align-middle">
+                          <td className="align-middle">
                             <button className="btn btn-outline-warning">View Reviews</button>
                           </td>
                         </>
                       ) : (
                         <>
                           <td className="align-middle">
-                            <button className="btn btn-outline-warning"  onClick={() => navigate("/ReviewForm",{state:{Id:student.Student_Id,ReviewOf:"Student"}})}>Review Student</button>
+                            <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: student.Student_Id, ReviewOf: "Student" } })}>Review Student</button>
                           </td>
                         </>
                       )}
 
 
-                    </tr> 
+                    </tr>
                   )
                 })}
             </tbody>

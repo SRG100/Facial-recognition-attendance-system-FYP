@@ -11,12 +11,14 @@ router.post('/studentReview', async (req, res) => {
 
         const db = await connectDatabase()
         console.log("Database connected successfully in student review!");
-        const [rows] = await db.query('SELECT * FROM  student_association WHERE Student_id=?', [Student_id])
+
+        const [rows] = await db.query('SELECT DISTINCT sa.* FROM  section_association seca JOIN student_association sa ON seca.Module_id = sa.Module_id WHERE seca.Teacher_id=? and sa.student_id=?', [userId,Student_id])
         console.log(rows)
         const Module_id = rows[0].Module_id
         const Academic_Year_id = rows[0].Academic_Year_id
         const Course_id = rows[0].Course_id
-        const Section_id = rows[0].Course_id
+        const Section_id = rows[0].Section_id
+        console.log(Section_id,Course_id,Academic_Year_id,Module_id)
 
         const [result] = await db.execute(
             "INSERT INTO `Student_Review` ( `Rating`, `Suggestions`) VALUES ( ?, ?)",
@@ -24,7 +26,7 @@ router.post('/studentReview', async (req, res) => {
         )
 
         const Student_review_id = result.insertId
-        await db.execute("INSERT INTO `student_review_association` (`Module_id`, `Academic_Year_id`, `Course_id`, `Reviewed_By_Teacher_id`,Section_id,Student_Id, `Student_review_Id`) VALUES (?, ?, ?,?,?, ?, ?)", [Module_id, Academic_Year_id, Course_id, userId, Section_id, Student_id, Student_review_id])
+        await db.execute("INSERT INTO student_review_association (Module_id, Academic_Year_id, Course_id, Class_id Reviewed_By_Teacher_id,Section_id,Student_Id, Student_review_Id) VALUES (?, ?, ?,?,?, ?, ?,?)", [Module_id, Academic_Year_id, Course_id, userId, Section_id, Student_id, Student_review_id])
         console.log("Sucessfully reviewd the student")
         res.json({
             success: true,
@@ -40,19 +42,20 @@ router.post('/studentReview', async (req, res) => {
 
 router.post('/moduleReview', async (req, res) => {
     try {
-        const { Id, userId, rating, Suggestions } = req.body
-        console.log(Id, userId, rating, Suggestions)
+        const { Id, userId, rating, suggestions } = req.body
+        console.log(Id, userId, rating, suggestions)
         const Module_id = Id
         const db = await connectDatabase()
         console.log("Database connected successfully in module review!");
-        const [rows] = await db.query('SELECT * FROM  module_course_academic WHERE Module_id=?', [Module_id])
+        
+        const [rows] = await db.query('SELECT DISTINCT mca.* FROM  module_course_academic mca JOIN student_association sa ON mca.Course_id = sa.Course_id WHERE mca.Module_id=? and sa.student_id=?  ', [Module_id, userId])
         console.log(rows)
         const Academic_Year_id = rows[0].Academic_Year_id
         const Course_id = rows[0].Course_id
 
         const [result] = await db.execute(
             "INSERT INTO `module_review` ( `Rating`, `Suggestions`) VALUES ( ?, ?)",
-            [rating, Suggestions]
+            [rating, suggestions]
         )
 
         const Module_review_id = result.insertId

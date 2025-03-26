@@ -20,6 +20,7 @@ import Teachers from './pages/Teachers';
 import Students from './pages/Students';
 import Modules from './pages/Modules';
 import Attendance from './pages/Attendance';
+import ViewReview from './pages/ViewReview';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -68,6 +69,7 @@ function App() {
             <Route path="/viewTeachers" element={<Teachers userId={userId} userRole={userRole} />} />
             <Route path="/viewSections" element={<Sections userId={userId} userRole={userRole} />} />
             <Route path="/ReviewForm" element={<ReviewForm userId={userId} userRole={userRole} />} />
+            <Route path="/ViewReview" element={<ViewReview userId={userId} userRole={userRole} />} />
 
             <Route path="/login" element={<Navigate to="/" />} />
           </Route>

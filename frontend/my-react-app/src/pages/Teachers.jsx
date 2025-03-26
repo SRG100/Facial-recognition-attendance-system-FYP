@@ -48,6 +48,9 @@ const Teachers = ({ userRole, userId }) => {
                                 </>
                             )}
                             <th scope="col" >Review </th>
+                            {userRole=="admin" && (
+                                <th scope="col" > Associations </th>
+                            )}
                         </tr>
                     </thead>
 
@@ -66,6 +69,9 @@ const Teachers = ({ userRole, userId }) => {
                                                 <td className="align-middle">{teachers.Sections}</td>
                                                 <td className="align-middle">
                                                     <button className="btn btn-outline-warning" > View Reviews </button>
+                                                </td>
+                                                <td className="align-middle">
+                                                    <button className="btn btn-outline-primary" > Add Associations </button>
                                                 </td>
                                             </>
                                         ) : (
