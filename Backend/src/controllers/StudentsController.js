@@ -11,6 +11,7 @@ router.post('/registerStudent', async (req, res) => {
     const { studentId, studentName, studentEmail, studentAddress, studentDOB, studentPassword } = req.body;
     console.log(studentName)
     try {
+        
         const db = await connectDatabase()
         console.log("Database connected successfully!");
 
@@ -48,7 +49,7 @@ router.get('/getStudentDetail', async (req, res) => {
                                                 COALESCE(GROUP_CONCAT(DISTINCT sa.Module_id SEPARATOR ', '), 'Not Assigned') AS Modules,
                                                 COALESCE(GROUP_CONCAT(DISTINCT sa.Academic_Year_id SEPARATOR ', '), 'Not Assigned') AS Academic_Years,
                                                 COALESCE(GROUP_CONCAT(DISTINCT sa.Course_id SEPARATOR ', '), 'Not Assigned') AS Courses,
-                                                DISTINCT sa.Section_id
+                                                COALESCE(GROUP_CONCAT(DISTINCT sa.Section_id SEPARATOR ', '), 'Not Assigned') AS section_id
                                             FROM Student s
                                             LEFT JOIN student_association  sa ON s.Student_Id = sa.Student_Id
                                             GROUP BY s.Student_Id, s.Student_Name;

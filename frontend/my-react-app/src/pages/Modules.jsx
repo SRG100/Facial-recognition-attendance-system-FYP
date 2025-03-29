@@ -26,7 +26,7 @@ const Modules = ({ userId, userRole }) => {
     <div>Modules
       <SidebarComponent userRole={userRole} />
       <div className="container p-0 m-0">
-        <table className="table table-dark table-hover text-center table-responsive">
+        <table className="table table-light table-hover text-center table-responsive">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
             <tr>
@@ -58,7 +58,7 @@ const Modules = ({ userId, userRole }) => {
                         </>
                       ) : (
                         <>
-                          <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: module.Module_id } })}>View Reviews</button>
+                          <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: module.Module_id, ReviewOf: "Module" } })}>View Module Reviews</button>
                         </>
                       )}
                     </td>

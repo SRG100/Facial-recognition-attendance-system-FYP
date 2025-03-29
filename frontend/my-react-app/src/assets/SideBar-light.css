@@ -1,0 +1,253 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --light-bg: #f8f9fa;
+    --dark-text: #333;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 78px;
+    background: var(--light-bg);
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+}
+.home-section {
+    position: relative;
+    background: #E4E9F7;
+    min-height: 100vh;
+    top: 0;
+    left: 78px;
+    width: calc(100% - 78px);
+    transition: all 0.5s ease;
+    z-index: 2;
+}
+.sidebar.open ~ .home-section {
+    left: 250px;
+    width: calc(100% - 250px);
+}
+.home-section .text {
+    display: inline-block;
+    color: #11101d;
+    font-size: 25px;
+    font-weight: 500;
+    margin: 18px
+}
+.sidebar.open {
+    width: 250px;
+}
+
+.sidebar .logo-details {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    position: relative;
+}
+
+.sidebar .logo-details .icon {
+    font-size: 30px;
+    color: var(--primary-color);
+    margin-right: 15px;
+}
+
+.sidebar .logo-details .logo-name {
+    color: var(--dark-text);
+    font-size: 22px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar.open .logo-details .logo-name {
+    opacity: 1;
+}
+
+.sidebar .bx-menu {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    font-size: 25px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.sidebar .bx-x {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    font-size: 30px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.sidebar .bx-menu:hover {
+    color: var(--primary-color);
+}
+.sidebar .bx-x:hover {
+    color: red;
+}
+
+.sidebar .nav-list {
+    margin-top: 20px;
+    list-style: none;
+}
+
+.sidebar .nav-list li {
+    position: relative;
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.sidebar .nav-list li .nav-link {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    text-decoration: none;
+    transition:  0.3s ease;
+    border-radius: 12px;
+    margin: 0 10px;
+    padding: 0 7px;
+    width: calc(100% - 20px);
+}
+.sidebar.open .nav-list li .nav-link {
+    transition:  0.3s ease;
+    padding: 0 15px
+}
+
+.sidebar .nav-list li .nav-link i {
+    min-width: 45px;
+    text-align: center;
+    font-size: 20px;
+    color: var(--secondary-color);
+    transition: color 0.3s ease;
+}
+
+.sidebar .nav-list li .nav-link .links-name {
+    color: var(--dark-text);
+    font-size: 15px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    margin-left: 15px;
+}
+
+.sidebar.open .nav-list li .nav-link .links-name {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sidebar .nav-list li .nav-link:hover {
+    background: rgba(0, 123, 255, 0.1);
+    
+}
+
+.sidebar .nav-list li .nav-link:hover i {
+    color: var(--primary-color);
+}
+
+.sidebar .nav-list li .tooltip {
+    position: absolute;
+    top: 50%;
+    left: 78px;
+    transform: translateY(-50%);
+    background: white;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar .nav-list li:hover .tooltip {
+    opacity: 1;
+    pointer-events: auto;
+            transition: all 0.4s ease;
+            top: 50%;
+            transform: translateY(-50%);
+}
+
+.sidebar.open .nav-list li .tooltip {
+    display: none;
+}
+
+.sidebar .nav-list .profile {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: var(--light-bg);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.sidebar.open .nav-list .profile {
+    
+    width: 80%;
+}
+
+.sidebar .nav-list .profile .name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dark-text);
+}
+
+.sidebar .nav-list .profile .job {
+    font-size: 12px;
+    color: var(--secondary-color);
+    margin-bottom: 10px;
+}
+.sidebar .nav-list .profile .profile-details .name-job{
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.sidebar.open  .nav-list .profile .profile-details .name-job {
+    opacity: 1;
+}
+
+.sidebar .nav-list .profile .logout-btn {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.sidebar .nav-list .profile .logout-btn:hover {
+    color: #bd2130;
+}
+
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 78px;
+    }
+    
+    .sidebar.open {
+        width: 250px;
+    }
+}
+ol, ul {
+    padding-left: 0rem !important;
+  }

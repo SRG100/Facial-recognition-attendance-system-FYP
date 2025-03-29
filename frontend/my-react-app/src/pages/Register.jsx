@@ -1,9 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import "../assets/Register.css"
 import SidebarComponent from '../components/SideBar'
-const Register = ({userRole}) => {
+
+const Register = ({ userRole }) => {
+
+    const [sections, setSections] = useState([])
+
+    useEffect(() => {
+        getSections();
+    }, []);
+
 
     const [values, setValues] = useState({
         studentId: '',
@@ -12,8 +20,17 @@ const Register = ({userRole}) => {
         studentAddress: '',
         studentDOB: '',
         studentGender: '',
-        studentPassword: ''
+        studentPassword: '',
+        section:''
     })
+    const getSections = async () => {
+        try {
+            const response = await axios.get(`http://localhost:3000/sections/getSection`);
+            setSections(Array.isArray(response.data) ? response.data : []);
+        } catch (err) {
+            console.error('Error while getting the student', err);
+        }
+    }
 
     const handleChanges = (e) => {
         const { name, value } = e.target
@@ -45,12 +62,14 @@ const Register = ({userRole}) => {
     }
     return (
         <div>
-            <SidebarComponent userRole={userRole}/>
+            <SidebarComponent userRole={userRole} />
             <div className="container-fluid px-1 py-5 mx-auto">
                 <div className="row d-flex justify-content-center">
                     <div className="col-xl-7 col-lg-8 col-md-9 col-11 text-center">
                         <div className="card">
+                        <div className="card-header bg-primary text-white p-4">
                             <h5 className="text-center mb-4">Register Students</h5>
+                            </div>
                             <form className="form-card" onSubmit={handleSubmitStudent}>
                                 <div className="row justify-content-between text-left">
                                     <div className="form-group col-sm-6 flex-column d-flex">
@@ -77,7 +96,23 @@ const Register = ({userRole}) => {
                                         <label className="form-control-label px-3">Student's DOB<span className="text-danger"> *</span></label>
                                         <input type='date' placeholder="Student's DOB" name="studentDOB" onChange={handleChanges} />
                                     </div>
-                                    
+                                    <div className="form-group col-sm-6 flex-column d-flex">
+                                        <label className="form-control-label px-3">Student's DOB<span className="text-danger"> *</span></label>
+                                        <input type='date' placeholder="Student's DOB" name="studentDOB" onChange={handleChanges} />
+                                    </div>
+                                    <select
+                                        name="section"
+                                        onChange={handleChanges}
+                                        className="form-control"
+                                    >
+                                        <option value="">-- Select a Section --</option>
+                                        {sections.map((section) => (
+                                            <option key={section.id} value={section.id}>
+                                                {section.name}
+                                            </option>
+                                        ))}
+                                    </select>
+
                                 </div>
 
                                 <div className="row justify-content-end">

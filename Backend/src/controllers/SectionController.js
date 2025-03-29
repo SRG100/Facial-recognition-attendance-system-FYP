@@ -18,12 +18,13 @@ router.get('/getSection', async (req, res) => {
 })
 router.post('/addSection', async (req, res) => {
     try {
-        const { Section_id, Academic_Year_id, Course_id, Teacher_id } = req.body
+        const {name} = req.body
+        const Section_id= name
         const db = await connectDatabase()
         console.log("Database connected successfully in add sections !");
-        const modules = await db.execute("Select module_id from module_course_academic where Academic_Year_id=? and Course_id =?", [Academic_Year_id, Course_id])
+        // const modules = await db.execute("Select module_id from module_course_academic where Academic_Year_id=? and Course_id =?", [Academic_Year_id, Course_id])
         await db.execute("INSERT INTO `section` (`Section_id`) VALUES (?)", [Section_id])
-        await db.execute("INSERT INTO `section_association` (`Module_id`, `Academic_Year_id`, `Course_id`, `Teacher_id`, `Section_id`) VALUES (?, ?, ?, ?, ?)", [Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id])
+        // await db.execute("INSERT INTO `section_association` (`Module_id`, `Academic_Year_id`, `Course_id`, `Teacher_id`, `Section_id`) VALUES (?, ?, ?, ?, ?)", [Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id])
 
         console.log("Sucessfully added the sections.")
         res.json({

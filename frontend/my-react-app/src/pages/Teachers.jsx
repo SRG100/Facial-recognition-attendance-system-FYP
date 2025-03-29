@@ -26,8 +26,8 @@ const Teachers = ({ userRole, userId }) => {
     return (
         <div>Teachers
             <SidebarComponent userRole={userRole} />
-            <div className="container p-0 m-0">
-                <table className="table table-dark table-hover text-center table-responsive">
+            <div className="container p-0 m-0" >
+                <table className="table table-light table-hover text-center table-responsive ">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                         <tr>
@@ -68,7 +68,7 @@ const Teachers = ({ userRole, userId }) => {
                                                 <td className="align-middle">{teachers.Courses}</td>
                                                 <td className="align-middle">{teachers.Sections}</td>
                                                 <td className="align-middle">
-                                                    <button className="btn btn-outline-warning" > View Reviews </button>
+                                                <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: teachers.Teacher_id, ReviewOf: "Teacher" } })}>View  Reviews</button>
                                                 </td>
                                                 <td className="align-middle">
                                                     <button className="btn btn-outline-primary" > Add Associations </button>

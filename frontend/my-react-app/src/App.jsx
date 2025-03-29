@@ -13,7 +13,6 @@ import VerifyCode from './pages/VerifyCode';
 import VerifyLocation from './pages/VerifyLocation';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ReviewForm from './pages/ReviewForm';
-
 import RegisterTeacher from './pages/RegisterTeacher';
 import Sections from './pages/Sections';
 import Teachers from './pages/Teachers';

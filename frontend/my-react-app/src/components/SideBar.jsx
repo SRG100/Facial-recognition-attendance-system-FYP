@@ -1,29 +1,23 @@
-import React , { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios'
-import "../assets/SideBar.css"
-{ useState, useEffect }
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'boxicons/css/boxicons.min.css';
+import '../assets/SideBar-light.css';
 
-const SidebarComponent = ({userRole}) => {
+const SidebarComponent = ({ userRole }) => {
+    const [isOpen, setIsOpen] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+
     useEffect(() => {
-        // Check if the token exists in cookies and verify the authorization
         const checkAuthorization = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/auth/isAuthorized', { withCredentials: true });
                 const isVerified = response.data?.success;
-                const role = response.data?.role;  // You can use this if needed for role-based logic
-
-                console.log('Authorization response:', response.data);
-
-                if (isVerified) {
-                    setIsLoggedIn(true);  // User is logged in
-                } else {
-                    setIsLoggedIn(false); // User is not logged in
-                }
+                setIsLoggedIn(isVerified);
             } catch (error) {
                 console.error('Error checking authorization:', error);
-                setIsLoggedIn(false); // Default to false if error occurs
+                setIsLoggedIn(false);
             }
         };
 
@@ -32,196 +26,88 @@ const SidebarComponent = ({userRole}) => {
 
     const handleLogout = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/auth/logout', { withCredentials: true })
-            const logoutSuccess = response.data.success
-            console.log(logoutSuccess)
-            if (logoutSuccess) {
+            const response = await axios.get('http://localhost:3000/auth/logout', { withCredentials: true });
+            if (response.data.success) {
                 alert(response.data.message);
+                window.location.reload();
             } else {
                 console.error("Logout failed:", response.data.message);
             }
-            window.location.reload();
-
+        } catch (err) {
+            console.log("error while logging out", err);
         }
-        catch (err) {
-            console.log("error while logging out", err)
-        }
-
-
     };
-    if(userRole === "admin") {
-        return (
 
-            <div>
-                
-                <div className="sidebar">
-                    <div className="logo-details">
-                        <i className='bx bxl-c-plus-plus icon'></i>
-                        <i className='bx bx-menu' id="btn"></i>
-                    </div>
-                    <ul className="nav-list">
-                        <li>
-                            <NavLink to="/">
-                                <i className='bx bx-grid-alt'></i>
-                            </NavLink>
-                            <span className="tooltip">Dashboard</span>
-                        </li>
-                        <li>
-                            <NavLink to="/classes">
-                            <i class='bx bxs-chalkboard'></i>
-                             </NavLink>
-                            <span className="tooltip">Classes</span>
-                        </li>
-                        <li>
-                            <NavLink to="/viewTeachers">
-                            <i class='bx bxs-user-rectangle'></i>
-                            </NavLink>
-                            <span className="tooltip">View Teachers</span>
-                        </li>
-                        <li>
-                            <NavLink to="/viewStudents">
-                            <i class='bx bxs-user-account'></i>
-                            </NavLink>
-                            <span className="tooltip">View Students</span>
-                        </li>
-                        <li>
-                            <NavLink to="/viewModules">
-                            <i class='bx bxs-book'></i>
-                            </NavLink>
-                            <span className="tooltip">View Modules</span>
-                        </li>
-                        <li>
-                            <NavLink to="/viewAttendance ">
-                            <i class='bx bxs-book-open'></i>
-                            </NavLink>
-                            <span className="tooltip">View Attendance</span>
-                        </li>
-                        <li>
-                            <NavLink to="/viewSections">
-                            <i class='bx bxs-checkbox-minus'></i>
-                            </NavLink>
-                            <span className="tooltip">View Section</span>
-                        </li>
-                        <li className="profile">
-                            <button className='logout' onClick={handleLogout}>
-                                <i className='bx bx-log-out' style={{ color: 'red', margin_button: "20px" }}></i>
-                            </button>
-                        </li>
-                    </ul>
+    const toggleSidebar = () => {
+        setIsOpen(!isOpen);
+    }
+
+    const renderSidebarContent = () => {
+        const menuItems = {
+            admin: [
+                { to: "/", icon: "bx-grid-alt", tooltip: "Dashboard" },
+                { to: "/classes", icon: "bxs-chalkboard", tooltip: "Classes" },
+                { to: "/viewTeachers", icon: "bxs-user-rectangle", tooltip: "View Teachers" },
+                { to: "/viewStudents", icon: "bxs-user-account", tooltip: "View Students" },
+                { to: "/viewModules", icon: "bxs-book", tooltip: "View Modules" },
+                { to: "/viewAttendance", icon: "bxs-book-open", tooltip: "View Attendance" },
+                { to: "/viewSections", icon: "bxs-checkbox-minus", tooltip: "View Section" }
+            ],
+            teacher: [
+                { to: "/", icon: "bx-grid-alt", tooltip: "Dashboard" },
+                { to: "/classes", icon: "bxs-chalkboard", tooltip: "Classes" },
+                { to: "/viewSections", icon: "bx-transfer-alt", tooltip: "View Sections" },
+                { to: "/viewAttendance", icon: "bxs-book-open", tooltip: "View Attendance" }
+            ],
+            student: [
+                { to: "/", icon: "bx-grid-alt", tooltip: "Dashboard" },
+                { to: "/classes", icon: "bxs-chalkboard", tooltip: "Classes" },
+                { to: "/viewTeachers", icon: "bx-transfer-alt", tooltip: "View Teachers" },
+                { to: "/viewAttendance", icon: "bxs-book-open", tooltip: "View Attendance" },
+                { to: "/viewModules", icon: "bx-user", tooltip: "View Modules" }
+            ]
+        };
+
+        return (
+            <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+                <div className="logo-details">
+                    <div className="logo-name">School Portal</div>
+                    <i 
+                        className={`bx ${isOpen ? 'bx-x' : 'bx-menu'}`} 
+                        id="btn"
+                        onClick={toggleSidebar}
+                    ></i>
                 </div>
+                <ul className="nav-list">
+                    {menuItems[userRole]?.map((item, index) => (
+                        <li key={index}>
+                            <NavLink to={item.to} className="nav-link">
+                                <i className={`bx ${item.icon}`}></i>
+                                <span className="links-name">{item.tooltip}</span>
+                            </NavLink>
+                            <span className="tooltip">{item.tooltip}</span>
+                        </li>
+                    ))}
+                    <li className="profile">
+                        <div className="profile-details">
+                            <div className="name-job">
+                                <div className="name">John Doe</div>
+                                <div className="job">{userRole}</div>
+                            </div>
+                            <button 
+                                className="logout-btn" 
+                                onClick={handleLogout}
+                            >
+                                <i className='bx bx-log-out'></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
             </div>
-    
         );
-    }
-    else if(userRole === "teacher"){
-        return (
-            
-            <div>
-                
-                <div className="sidebar">
-                    <div className="logo-details">
-                        <i className='bx bxl-c-plus-plus icon'></i>
-                        <i className='bx bx-menu' id="btn"></i>
-                    </div>
-                    <ul className="nav-list">
-                        <li>
-                            <NavLink to="/">
-                                <i className='bx bx-grid-alt'></i>
-                            </NavLink>
-                            <span className="tooltip">Dashboard</span>
-                        </li>
-                        <li>
-                        <NavLink to="/classes">
-                            <i class='bx bxs-chalkboard'></i>
-                             </NavLink>
-                            <span className="tooltip">Classes</span>
-                        </li>
-                        <li>
-                            <NavLink to="/viewSections">
-                                <i className='bx bx-transfer-alt'></i>
-                            </NavLink>
-                            <span className="tooltip"> View Sections</span>
-                        </li>
-                        <li>
-                            <NavLink to="/viewAttendance ">
-                            <i class='bx bxs-book-open'></i>
-                            </NavLink>
-                            <span className="tooltip">View Attendance</span>
-                        </li>
-                        <li className="profile">
-                            <button className='logout' onClick={handleLogout}>
-                                <i className='bx bx-log-out' style={{ color: 'red' }}></i>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-    
-        )
-    }
-        
-    else if (userRole === "student"){
-        return (
+    };
 
-            <div>
-                    
-                <div className="sidebar">
-                    <div className="logo-details">
-                        <i className='bx bxl-c-plus-plus icon'></i>
-                        <i className='bx bx-menu' id="btn"></i>
-                    </div>
-                    <ul className="nav-list">
-                        <li>
-                            <NavLink to="/">
-                                <i className='bx bx-grid-alt'></i>
-                            </NavLink>
-                            <span className="tooltip">Dashboard</span>
-                        </li>
-                        <li>
-                        <NavLink to="/classes">
-                            <i class='bx bxs-chalkboard'></i>
-                             </NavLink>
-                            <span className="tooltip">Classes</span>
-                        </li>
-                        <li>
-                            <NavLink to="/viewTeachers">
-                                <i className='bx bx-transfer-alt'></i>
-                            </NavLink>
-                            <span className="tooltip">View Teachers</span>
-                        </li>
-                        <li>
-                        <NavLink to="/viewAttendance">
-                            <i class='bx bxs-book-open'></i>
-                            </NavLink>
-                            <span className="tooltip">View Attendance</span>
-                        </li>
-                        <li>
-                            <NavLink to="/viewModules">
-                                <i className='bx bx-user'></i>
-                            </NavLink>
-                            <span className="tooltip">View Modules</span>
-                        </li>
-
-                        <li className="profile">
-                            <button className='logout' onClick={handleLogout}>
-                                <i className='bx bx-log-out' style={{ color: 'red', margin_button: "20px" }}></i>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-    
-        )
-    }
-    else{
-        return(
-            <div>
-                No user at the side bar
-            </div>
-        )
-    }
-    
-
+    return isLoggedIn ? renderSidebarContent() : null;
 };
 
-export default SidebarComponent
+export default SidebarComponent;

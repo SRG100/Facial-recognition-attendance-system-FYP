@@ -1,5 +1,5 @@
 
-* {
+*{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -12,7 +12,6 @@
     height: 100%;
     width: 78px;
     background: #11101D;
-    /* padding: 6px 14px; */
     z-index: 99;
     transition: all 0.5s ease;
 }
@@ -149,7 +148,6 @@
 
     .sidebar .bx-search:hover {
         background: #FFF;
-        /* color: #11101d; */
     }
     
     .sidebar li a {
@@ -157,16 +155,11 @@
         height: 100%;
         width: 100%;
         border-radius: 12px;
-        /* align-items: center; */
         text-decoration: none;
         transition: all 0.4s ease;
         background: #11101D;
     }
 
-        .sidebar li a:hover {
-            /* background: #FFF; */
-            /* margin-left: -10px ; */
-        }
 
         .sidebar li a .links_name {
             color: #fff;

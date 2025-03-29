@@ -9,7 +9,7 @@ import crud from './routes/adminCRUD.js'
 import teacher from './controllers/TeachersController.js'
 import module from './controllers/ModuleController.js'
 import student from './controllers/StudentsController.js'
-import review from './routes/reviewForm.js'
+import review from './controllers/ReviewController.js'
 import section from './controllers/SectionController.js'
 const app = express()
 

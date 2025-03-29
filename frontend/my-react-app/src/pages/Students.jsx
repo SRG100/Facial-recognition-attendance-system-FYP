@@ -5,7 +5,7 @@ import axios from 'axios'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 const Students = ({ userRole, userId }) => {
-    const navigate = useNavigate();
+    const navigate = useNavigate()
     const [students, setStudents] = useState([])
     const [section, setSection] = useState(null)
     const location = useLocation()
@@ -45,7 +45,7 @@ const Students = ({ userRole, userId }) => {
         <SidebarComponent userRole={userRole} />
         <div className="container p-0 m-0">
 
-          <table className="table table-dark table-hover text-center table-responsive">
+          <table className="table table-light table-hover text-center table-responsive">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
               <tr>
@@ -72,7 +72,7 @@ const Students = ({ userRole, userId }) => {
                       {userRole == "admin" ? (
                         <>
                           <td className="align-middle">
-                            <button className="btn btn-outline-warning">View Reviews</button>
+                          <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: student.Student_Id, ReviewOf: "Student" } })}>View Student Reviews</button>
                           </td>
                         </>
                       ) : (
