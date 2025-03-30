@@ -52,10 +52,14 @@ router.get('/locationVerification', async(req,res)=>{
         console.log("Database connected successfully!");
         console.log("got to get the location verification api")
         const { Class_Id, studentLongitude ,studentLatitude,Attendance_id } = req.query
-        console.log("The student longitufe is:",studentLongitude)
+        
         const [result] = await db.query("SELECT * FROM `class` WHERE Class_id=?",[Class_Id])
         const teacherLongitude=result[0].Teacher_Longitude
         const teacherLatitude=result[0].Teacher_Latitude
+        console.log("The student longitufe is:",studentLongitude)
+        console.log("The student lat is:",studentLatitude)
+        console.log("The teacher longitufe is:",teacherLongitude)
+        console.log("The teacher lat is:",teacherLatitude)
         const distance =calculateDistance(studentLatitude,studentLongitude,teacherLatitude,teacherLongitude)
         console.log("The distance between teacher and student is:",distance)
         if(distance<50 ||distance===0 ){

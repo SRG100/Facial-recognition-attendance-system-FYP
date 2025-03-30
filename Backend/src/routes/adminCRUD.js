@@ -4,6 +4,9 @@ import { connectDatabase } from '../config/database.js'
 
 const router = express.Router()
 
+
+
+
 router.post('/addModule', async (req, res) => {
     try {
         const { Module_id, Module_Name, Module_details, Module_Credits, Academic_Year_id, Course_id } = req.body
@@ -70,6 +73,23 @@ router.post('/addSection', async (req, res) => {
         })
     }
 })
+router.get('/getAcademicYears', async (req, res) => {
+    try {
+        const db = await connectDatabase()
+        console.log("Database connected successfully in get years !")
+        const [years] = await db.execute("Select * from Academic_year")
+        console.log("Sucessfully got the Academic year.")
+        res.json(years)
+    }
+    catch (e) {
+        console.log("error found:", e)
+        res.json({
+            success: false,
+            message: "Error occured while adding section",
+        })
+    }
+})
+
 router.post('/addSectionAssociations', async (req, res) => {
     try {
         const { Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id } = req.body
@@ -119,6 +139,8 @@ router.post('/addClass', async (req, res) => {
         })
     }
 })
+
+
 
 
 

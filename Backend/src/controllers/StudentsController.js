@@ -8,8 +8,8 @@ const router = express.Router()
 
 //to register students 
 router.post('/registerStudent', async (req, res) => {
-    const { studentId, studentName, studentEmail, studentAddress, studentDOB, studentPassword } = req.body;
-    console.log(studentName)
+    const { studentId, studentName, studentEmail, studentAddress, studentDOB, studentPassword, section,studentGender } = req.body;
+    console.log(section,studentGender)
     try {
         
         const db = await connectDatabase()
@@ -26,6 +26,15 @@ router.post('/registerStudent', async (req, res) => {
         await db.query("INSERT INTO student (Student_Id,Student_Name,Student_Address,Student_Email,Student_DOB,Password) VALUES (?,?,?,?,?,?)",
             [studentId, studentName, studentAddress, studentEmail, studentDOB, hashPassword])
         console.log("Sucessfully regiosterd student")
+        const [section_association]= await db.query("SELECT * FROM `section_association` WHERE section_id=?",[section])
+        const values = section_association.map(sa => `('${sa.Module_id}', ${sa.Academic_Year_id}, '${sa.Course_id}', '${sa.Section_id}', '${studentId}')`).join(",")
+
+        console.log(values)
+        if (values.length > 0) {
+            await db.query(`INSERT INTO student_association (Module_id, Academic_Year_id, Course_id, Section_id, Student_Id) VALUES ${values}`);
+        }
+        console.log("Sucessfully  student associations")
+
         res.status(201).json({ message: "Student Added successfully" })
     } catch (err) {
         res.status(500).json(err)

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import "../assets/Register.css"
 import SidebarComponent from '../components/SideBar'
@@ -9,9 +8,8 @@ const Register = ({ userRole }) => {
     const [sections, setSections] = useState([])
 
     useEffect(() => {
-        getSections();
-    }, []);
-
+        getSections()
+    }, [])
 
     const [values, setValues] = useState({
         studentId: '',
@@ -21,7 +19,7 @@ const Register = ({ userRole }) => {
         studentDOB: '',
         studentGender: '',
         studentPassword: '',
-        section:''
+        section: ''
     })
     const getSections = async () => {
         try {
@@ -61,58 +59,65 @@ const Register = ({ userRole }) => {
 
     }
     return (
-        <div>
+        <div className='d-flex'>
             <SidebarComponent userRole={userRole} />
-            <div className="container-fluid px-1 py-5 mx-auto">
+            <div className="container-fluid px-1 py-3 mx-auto flex-grow-1">
                 <div className="row d-flex justify-content-center">
-                    <div className="col-xl-7 col-lg-8 col-md-9 col-11 text-center">
-                        <div className="card">
-                        <div className="card-header bg-primary text-white p-4">
-                            <h5 className="text-center mb-4">Register Students</h5>
+                    <div className="col-xl-7 col-lg-8 col-md-9 col-11 ">
+                        <div className="card shadow">
+                            <div className="card-header bg-primary text-white p-2 text-center">
+                                <h5 className="text-center m-0">Register Students</h5>
                             </div>
-                            <form className="form-card" onSubmit={handleSubmitStudent}>
-                                <div className="row justify-content-between text-left">
+
+                            <form className="form-card mt-4" onSubmit={handleSubmitStudent}>
+                                <div className="row justify-content-between mb-3">
                                     <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Student Id <span className="text-danger"> *</span></label>
+                                        <label className="form-label fw-bold">Student Id <span className="text-danger"> *</span></label>
                                         <input type="text" placeholder="Enter the Student's Id name" name="studentId" onChange={handleChanges} />
                                     </div>
                                     <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Student Name<span className="text-danger"> *</span></label>
-                                        <input type="text" name="studentName" placeholder="Enter the students name" onChange={handleChanges} />
+                                        <label className="form-label fw-bold">Student Name<span className="text-danger"> *</span></label>
+                                        <input type="text"  name="studentName" placeholder="Enter the students name" onChange={handleChanges} />
                                     </div>
                                 </div>
-                                <div className="row justify-content-between text-left">
+                                <div className="row justify-content-between mb-3">
                                     <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Student's Loaction<span className="text-danger"> *</span></label>
+                                        <label className="form-label fw-bold">Student's Loaction<span className="text-danger"> *</span></label>
                                         <input type="text" name="studentAddress" onChange={handleChanges} placeholder="Student's Location" />
                                     </div>
                                     <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Student's Email<span className="text-danger"> *</span></label>
+                                        <label className="form-label fw-bold">Student's Email<span className="text-danger"> *</span></label>
                                         <input type="text" placeholder="Student's email" name="studentEmail" onChange={handleChanges} />
                                     </div>
                                 </div>
-                                <div className="row justify-content-between text-left">
+                                <div className="row justify-content-between mb-3">
                                     <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Student's DOB<span className="text-danger"> *</span></label>
+                                        <label className="form-label fw-bold">Student's DOB<span className="text-danger"> *</span></label>
                                         <input type='date' placeholder="Student's DOB" name="studentDOB" onChange={handleChanges} />
                                     </div>
                                     <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Student's DOB<span className="text-danger"> *</span></label>
-                                        <input type='date' placeholder="Student's DOB" name="studentDOB" onChange={handleChanges} />
-                                    </div>
-                                    <select
-                                        name="section"
-                                        onChange={handleChanges}
-                                        className="form-control"
-                                    >
+                                        <label className="form-label fw-bold">Student's Section<span className="text-danger"> *</span></label>
+                                        <select name="section" onChange={handleChanges}>
                                         <option value="">-- Select a Section --</option>
                                         {sections.map((section) => (
-                                            <option key={section.id} value={section.id}>
-                                                {section.name}
+                                            <option key={section.Section_id}  value={section.Section_id} >
+                                                {section.Section_id}
                                             </option>
                                         ))}
-                                    </select>
-
+                                    </select>    
+                                </div>
+                                </div>
+                                <div className="row justify-content-between mb-3">
+                                    
+                                    <div className="form-group col-sm-6 flex-column d-flex">
+                                        <label className="form-label fw-bold">Student's Gender<span className="text-danger"> *</span></label>
+                                        <select name="studentGender" onChange={handleChanges}>
+                                        <option value="">-- Select Gender --</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>    
+                                </div>
                                 </div>
 
                                 <div className="row justify-content-end">

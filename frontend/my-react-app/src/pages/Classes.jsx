@@ -55,7 +55,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords
-                    setUserLocation({ latitude, longitude })
+                    
                     setLoading(false)
                     resolve({ latitude, longitude })
                 },
@@ -77,6 +77,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
         try {
             const teacherLocation = await getUserLocation()
             console.log("The user location is :", teacherLocation)
+            
             const startClassData = {
                 
                 Section_Id: classDetail.Section_Id,

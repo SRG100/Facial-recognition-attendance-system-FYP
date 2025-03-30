@@ -20,6 +20,8 @@ import Students from './pages/Students';
 import Modules from './pages/Modules';
 import Attendance from './pages/Attendance';
 import ViewReview from './pages/ViewReview';
+import Toast from './components/Toast';
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -69,6 +71,7 @@ function App() {
             <Route path="/viewSections" element={<Sections userId={userId} userRole={userRole} />} />
             <Route path="/ReviewForm" element={<ReviewForm userId={userId} userRole={userRole} />} />
             <Route path="/ViewReview" element={<ViewReview userId={userId} userRole={userRole} />} />
+            <Route path="/toast" element={<Toast userId={userId} userRole={userRole} />} />
 
             <Route path="/login" element={<Navigate to="/" />} />
           </Route>

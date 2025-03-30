@@ -19,9 +19,9 @@ body {
     margin-bottom: 0
 }
 
-input,
+input:not([type="radio"]),
 textarea,
-button {
+button ,select {
     padding: 8px 15px;
     border-radius: 5px !important;
     margin: 5px 0px;
@@ -30,8 +30,11 @@ button {
     font-size: 18px !important;
     font-weight: 300
 }
+input[type="radio"] {
+    margin: 0 5px 0 0;
+}
 
-input:focus,
+input:not([type="radio"]):focus,
 textarea:focus {
     -moz-box-shadow: none !important;
     -webkit-box-shadow: none !important;

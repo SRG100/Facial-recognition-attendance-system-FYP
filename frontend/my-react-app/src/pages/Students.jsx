@@ -45,7 +45,7 @@ const Students = ({ userRole, userId }) => {
         <SidebarComponent userRole={userRole} />
         <div className="container p-0 m-0">
 
-          <table className="table table-light table-hover text-center table-responsive">
+          <table  className="table table-light table-hover text-center table-responsive">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
               <tr>
