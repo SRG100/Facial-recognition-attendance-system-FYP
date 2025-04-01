@@ -25,6 +25,8 @@ const Modules = ({ userId, userRole }) => {
   return (
     <div>Modules
       <SidebarComponent userRole={userRole} />
+      <div className='home-section'>
+
       <div className="container p-0 m-0">
         <table className="table table-light table-hover text-center table-responsive">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -73,6 +75,7 @@ const Modules = ({ userId, userRole }) => {
         // console.log("User Role:", userRole)
         <button className="btn btn-success" onClick={() => navigate("/RegisterModule")}>Add Module</button>
       )}
+      </div>
     </div>
   )
 }

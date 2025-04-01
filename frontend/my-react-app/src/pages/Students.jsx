@@ -5,47 +5,49 @@ import axios from 'axios'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 const Students = ({ userRole, userId }) => {
-    const navigate = useNavigate()
-    const [students, setStudents] = useState([])
-    const [section, setSection] = useState(null)
-    const location = useLocation()
+  const navigate = useNavigate()
+  const [students, setStudents] = useState([])
+  const [section, setSection] = useState(null)
+  const location = useLocation()
 
-    const Section_id = location.state?.Section_id
-    useEffect(() => {
-      if (userRole === "admin") {
-        setSection(null);
-      } else if (Section_id) {
-        console.log("Setting section:", Section_id);
-        setSection(Section_id);
-      }
-    }, [userRole, Section_id]);
-    
-    useEffect(() => {
-      console.log("Checking before fetching students. Section:", section);
-      if (userId && userRole=="teacher" && section) {
-        getStudentDetails();
-      }
-      else if (userId && userRole=="admin") {
-        getStudentDetails();
-      }
-    }, [section]);
-    
-    const getStudentDetails = async () => {
-      try {
-
-        const response = await axios.get(`http://localhost:3000/students/getStudentDetail?userId=${userId}&userRole=${userRole}&section_id=${section}`);
-        setStudents(Array.isArray(response.data) ? response.data : []);
-
-      } catch (error) {
-        console.error('Error while getting the student', error);
-      }
+  const Section_id = location.state?.Section_id
+  useEffect(() => {
+    if (userRole === "admin") {
+      setSection(null);
+    } else if (Section_id) {
+      console.log("Setting section:", Section_id);
+      setSection(Section_id);
     }
-    return (
-      <div>Students
-        <SidebarComponent userRole={userRole} />
+  }, [userRole, Section_id]);
+
+  useEffect(() => {
+    console.log("Checking before fetching students. Section:", section);
+    if (userId && userRole == "teacher" && section) {
+      getStudentDetails();
+    }
+    else if (userId && userRole == "admin") {
+      getStudentDetails();
+    }
+  }, [section]);
+
+  const getStudentDetails = async () => {
+    try {
+
+      const response = await axios.get(`http://localhost:3000/students/getStudentDetail?userId=${userId}&userRole=${userRole}&section_id=${section}`);
+      setStudents(Array.isArray(response.data) ? response.data : []);
+
+    } catch (error) {
+      console.error('Error while getting the student', error);
+    }
+  }
+  return (
+    <div>Students
+      <SidebarComponent userRole={userRole} />
+
+      <div className='home-section'>
         <div className="container p-0 m-0">
 
-          <table  className="table table-light table-hover text-center table-responsive">
+          <table className="table table-light table-hover text-center table-responsive">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
               <tr>
@@ -72,7 +74,7 @@ const Students = ({ userRole, userId }) => {
                       {userRole == "admin" ? (
                         <>
                           <td className="align-middle">
-                          <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: student.Student_Id, ReviewOf: "Student" } })}>View Student Reviews</button>
+                            <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: student.Student_Id, ReviewOf: "Student" } })}>View Student Reviews</button>
                           </td>
                         </>
                       ) : (
@@ -95,7 +97,8 @@ const Students = ({ userRole, userId }) => {
           <button className="btn btn-success" onClick={() => navigate("/Register")}>Add Students</button>
         )}
       </div>
-    )
-  }
+    </div>
+  )
+}
 
 export default Students

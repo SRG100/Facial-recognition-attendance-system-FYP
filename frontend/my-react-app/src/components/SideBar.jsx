@@ -50,21 +50,20 @@ const SidebarComponent = ({ userRole }) => {
                 { to: "/viewTeachers", icon: "bxs-user-rectangle", tooltip: "View Teachers" },
                 { to: "/viewStudents", icon: "bxs-user-account", tooltip: "View Students" },
                 { to: "/viewModules", icon: "bxs-book", tooltip: "View Modules" },
-                { to: "/viewAttendance", icon: "bxs-book-open", tooltip: "View Attendance" },
                 { to: "/viewSections", icon: "bxs-checkbox-minus", tooltip: "View Section" }
             ],
             teacher: [
                 { to: "/", icon: "bx-grid-alt", tooltip: "Dashboard" },
                 { to: "/classes", icon: "bxs-chalkboard", tooltip: "Classes" },
                 { to: "/viewSections", icon: "bx-transfer-alt", tooltip: "View Sections" },
-                { to: "/viewAttendance", icon: "bxs-book-open", tooltip: "View Attendance" }
             ],
             student: [
                 { to: "/", icon: "bx-grid-alt", tooltip: "Dashboard" },
                 { to: "/classes", icon: "bxs-chalkboard", tooltip: "Classes" },
                 { to: "/viewTeachers", icon: "bx-transfer-alt", tooltip: "View Teachers" },
-                { to: "/viewAttendance", icon: "bxs-book-open", tooltip: "View Attendance" },
-                { to: "/viewModules", icon: "bx-user", tooltip: "View Modules" }
+                { to: "/viewModules", icon: "bx-user", tooltip: "View Modules" },
+                { to: "/viewAttendance", icon: "bx-book-open", tooltip: "View Attendance" }
+
             ]
         };
 

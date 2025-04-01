@@ -8,18 +8,20 @@ const Dashboard = ({ isLoggedIn, userRole, userId }) => {
   return (
     <div>Home
       {/* <Nav /> */}
-      <SidebarComponent userRole={userRole}/>
-      {userRole === "admin" ?
-        <p>Admin Condition</p>
-        : userRole === "student" ? <p>Student Condition</p>
-          : <p>Teacher Condition</p>
-      }
+      <SidebarComponent userRole={userRole} />
+      <div className='home-section'>
+
+        {userRole === "admin" ?
+          <p>Admin Condition</p>
+          : userRole === "student" ? <p>Student Condition</p>
+            : <p>Teacher Condition</p>
+        }
 
 
-      link to current class <br />
-      link to result prediction <br />
+        link to current class <br />
+        link to result prediction <br />
 
-
+      </div>
     </div>
 
 

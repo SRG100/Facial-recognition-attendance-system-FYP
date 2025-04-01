@@ -7,11 +7,10 @@ import Webcam from "react-webcam";
 export const FaceCapture = ({image,setImage}) => {
 
     const videoConstraints = {
-        width: 520,
-        height: 500,
+        width: 800,
+        height: 450,  
         facingMode: "user"
     };
-
     
     const webcamRef = React.useRef(null);
 
@@ -31,10 +30,10 @@ export const FaceCapture = ({image,setImage}) => {
 
                 {image == '' ? <Webcam
                     audio={false}
-                    height={500}
+                    height={450}
+                    width={800}
                     ref={webcamRef}
                     screenshotFormat="image/jpeg"
-                    width={500}
                     videoConstraints={videoConstraints}
                 /> : <img src={image} />}
             </div>

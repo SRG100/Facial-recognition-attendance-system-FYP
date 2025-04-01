@@ -13,19 +13,19 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
     const [userLocation, setUserLocation] = useState(null)
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate();
-    
+
     // const [code,setCode]=useState(null)
     const [code, setCode] = useState({
-    
-            classCode: ''
+
+        classCode: ''
+    })
+    const handleChanges = (e) => {
+        const { name, value } = e.target
+        setCode({
+            ...code,
+            [name]: value,
         })
-        const handleChanges = (e) => {
-            const { name, value } = e.target
-            setCode({
-                ...code,
-                [name]: value,
-            })
-        }
+    }
 
     useEffect(() => {
         if (userId) {
@@ -33,7 +33,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
         }
     }, [userId, userRole]);
 
-    
+
 
     const isClassLive = (startTime, endTime) => {
         const now = new Date();
@@ -51,11 +51,11 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                 reject(new Error("Geolocation not supported"))
                 return;
             }
-    
+
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords
-                    
+
                     setLoading(false)
                     resolve({ latitude, longitude })
                 },
@@ -66,8 +66,8 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 10000, 
-                    maximumAge: 0 
+                    timeout: 10000,
+                    maximumAge: 0
                 }
             )
         })
@@ -77,20 +77,20 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
         try {
             const teacherLocation = await getUserLocation()
             console.log("The user location is :", teacherLocation)
-            
+
             const startClassData = {
-                
+
                 Section_Id: classDetail.Section_Id,
                 Class_Id: classDetail.Class_Id,
-                teacherLocation:teacherLocation
+                teacherLocation: teacherLocation
             }
             const response = await axios.post('http://localhost:3000/classes/startAttendance', startClassData)
-            const classCode =response.data.classCode
+            const classCode = response.data.classCode
 
             console.log(classCode)
             if (response.data.classCode) {
                 alert(`The class code is: ${classCode}`);
-                
+
             }
             console.log("The user location is :", teacherLocation)
             window.location.reload()
@@ -99,15 +99,15 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
         }
 
     }
-    const viewAttendance=async(classDetail)=>{
+    const viewAttendance = async (classDetail) => {
         const viewAttendnace = {
             Section_Id: classDetail.Section_Id,
             Class_Id: classDetail.Class_Id
         }
     }
     const joinClass = async (classDetail) => {
-        try {   
-           
+        try {
+
             const attendanceData = {
                 Module_id: classDetail.Module_Id,
                 Academic_Year_id: classDetail.Academic_Year_id,
@@ -117,12 +117,12 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                 Class_Id: classDetail.Class_Id,
                 Student_Id: userId
             }
-            const Class_Id=classDetail.Class_Id
+            const Class_Id = classDetail.Class_Id
             const response = await axios.post('http://localhost:3000/classes/markAttendance', attendanceData)
             console.log(response.message)
-            const Attendance_id= response.data.Attendance_Id
-            
-            navigate("/verifycode",{state:{Class_Id, Attendance_id}})
+            const Attendance_id = response.data.Attendance_Id
+
+            navigate("/verifycode", { state: { Class_Id, Attendance_id } })
 
         } catch (err) {
             console.log(err)
@@ -155,100 +155,101 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
     }
     return (
         <div>
-            <SidebarComponent userRole={userRole}/>
+            <SidebarComponent userRole={userRole} />
 
             Classes
             The classes of the {userRole} are as follows:
-            
 
-            <div className="container p-0 m-0">
-                <table className="table table-light table-hover text-center table-responsive">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <div className='home-section'>
 
-                        <tr>
-                            <th scope="col" >Class Id </th>
-                            <th scope="col" >Module Name </th>
-                            <th scope="col" >Class Start Time </th>
-                            <th scope="col" >Class End Time </th>
-                            <th scope="col" >Class Type </th>
-                            <th scope="col" >Class Day </th>
-                            {userRole === "student" ? (
-                                <th scope="col">Teacher Name</th>
-                            ) : (<th scope="col">Section Name</th>)}
-                            <th scope="col" >
-                                <span className="sr-only"> Class </span>
-                            </th>
-                        </tr>
+                <div className="container p-0 m-0">
+                    <table className="table table-light table-hover text-center table-responsive">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
-                    </thead>
-                    <tbody>
-                        {
-                            scheduledClasses.map((classDetail, i) => {
-                                return (
-                                    <tr scope="row" key={i}>
-                                        <td className="align-middle" >{classDetail.Class_Id}</td>
-                                        <td  className="align-middle">{classDetail.Module_Name}</td>
-                                        <td className="align-middle">{classDetail.Class_Start_Time}</td>
-                                        <td className="align-middle">{classDetail.Class_End_Time}</td>
-                                        <td className="align-middle">{classDetail.Class_Type}</td>
-                                        <td className="align-middle">{classDetail.Class_Day}</td>
-                                        
-                                        {userRole === "student" ? (
-                                            <td className="align-middle" >{classDetail.Teacher_Name}</td>
-                                        ) : (<td  className="align-middle">{classDetail.Section_Id}</td>)}
+                            <tr>
+                                <th scope="col" >Class Id </th>
+                                <th scope="col" >Module Name </th>
+                                <th scope="col" >Class Start Time </th>
+                                <th scope="col" >Class End Time </th>
+                                <th scope="col" >Class Type </th>
+                                <th scope="col" >Class Day </th>
+                                {userRole === "student" ? (
+                                    <th scope="col">Teacher Name</th>
+                                ) : (<th scope="col">Section Name</th>)}
+                                <th scope="col" >
+                                    <span className="sr-only"> Class </span>
+                                </th>
+                            </tr>
 
-                                        {userRole === "student" ? (
-                                            <td >
-                                                {classDetail.Class_Status === 1 ? (
-                                                    <button className="btn btn-outline-success" onClick={() => joinClass(classDetail)}>Join Class</button>
-                                                ) : (
-                                                    <span className="text-gray-400">Class not started</span>
-                                                )}
+                        </thead>
+                        <tbody>
+                            {
+                                scheduledClasses.map((classDetail, i) => {
+                                    return (
+                                        <tr scope="row" key={i}>
+                                            <td className="align-middle" >{classDetail.Class_Id}</td>
+                                            <td className="align-middle">{classDetail.Module_Name}</td>
+                                            <td className="align-middle">{classDetail.Class_Start_Time}</td>
+                                            <td className="align-middle">{classDetail.Class_End_Time}</td>
+                                            <td className="align-middle">{classDetail.Class_Type}</td>
+                                            <td className="align-middle">{classDetail.Class_Day}</td>
 
-                                            </td>) :userRole === "teacher" ?  (<td >
-                                                {classDetail.Class_Status === 1 ? (
-                                                    <button className="btn btn-outline-success">Class Ongoing</button>
-                                                ) : (
-                                                    <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
-                                                )}
+                                            {userRole === "student" ? (
+                                                <td className="align-middle" >{classDetail.Teacher_Name}</td>
+                                            ) : (<td className="align-middle">{classDetail.Section_Id}</td>)}
 
-                                                {/* 
+                                            {userRole === "student" ? (
+                                                <td >
+                                                    {classDetail.Class_Status === 1 ? (
+                                                        <button className="btn btn-outline-success" onClick={() => joinClass(classDetail)}>Join Class</button>
+                                                    ) : (
+                                                        <span className="text-gray-400">Class not started</span>
+                                                    )}
+
+                                                </td>) : userRole === "teacher" ? (<td >
+                                                    {classDetail.Class_Status === 1 ? (
+                                                        <button className="btn btn-outline-success">Class Ongoing</button>
+                                                    ) : (
+                                                        <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
+                                                    )}
+
+                                                    {/* 
                                                 {isClassLive(classDetail.Class_Start_Time, classDetail.Class_End_Time) ? (
                                                     <button className="font-medium text-blue-600 dark:text-blue-500" onClick={startClass}>Start Class</button>
                                                 ) : (
                                                     <span className="text-gray-400">Class not started</span>
                                                 )} */}
-                                            </td>):(<td>
-                                                {classDetail.Class_Status === 1 ? (
-                                                    <button className="btn btn-outline-success"  onClick={() => viewAttendance(classDetail)}>View Attendance</button>
+                                                </td>) : (<td>
+                                                    {classDetail.Class_Status === 1 ? (
+                                                        <button className="btn btn-outline-success" onClick={() => viewAttendance(classDetail)}>View Attendance</button>
 
-                                                ) : (
-                                                    <button className="btn btn-outline-success" >No Class Yet</button>
-                                                )}
-                                            </td>)}
+                                                    ) : (
+                                                        <button className="btn btn-outline-success" >No Class Yet</button>
+                                                    )}
+                                                </td>)}
 
-                                    </tr>
-                                )
-                            })
-                        }
-                    </tbody>
-                </table>
+                                        </tr>
+                                    )
+                                })
+                            }
+                        </tbody>
+                    </table>
 
-            </div>
-            {userLocation && (
-                <div>
-                    <h2>User Location</h2>
-                    <p>Latitude: {userLocation.latitude}</p>
-                    <p>Longitude: {userLocation.longitude}</p>
-                    <div>
-                        <h2>User Location from single</h2>
-                        <p>Latitude: {userLocationLatitude}</p>
-                        <p>Longitude: {userLocationLongitude}</p>
-                    </div>
                 </div>
+                {userLocation && (
+                    <div>
+                        <h2>User Location</h2>
+                        <p>Latitude: {userLocation.latitude}</p>
+                        <p>Longitude: {userLocation.longitude}</p>
+                        <div>
+                            <h2>User Location from single</h2>
+                            <p>Latitude: {userLocationLatitude}</p>
+                            <p>Longitude: {userLocationLongitude}</p>
+                        </div>
+                    </div>
 
-            )}
-
+                )}
+            </div>
         </div>
 
     )
