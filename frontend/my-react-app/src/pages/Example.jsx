@@ -1,78 +1,116 @@
-import { useState } from "react";
+import React from 'react'
+import { useState, useEffect } from 'react'
+import SidebarComponent from '../components/SideBar'
+import axios from 'axios'
+import { useNavigate, useLocation } from 'react-router-dom'
 
-const ModuleTeacherSelector = ({ modules }) => {
-  const [selectedTeachers, setSelectedTeachers] = useState({});
+const Examples = ({ userRole, userId }) => {
+  const navigate = useNavigate()
+  const [students, setStudents] = useState([])
+  const [section, setSection] = useState(null)
+  const location = useLocation()
 
-  // Handle teacher selection for each module
-  const handleTeacherChange = (moduleId, teacherId) => {
-    setSelectedTeachers((prev) => ({
-      ...prev,
-      [moduleId]: teacherId
-    }));
-  };
+  const Section_id = location.state?.Section_id
+  useEffect(() => {
+    if (userRole === "admin") {
+      setSection(null);
+    } else if (Section_id) {
+      console.log("Setting section:", Section_id);
+      setSection(Section_id);
+    }
+  }, [userRole, Section_id]);
 
-  return (
-    <div className="p-4 space-y-4">
-      {Object.keys(modules).map((moduleId) => {
-        const module = modules[moduleId];
+  useEffect(() => {
+    console.log("Checking before fetching students. Section:", section);
+    if (userId && userRole == "teacher" && section) {
+      getStudentDetails();
+    }
+    else if (userId && userRole == "admin") {
+      getStudentDetails();
+    }
+  }, [section]);
 
-        return (
-          <div key={moduleId} className="p-4 border rounded-lg shadow">
-            <h2 className="text-lg font-semibold">{module.Module_id}</h2>
-            <p className="text-sm text-gray-600">
-              Course: {module.Course_id} | Academic Year: {module.Academic_Year_id}
-            </p>
-
-            {/* Dropdown to select teacher */}
-            <select
-              className="mt-2 p-2 border rounded-md w-full"
-              value={selectedTeachers[moduleId] || ""}
-              onChange={(e) => handleTeacherChange(moduleId, e.target.value)}
-            >
-              <option value="">Select a Teacher</option>
-              {module.Teacher_id.map((teacherId, index) => (
-                <option key={teacherId} value={teacherId}>
-                  {module.teacher_name[index]}
-                </option>
-              ))}
-            </select>
-
-            {selectedTeachers[moduleId] && (
-              <p className="mt-2 text-green-600">
-                Selected Teacher:{" "}
-                {module.teacher_name[module.Teacher_id.indexOf(Number(selectedTeachers[moduleId]))]}
-              </p>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-// Example Usage
-const modulesData = {
-  CC4057NI: {
-    Module_id: "CC4057NI",
-    Academic_Year_id: 1,
-    Course_id: "Computing",
-    Teacher_id: [1, 4],
-    teacher_name: ["Sagun SIr", "Random mam 3"]
-  },
-  CS4001NI: {
-    Module_id: "CS4001NI",
-    Academic_Year_id: 1,
-    Course_id: "Computing",
-    Teacher_id: [2],
-    teacher_name: ["Random sir"]
+  const getStudentDetails = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/students/getStudentDetail?userId=${userId}&userRole=${userRole}&section_id=${section}`);
+      setStudents(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error('Error while getting the student', error);
+    }
   }
-};
-
-export default function App() {
+  
   return (
-    <div className="max-w-lg mx-auto mt-10">
-      <h1 className="text-xl font-bold mb-4">Select Teachers for Modules</h1>
-      <ModuleTeacherSelector modules={modulesData} />
+    <div>
+      <SidebarComponent userRole={userRole} />
+
+      <div className='home-section'>
+        <div className="row">
+          <div className="col-md-12 grid-margin stretch-card">
+            <div className="card">
+              <div className="card-body">
+                <p className="card-title mb-0">Student List</p>
+                <div className="table-responsive">
+                  <table className="table table-striped table-borderless">
+                    <thead>
+                      <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Module ID</th>
+                        <th>Course</th>
+                        <th>Section</th>
+                        <th>Review</th>
+                        <th>Attendance</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {students.map((student, i) => (
+                        <tr key={i}>
+                          <td>{student.Student_Id}</td>
+                          <td className="font-weight-bold">{student.Student_Name}</td>
+                          <td>{student.Modules}</td>
+                          <td>{student.Courses}</td>
+                          <td>{student.section_id}</td>
+                          <td className="font-weight-medium">
+                            {userRole == "admin" ? (
+                              <div className="badge badge-success">
+                                <button className="btn-link text-white p-0 border-0 bg-transparent" 
+                                        onClick={() => navigate("/ViewReview", { state: { Id: student.Student_Id, ReviewOf: "Student" } })}>
+                                  View Reviews
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="badge badge-warning">
+                                <button className="btn-link text-white p-0 border-0 bg-transparent" 
+                                        onClick={() => navigate("/ReviewForm", { state: { Id: student.Student_Id, ReviewOf: "Student" } })}>
+                                  Review Student
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                          <td className="font-weight-medium">
+                            <div className="badge badge-primary">
+                              <button className="btn-link text-white p-0 border-0 bg-transparent" 
+                                      onClick={() => navigate("/ViewAttendance", { state: { Id: student.Student_Id, From: "student" } })}>
+                                View Attendance
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {userRole == "admin" && (
+          <button className="btn btn-success mt-3" onClick={() => navigate("/Register")}>Add Students</button>
+        )}
+      </div>
     </div>
-  );
+  )
 }
+
+export default Examples

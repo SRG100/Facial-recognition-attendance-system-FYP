@@ -67,14 +67,17 @@ router.get('/getStudentDetail', async (req, res) => {
             students = result
         }
         else if (userRole === 'teacher') {
-            const [result] = await db.query(`SELECT  s.Student_Id, s.Student_Name,sa.Section_id,
-                seca.Module_id as Modules,
-                GROUP_CONCAT(DISTINCT sa.Academic_Year_id SEPARATOR ', ') AS Academic_Years,
-                GROUP_CONCAT(DISTINCT sa.Course_id SEPARATOR ', ') AS Courses
-                FROM Student s 
-                JOIN Student_Association sa ON s.Student_Id = sa.Student_Id 
-                JOIN section_association seca ON sa.Section_id = seca.Section_id
-                WHERE sa.Section_id=? and seca.Teacher_id =?`,[section_id,userId])
+            const [result] = await db.query(`SELECT 
+                                                s.Student_Id,
+                                                s.Student_Name,
+                                                COALESCE(GROUP_CONCAT(DISTINCT sa.Module_id SEPARATOR ', '), 'Not Assigned') AS Modules,
+                                                COALESCE(GROUP_CONCAT(DISTINCT sa.Academic_Year_id SEPARATOR ', '), 'Not Assigned') AS Academic_Years,
+                                                COALESCE(GROUP_CONCAT(DISTINCT sa.Course_id SEPARATOR ', '), 'Not Assigned') AS Courses,
+                                                COALESCE(GROUP_CONCAT(DISTINCT sa.Section_id SEPARATOR ', '), 'Not Assigned') AS section_id
+                                            FROM Student s
+                                            LEFT JOIN student_association  sa ON s.Student_Id = sa.Student_Id
+                                            WHERE sa.Section_id=?
+                                            GROUP BY s.Student_Id, s.Student_Name`,[section_id])
             students = result
         }
         else {

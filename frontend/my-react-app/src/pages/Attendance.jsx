@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'
+import Popup from 'reactjs-popup';
 import { useLocation } from 'react-router-dom';
 import SidebarComponent from '../components/SideBar';
 import { Doughnut, Line, Bar } from 'react-chartjs-2';
 import 'chart.js/auto';
+import 'boxicons/css/boxicons.min.css'
+
 
 const Attendance = ({ userId, userRole }) => {
   const location = useLocation()
@@ -12,6 +15,9 @@ const Attendance = ({ userId, userRole }) => {
   const [studentData, setStudentData] = useState([])
   const [attendanceData, setAttendanceData] = useState([])
   const [absenceData, setAbsenceData] = useState([])
+  const [attendanceBySubject, setAttendanceBySubject] = useState([])
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [reportCredit, setReportCredit] = useState({ Module: '', From: '', To: '' });
 
 
 
@@ -23,6 +29,7 @@ const Attendance = ({ userId, userRole }) => {
   useEffect(() => {
     getAttendanceByDate()
     getAbsenceByMonth()
+    getAbsenceBySubject()
 
   }, [Id]);
 
@@ -37,7 +44,7 @@ const Attendance = ({ userId, userRole }) => {
   }
   const getAttendanceByDate = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/attendance/getAttendnaceByDate?Id=${Id}`);
+      const response = await axios.get(`http://localhost:3000/attendance/getAttendnaceByDate?Id=${Id}&userRole=student`);
       setAttendanceData(Array.isArray(response.data) ? response.data : [])
 
     } catch (error) {
@@ -53,14 +60,33 @@ const Attendance = ({ userId, userRole }) => {
       console.error('Error while getting the student absence by month', error)
     }
   }
+  const getAbsenceBySubject = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/attendance/getAttendanceBySubject?Id=${Id}`);
+      setAttendanceBySubject(Array.isArray(response.data) ? response.data : [])
 
-
+    } catch (error) {
+      console.error('Error while getting the student absence by month', error)
+    }
+  }
+  const generateReport = async () => {
+    try {
+      console.log(reportCredit)
+      const response = await axios.get(`http://localhost:3000/generate/generateReport?Module=${reportCredit.Module}&From=${reportCredit.From}&To=${reportCredit.To}&Id=${Id}`, { responseType: 'blob' });
+      const blob = response.data
+      const pdfUrl = URL.createObjectURL(blob)
+      console.log(response)
+      window.open(pdfUrl, "_blank")
+    } catch (error) {
+      console.error('Error while getting the student absence by month', error)
+    }
+  }
 
   // Chart data configurations
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: true
-  };
+  }
   console.log(studentData)
 
   const doughnutChart = {
@@ -79,7 +105,43 @@ const Attendance = ({ userId, userRole }) => {
       data: [90, 85, 80, 70, 95],
       backgroundColor: '#2196f3',
     }]
+  }
+  const subjectBarChartConfig = (attendanceBySubject) => {
+    const labels = [];
+    const presentData = [];
+    const lateData = [];
+    const absentData = [];
+
+    // Process attendance data
+    attendanceBySubject.forEach(entry => {
+      labels.push(entry.Module_name);
+      presentData.push(entry.Present_Count);
+      lateData.push(entry.Late_Count);
+      absentData.push(entry.Absent_Count);
+    });
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Present',
+          data: presentData,
+          backgroundColor: '#4caf50',
+        },
+        {
+          label: 'Late',
+          data: lateData,
+          backgroundColor: '#ff9800',
+        },
+        {
+          label: 'Absent',
+          data: absentData,
+          backgroundColor: '#f44336',
+        }
+      ]
+    };
   };
+
 
   const lineChartConfig = (attendanceData) => {
     const labels = []
@@ -103,114 +165,158 @@ const Attendance = ({ userId, userRole }) => {
         }
       ]
     };
-  };
-  const monthlyAttendanceChart = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-    datasets: [{
-      label: 'Monthly Absences',
-      data: [5, 3, 7, 2, 4, 1, 0],
-      backgroundColor: '#f44336',
-    }]
-  };
+  }
   const monthlyAttendanceChartConfig = (absenceData) => {
     return {
-        labels: absenceData.map(entry => entry.Month),
-        datasets: [{
-            label: 'Monthly Absences',
-            data: absenceData.map(entry => entry.Absent_Count),
-            backgroundColor: '#f44336',
-        }]
+      labels: absenceData.map(entry => entry.Month),
+      datasets: [{
+        label: 'Monthly Absences',
+        data: absenceData.map(entry => entry.Absent_Count),
+        backgroundColor: '#f44336',
+      }]
     }
-}
-    const ChartCard = ({ title, children }) => (
-      <div className="card mt-4">
-        <div className="card-body">
-          <h4 className="card-title">{title}</h4>
-          <div className="chart-container">
-            {children}
-          </div>
+  }
+  const ChartCard = ({ title, children }) => (
+    <div className="card dashboard mt-4">
+      <div className="card-body">
+        <h4 className="card-title">{title}</h4>
+        <div className="chart-container">
+          {children}
         </div>
       </div>
-    );
+    </div>
+  );
 
-    return (
-      <div className="attendance-dashboard">
-        <SidebarComponent userRole={userRole} />
+  return (
+    <div className="attendance-dashboard">
+      <SidebarComponent userRole={userRole} />
 
-        <div className="home-section">
-          <div className="content-wrapper">
-            {/* Header */}
-            <div className="page-header">
-              <h3 className="page-title">Attendance Dashboard</h3>
-              <nav aria-label="breadcrumb">
+      <div className="home-section">
+        <div className="content-wrapper">
+          {/* Header */}
+          <div className="page-header">
+            <h3 className="page-title">Attendance Dashboard</h3>
+            {/* <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item"><a href="#">Dashboard</a></li>
                   <li className="breadcrumb-item active" aria-current="page">Attendance</li>
                 </ol>
-              </nav>
-            </div>
+              </nav> */}
+          </div>
 
-            {/* Student Info Summary */}
-            <div className="student-info-card mb-4">
-              <div className="card">
-                <div className="card-body">
-                  <h4 className="card-title">Student Information</h4>
-                  <div className="d-flex justify-content-between align-items-center flex-wrap">
-                    <div>
-                      <p className="mb-1"><strong>Student ID:</strong> {studentData[0]?.Student_ID}</p>
-                      <p className="mb-1"><strong>Name:</strong> {studentData[0]?.Student_Name}</p>
-                    </div>
-                    <div>
-                      <p className="mb-1"><strong>Attendance Rate:</strong> {studentData[0]?.Attendance_Percentage}%</p>
-                      <p className="mb-1"><strong>Total Classes:</strong> {studentData[0]?.Total_Classes}</p>
-                    </div>
+          {/* Student Info Summary */}
+          <div className="student-info-card mb-4">
+            <div className="card">
+              <div className="card-body">
+                <h4 className="card-title">Student Information</h4>
+                <div className="d-flex justify-content-between align-items-center flex-wrap">
+                  <div>
+                    <p className="mb-1"><strong>Student ID:</strong> {studentData[0]?.Student_ID}</p>
+                    <p className="mb-1"><strong>Name:</strong> {studentData[0]?.Student_Name}</p>
+                  </div>
+                  <div>
+                    <p className="mb-1"><strong>Attendance Rate:</strong> {studentData[0]?.Attendance_Percentage}%</p>
+                    <p className="mb-1"><strong>Total Classes:</strong> {studentData[0]?.Total_Classes}</p>
+                    <button className='btn btn-outline-primary' onClick={() => setIsPopupOpen(true)} >Generate Report</button>
+
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+          <Popup open={isPopupOpen} closeOnDocumentClick onClose={() => setIsPopupOpen(false)}>
+            <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
 
-            <div className="row mt-2">
+              <div className="modal-header mb-3">
+                <h3 className="modal-title">Generate Attendance Report</h3>
 
-              <div className="col-lg-6 grid-margin mx-auto">
-                <ChartCard title="Attendance Summary">
-                  <div className="d-flex justify-content-center">
-                    <div style={{ position: 'relative', height: '230px', width: '250px' }}>
-                      <Doughnut data={doughnutChart} options={chartOptions} />
-                    </div>
-                  </div>
-                </ChartCard>
               </div>
 
+              <div className="modal-body">
+                <h5>Select creterias</h5>
+                <div className="form-group mb-3">
+                  <label className="form-label">Modules:</label>
+                  <select
+                    className="form-select"
+                    onChange={(e) => setReportCredit({ ...reportCredit, Module: e.target.value })}
+                  >
+                    <option value="">-- Selelct Module --</option>
+                    <option value="All">All</option>
+
+                    {attendanceBySubject.map((module) => (
+                      <option key={module.Module_id} value={module.Module_id}>
+                        {module.Module_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group mb-3">
+                  <label className="form-label"   >From:</label>
+                  <input type="date"
+                    value={reportCredit.From}
+                    onChange={(e) => {
+                      setReportCredit((prev) => ({ ...prev, From: e.target.value }));
+                    }} className="form-control" />
+                  <label className="form-label"   >To:</label>
+                  <input type="date"
+                    value={reportCredit.To}
+                    onChange={(e) => {
+                      setReportCredit((prev) => ({ ...prev, To: e.target.value }));
+                    }}
+                    className="form-control" />
+                </div>
+                <button className='btn btn-outline-primary' onClick={generateReport} >Generate Report</button>
 
 
-              <div className="col-lg-6 grid-margin ml-1">
-                <ChartCard title="Subject-wise Attendance">
-                  <div style={{ position: 'relative', height: '230px' }}>
-                    <Bar data={subjectBarChart} options={chartOptions} />
-                  </div>
-                </ChartCard>
               </div>
             </div>
-            <div className="row">
-              <div className="col-lg-6 grid-margin ml-1">
-                <ChartCard title="Overall Attendnace Present Data">
-                  <div style={{ position: 'relative', height: '230px' }}>
-                    <Line data={lineChartConfig(attendanceData)} options={chartOptions} />
+          </Popup>
+
+          <div className="row mt-2">
+
+            <div className="col-lg-6 grid-margin mx-auto">
+              <ChartCard title="Attendance Summary">
+                <div className="d-flex justify-content-center">
+                  <div style={{ position: 'relative', height: '230px', width: '250px' }}>
+                    <Doughnut data={doughnutChart} options={chartOptions} />
                   </div>
-                </ChartCard>
-              </div>
-              <div className="col-lg-6 grid-margin">
-                <ChartCard title="Monthly Absence Report">
-                  <div style={{ position: 'relative', height: '230px' }}>
-                    <Bar data={monthlyAttendanceChartConfig(absenceData)} options={chartOptions} />
-                  </div>
-                </ChartCard>
-              </div>
+                </div>
+              </ChartCard>
+            </div>
+
+
+
+            <div className="col-lg-6 grid-margin ml-1">
+              <ChartCard title="Subject-wise Attendance">
+                <div style={{ position: 'relative', height: '230px' }}>
+                  <Bar data={subjectBarChartConfig(attendanceBySubject)} options={chartOptions} />
+                </div>
+              </ChartCard>
+            </div>
+          </div>
+          <div className="row">
+            
+            <div className="col-lg-6 grid-margin ml-1">
+              
+              <ChartCard title="Overall Attendnace Present Data">
+                <div style={{ position: 'relative', height: '230px' }}>
+                  <Line data={lineChartConfig(attendanceData)} options={chartOptions} />
+                </div>
+              </ChartCard>
+            </div>
+            <div className="col-lg-6 grid-margin">
+              <ChartCard title="Monthly Absence Report">
+                <div style={{ position: 'relative', height: '230px' }}>
+                  <Bar data={monthlyAttendanceChartConfig(absenceData)} options={chartOptions} />
+                </div>
+              </ChartCard>
             </div>
           </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
-  export default Attendance;
+export default Attendance;

@@ -93,7 +93,7 @@ const ViewReview = ({ userId, userRole }) => {
   return (
     <div>
       <SidebarComponent userRole={userRole} />
-
+    <div className='home-section'>
       <div className="container py-5">
         <div className="row">
           <div className="col-lg-10 mx-auto">
@@ -122,7 +122,7 @@ const ViewReview = ({ userId, userRole }) => {
                     {/* Summary Section */}
                     <div className="row mb-5">
                       <div className="col-md-5">
-                        <div className="card border-0 bg-light shadow-sm h-100">
+                        <div className="card review border-0 bg-light shadow-sm h-100">
                           <div className="card-body text-center p-4">
                             <h2 className="display-3 fw-bold text-primary mb-0">
                               {parseFloat(reviewData.avgRatings).toFixed(1)}
@@ -139,7 +139,7 @@ const ViewReview = ({ userId, userRole }) => {
                       </div>
 
                       <div className="col-md-7">
-                        <div className="card border-0 bg-light shadow-sm h-100">
+                        <div className="card review border-0 bg-light shadow-sm h-100">
                           <div className="card-body p-4">
                             <h5 className="card-title mb-4">Rating Distribution</h5>
 
@@ -178,7 +178,7 @@ const ViewReview = ({ userId, userRole }) => {
                     <div className="mb-4">
                       <h5 className="card-title mb-4">All Reviews</h5>
                       {reviewData.review.map((review) => (
-                        <div key={review.Module_review_id} className="card mb-3 border-0 shadow-sm">
+                        <div key={review.Module_review_id} className="card review mb-3 border-0 shadow-sm">
                           <div className="card-body p-4">
                             <div className="d-flex flex-column flex-md-row justify-content-between mb-3">
                               <div>
@@ -223,7 +223,7 @@ const ViewReview = ({ userId, userRole }) => {
           </div>
         </div>
       </div>
-
+      </div>
     </div>
   );
 };

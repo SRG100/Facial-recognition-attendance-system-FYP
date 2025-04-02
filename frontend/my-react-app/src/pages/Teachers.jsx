@@ -26,9 +26,8 @@ const Teachers = ({ userRole, userId }) => {
         <div>
             <SidebarComponent userRole={userRole} />
             <div className='home-section'>
-                <div className="container p-0 m-0">
-                    <h2 className="text-center my-3">Teachers</h2>
-                    <table className="table table-light table-hover text-center table-responsive">
+                <div className="card container p-0 m-0">
+                    <table className="table  table-hover text-center table-responsive">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col">Teacher ID</th>
@@ -47,7 +46,6 @@ const Teachers = ({ userRole, userId }) => {
                                     </>
                                 )}
                                 <th scope="col">Review</th>
-                                {userRole === "admin" && <th scope="col">Associations</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -62,9 +60,6 @@ const Teachers = ({ userRole, userId }) => {
                                             <td className="align-middle">{teacher.Sections}</td>
                                             <td className="align-middle">
                                                 <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: teacher.Teacher_id, ReviewOf: "Teacher" } })}>View Reviews</button>
-                                            </td>
-                                            <td className="align-middle">
-                                                <button className="btn btn-outline-primary">Add Associations</button>
                                             </td>
                                         </>
                                     ) : (
@@ -81,10 +76,11 @@ const Teachers = ({ userRole, userId }) => {
                             ))}
                         </tbody>
                     </table>
-                </div>
-                {userRole === "admin" && (
+                    {userRole === "admin" && (
                     <button className="btn btn-success mt-3" onClick={() => navigate("/RegisterTeacher")}>Add Teacher</button>
                 )}
+                </div>
+                
             </div>
         </div>
     );

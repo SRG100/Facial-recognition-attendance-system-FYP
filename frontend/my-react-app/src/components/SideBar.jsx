@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
-import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'boxicons/css/boxicons.min.css';
-import '../assets/SideBar-light.css';
+import React, { useState, useEffect } from 'react'
+import { NavLink } from 'react-router-dom'
+import axios from 'axios'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'boxicons/css/boxicons.min.css'
+import '../assets/SideBar-light.css'
 
-const SidebarComponent = ({ userRole }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+const SidebarComponent = ({userId, userRole }) => {
+    const [isOpen, setIsOpen] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [userName,setUserName]=useState()
 
     useEffect(() => {
         const checkAuthorization = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/auth/isAuthorized', { withCredentials: true });
                 const isVerified = response.data?.success;
+                setUserName(response.data?.userName)
                 setIsLoggedIn(isVerified);
             } catch (error) {
                 console.error('Error checking authorization:', error);
@@ -22,7 +24,7 @@ const SidebarComponent = ({ userRole }) => {
         };
 
         checkAuthorization();
-    }, []);
+    }, [])
 
     const handleLogout = async () => {
         try {
@@ -90,7 +92,7 @@ const SidebarComponent = ({ userRole }) => {
                     <li className="profile">
                         <div className="profile-details">
                             <div className="name-job">
-                                <div className="name">John Doe</div>
+                                <div className="name">{userName}</div>
                                 <div className="job">{userRole}</div>
                             </div>
                             <button 

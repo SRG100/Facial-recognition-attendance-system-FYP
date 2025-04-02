@@ -21,6 +21,7 @@ import Modules from './pages/Modules';
 import Attendance from './pages/Attendance';
 import ViewReview from './pages/ViewReview';
 import Toast from './components/Toast';
+import Examples from './pages/Example';
 
 
 function App() {
@@ -28,21 +29,24 @@ function App() {
   const [userRole, setUserRole] = useState();
   const [userId, setUserId] = useState();
   const [loading, setLoading] = useState(true);
+  const [userName, setUsername] = useState();
 
   useEffect(() => {
     const checkAuthorization = async () => {
       try {
         const response = await axios.get('http://localhost:3000/auth/isAuthorized', { withCredentials: true });
-        setUserId(response.data.userId);
-        setUserRole(response.data.role);
-        setIsLoggedIn(response.data.success);
+        setUserId(response.data.userId)
+        setUserRole(response.data.role)
+        setUsername(response.data.userName)
+        setIsLoggedIn(response.data.success)
+
       } catch (error) {
-        setIsLoggedIn(false);
+        setIsLoggedIn(false)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     };
-    checkAuthorization();
+    checkAuthorization()
   }, []);
 
   if (loading) return <p>Loading...</p>;
@@ -57,7 +61,7 @@ function App() {
             <Route path="/register" element={ <Register userRole={userRole}/>  } />
             <Route path="/registerTeacher" element={<RegisterTeacher userRole={userRole} />  } />
           
-            <Route path="/" element={<Dashboard isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} />} />
+            <Route path="/" element={<Dashboard isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} userName={userName}/>} />
             <Route path="/checkface" element={<CheckFace userId={userId} userRole={userRole}/>} />
             <Route path="/classes" element={<Classes isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} />} />
             <Route path="/registerface" element={<RegisterFace userId={userId} userRole={userRole} />} />
@@ -72,6 +76,8 @@ function App() {
             <Route path="/ReviewForm" element={<ReviewForm userId={userId} userRole={userRole} />} />
             <Route path="/ViewReview" element={<ViewReview userId={userId} userRole={userRole} />} />
             <Route path="/toast" element={<Toast userId={userId} userRole={userRole} />} />
+            <Route path="/example" element={<Examples userId={userId} userRole={userRole} />} />
+
 
             <Route path="/login" element={<Navigate to="/" />} />
           </Route>

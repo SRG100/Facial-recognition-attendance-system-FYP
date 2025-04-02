@@ -13,20 +13,24 @@ router.post('/login', async (req, res) => {
 
     let rows = [];
     let id
+    let userName
     try {
         const db = await connectDatabase()
         console.log("Database connected successfully!");
         if (role === 'student') {
             [rows] = await db.query('SELECT * FROM student WHERE Student_Email=?', [email])
             id = rows[0].Student_Id
+            userName= rows[0].Student_Name
 
         } else if (role === 'teacher') {
             [rows] = await db.query('SELECT * FROM teacher WHERE Teacher_Email=?', [email])
             id = rows[0].Teacher_id
+            userName=rows[0].Teacher_Name
 
         } else if (role === 'admin') {
             [rows] = await db.query('SELECT * FROM admin WHERE Admin_Email=?', [email])
             id = rows[0].Admin_id
+            userName=rows[0].Admin_Name
 
         } else {
             return res.status(400).json({ message: "Invalid role provided" });
@@ -59,7 +63,7 @@ router.post('/login', async (req, res) => {
 
         console.log("the user id is:", id)
         const token = jwt.sign(
-            { id: id, role: role },
+            { id: id, role: role , userName:userName },
             process.env.JWT_KEY,
             { expiresIn: "1h" }
         );
@@ -101,7 +105,8 @@ router.get('/isAuthorized', async (req, res) => {
             success: true,
             message: "User is authorized",
             userId: decoded.id,
-            role: decoded.role
+            role: decoded.role,
+            userName: decoded.userName
         })
 
 

@@ -33,14 +33,18 @@ router.get('/getAttendnaceDetails', async (req, res) => {
 })
 router.get('/getAttendnaceByDate', async (req, res) => {
     try {
-        const { Id } = req.query
+        const { Id, userRole } = req.query
         const db = await connectDatabase()
-
-
-        const [results] = await db.execute(`SELECT c.Class_date, SUM(CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present_Count, 
+        let query = `
+            SELECT c.Class_date, SUM(CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present_Count, 
             SUM(CASE WHEN a.Attendance_Status = 'Late' THEN 1 ELSE 0 END) AS Late_Count, SUM(CASE WHEN a.Attendance_Status = 'Absent' THEN 1 ELSE 0 END) AS
-            Absent_Count FROM attendance a JOIN attendance_association aa ON a.Attendance_Id = aa.Attendance_Id Join class c on aa.Class_id= c.Class_id WHERE aa.Student_ID = ? 
-            GROUP BY c.Class_date ORDER BY c.Class_date`, [Id])
+            Absent_Count FROM attendance a JOIN attendance_association aa ON a.Attendance_Id = aa.Attendance_Id Join class c on aa.Class_id= c.Class_id
+            WHERE 1=1
+        `
+        if (userRole === "student") query += ` AND aa.Student_ID = '${Id}'`
+        query += ` GROUP BY c.Class_date ORDER BY c.Class_date`
+        
+        const [results] = await db.execute(query)
         console.log("Got the attendnace by date")
         const formattedData = results.map(item => ({
             Attendance_Date: new Date(item.Class_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -61,7 +65,7 @@ router.get('/getAbsenceMonth', async (req, res) => {
 
 
         const [results] = await db.execute(`SELECT 
-                                    DATE_FORMAT(a.Attendance_Date, '%b') AS Month,  -- Extracts 'Jan', 'Feb', etc.
+                                    DATE_FORMAT(a.Attendance_Date, '%b') AS Month,
                                     SUM(CASE WHEN a.Attendance_Status = 'Absent' THEN 1 ELSE 0 END) AS Absent_Count
                                 FROM attendance a
                                 JOIN attendance_association aa ON a.Attendance_Id = aa.Attendance_Id
@@ -80,38 +84,59 @@ router.get('/getAbsenceMonth', async (req, res) => {
 })
 
 
-
-
-router.get('/getSpecificModules', async (req, res) => {
+router.get('/generateReport', async (req, res) => {
     try {
-        console.log("Got the specific  modules ")
-        const { Course, Year } = req.query
+        const { Module, From, To, Id } = req.query
         const db = await connectDatabase()
-        let modules = []
-        const [result] = await db.query(`SELECT ta.*, t.teacher_name from teacher_association ta JOIN teacher t ON ta.teacher_id = t.teacher_id where ta.course_id=? and ta.academic_year_id = ?`, [Course, Year])
-        const groupedModules = result.reduce((acc, row) => {
-            const { Module_id, Academic_Year_id, Course_id, Teacher_id, teacher_name } = row;
+        console.log(Module, From, To)
+        let query = `select m.Module_Name, c.Class_id, c.Class_Type, DATE_FORMAT(c.Class_Date, '%Y-%m-%d') AS Class_Date, a.Attendance_Time, 
+                            (CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present, 
+                            (CASE WHEN a.Attendance_Status = 'Late' THEN 1 ELSE 0 END) AS Late, 
+                            (CASE WHEN a.Attendance_Status = 'Absent' THEN 1 ELSE 0 END) AS Absent
+                        FROM attendance a 
+                        JOIN attendance_association aa ON a.Attendance_Id = aa.Attendance_Id
+                        JOIN module m ON aa.Module_id = m.Module_id 
+                        JOIN class c ON aa.Class_Id = c.Class_Id  
+                        WHERE aa.Student_ID = ?`
 
-            if (!acc[Module_id]) {
-                acc[Module_id] = {
-                    Module_id,
-                    Academic_Year_id,
-                    Course_id,
-                    Teacher_id: [],
-                    teacher_name: []
-                };
-            }
+        if (Module !== "All") query += ` And m.Module_id = ?`
+        query += ` AND c.Class_Date BETWEEN ? AND ?`
+        let report = []
+        if (Module === "All") {
+            report = await db.query(query, [Id, From, To])
+        }
+        else {
+            report = await db.query(query, [Id, Module, From, To])
+        }
 
-            acc[Module_id].Teacher_id.push(Teacher_id);
-            acc[Module_id].teacher_name.push(teacher_name);
+        console.log(report)
+        res.json(Module)
 
-            return acc;
-        }, {});
-        modules = groupedModules
-        res.status(200).json(modules)
     } catch (err) {
-        console.error("Overall Class js error:", err);
-        res.status(500).json({ success: false, message: "Failed to get teachers" });
+        console.error("Attendnace Report error:", err);
+        res.status(500).json({ success: false, message: "Failed to get generate attendnace" })
     }
 })
+router.get('/getAttendanceBySubject', async (req, res) => {
+    try {
+        const { Id } = req.query
+        const db = await connectDatabase()
+        const [results] = await db.execute(`SELECT aa.Module_id,m.Module_name, SUM(CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present_Count, 
+            SUM(CASE WHEN a.Attendance_Status = 'Late' THEN 1 ELSE 0 END) AS Late_Count, 
+            SUM(CASE WHEN a.Attendance_Status = 'Absent' THEN 1 ELSE 0 END) AS Absent_Count 
+            FROM attendance a JOIN attendance_association aa ON a.Attendance_Id = aa.Attendance_Id
+            Join module m on aa.Module_id= m.Module_id WHERE aa.Student_ID = ? GROUP BY m.Module_id,m.Module_Name 
+            ORDER BY m.Module_id`, [Id])
+        console.log("Got the present by  module")
+        res.json(results)
+
+    } catch (err) {
+        console.error("Overall Class js error:", err);
+        res.status(500).json({ success: false, message: "Failed to get absence month" })
+    }
+})
+
+
+
+
 export default router

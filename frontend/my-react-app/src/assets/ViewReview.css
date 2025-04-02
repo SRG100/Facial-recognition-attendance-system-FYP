@@ -1,31 +1,31 @@
+.fa-star {
+  font-size: 1.2rem;
+  margin-right: 3px;
+}
 
-        .fa-star {
-          font-size: 1.2rem;
-          margin-right: 3px;
-        }
-        
-        .display-3 {
-          font-size: 4rem;
-        }
-        
-        .card {
-          transition: all 0.3s ease;
-        }
-        
-        .card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
-        }
-        
-        .progress {
-          border-radius: 20px;
-          background-color: #f0f0f0;
-        }
-        
-        .progress-bar {
-          border-radius: 20px;
-        }
-        .py-5 {
-            padding-top: 0rem !important;
-            padding-bottom: 0rem !important; 
-        }
+.display-3 {
+  font-size: 4rem;
+}
+
+.card.review {
+  transition: all 0.3s ease;
+}
+
+.card.review:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.progress {
+  border-radius: 20px;
+  background-color: #f0f0f0;
+}
+
+.progress-bar {
+  border-radius: 20px;
+}
+
+.py-5 {
+  padding-top: 0rem !important;
+  padding-bottom: 0rem !important;
+}

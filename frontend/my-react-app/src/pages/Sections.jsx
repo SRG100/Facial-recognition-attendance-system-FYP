@@ -167,7 +167,7 @@ const Sections = ({ userRole, userId }) => {
                 <select
                   className="form-select"
                   onChange={(e) => setNewSection({ ...newSection, Course: e.target.value })}>
-                  <option value="">-- Select a Section --</option>
+                  <option value="">-- Select a Course --</option>
                   {course.map((course) => (
                     <option key={course.Course_id} value={course.Course_id}>
                       {course.Course_Name}

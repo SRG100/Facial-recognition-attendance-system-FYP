@@ -27,54 +27,55 @@ const Modules = ({ userId, userRole }) => {
       <SidebarComponent userRole={userRole} />
       <div className='home-section'>
 
-      <div className="container p-0 m-0">
-        <table className="table table-light table-hover text-center table-responsive">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <div className="card container p-0 m-0">
+          <table className="table table-hover text-center table-responsive">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
-            <tr>
-              <th scope="col" >Module id</th>
-              <th scope="col" >Module name </th>
-              <th scope="col" >Module Credits </th>
-              <th scope="col" >Module Details </th>
+              <tr>
+                <th scope="col" >Module id</th>
+                <th scope="col" >Module name </th>
+                <th scope="col" >Module Credits </th>
+                <th scope="col" >Module Details </th>
 
-              <th scope="col" >Review </th>
+                <th scope="col" >Review </th>
 
 
-            </tr>
-          </thead>
+              </tr>
+            </thead>
 
-          <tbody>
-            {
-              modules.map((module, i) => {
-                return (
-                  <tr scope="row" key={i}>
+            <tbody>
+              {
+                modules.map((module, i) => {
+                  return (
+                    <tr scope="row" key={i}>
 
-                    <td className="align-middle" >{module.Module_id}</td>
-                    <td className="align-middle">{module.Module_Name}</td>
-                    <td className="align-middle">{module.Module_details}</td>
-                    <td className="align-middle">{module.Module_Credits}</td>
-                    <td className="align-middle">
-                      {userRole == "student" ? (
-                        <>
-                          <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: module.Module_id, userRole, ReviewOf: "Module" } })}>Review Module</button>
-                        </>
-                      ) : (
-                        <>
-                          <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: module.Module_id, ReviewOf: "Module" } })}>View Module Reviews</button>
-                        </>
-                      )}
-                    </td>
+                      <td className="align-middle" >{module.Module_id}</td>
+                      <td className="align-middle">{module.Module_Name}</td>
+                      <td className="align-middle">{module.Module_details}</td>
+                      <td className="align-middle">{module.Module_Credits}</td>
+                      <td className="align-middle">
+                        {userRole == "student" ? (
+                          <>
+                            <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: module.Module_id, userRole, ReviewOf: "Module" } })}>Review Module</button>
+                          </>
+                        ) : (
+                          <>
+                            <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: module.Module_id, ReviewOf: "Module" } })}>View Module Reviews</button>
+                          </>
+                        )}
+                      </td>
 
-                  </tr>
-                )
-              })}
-          </tbody>
-        </table>
-      </div>
-      {userRole == "admin" && (
-        // console.log("User Role:", userRole)
-        <button className="btn btn-success" onClick={() => navigate("/RegisterModule")}>Add Module</button>
-      )}
+                    </tr>
+                  )
+                })}
+            </tbody>
+          </table>
+          {userRole == "admin" && (
+            // console.log("User Role:", userRole)
+            <button className="btn btn-success" onClick={() => navigate("/RegisterModule")}>Add Module</button>
+          )}
+        </div>
+
       </div>
     </div>
   )

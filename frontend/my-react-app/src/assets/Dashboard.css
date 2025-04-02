@@ -1,0 +1,42 @@
+.card-body {
+    a {
+        text-decoration: none;
+    }
+
+
+    .card-body {
+        padding-top: 1rem;
+    }
+}
+
+.card.dashboard{
+    padding: 0em !important;
+    text-align: left;
+    box-shadow: none;
+
+}
+.card{
+    padding: 2em !important;
+    text-align: left;
+}
+
+.card-people {
+    position: relative;
+    padding-top: 20px;
+
+    img {
+        border-radius: 20px;
+        width: 100%;
+    }
+
+    .weather-info {
+        position: absolute;
+        top: 30px;
+        right: 24px;
+
+        .location {
+            font-size: 20px;
+            margin-bottom: 0;
+        }
+    }
+}

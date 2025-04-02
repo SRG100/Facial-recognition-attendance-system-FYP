@@ -8,7 +8,8 @@ body {
 
 .card {
     border: none !important;
-    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2)
+    border-radius: 25px;
+    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
 }
 
 .blue-text {
@@ -62,3 +63,4 @@ button:focus {
     box-shadow: none !important;
     outline-width: 0
 }
+

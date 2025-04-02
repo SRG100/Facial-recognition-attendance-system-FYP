@@ -48,7 +48,7 @@ const RegisterFace = ({userId,userRole}) => {
       <FaceCapture image={image} setImage={setImage} />
       
       {image !== '' && (
-        <button onClick={registerFace} className="webcam-btn">
+        <button onClick={registerFace}>
           Register Face
         </button>
       )}

@@ -13,6 +13,7 @@ import review from './controllers/ReviewController.js'
 import section from './controllers/SectionController.js'
 import course from './controllers/CourseController.js'
 import attendance from './controllers/Attendnace.js'
+import generate from './controllers/GenerateReport.js'
 const app = express()
 
 app.use(cookieParser());
@@ -36,6 +37,7 @@ app.use('/sections',section)
 app.use('/reviews',review)
 app.use('/courses',course)
 app.use('/attendance',attendance)
+app.use('/generate',generate)
 app.listen(process.env.PORT,()=> {
     console.log("Server is Running")
 })

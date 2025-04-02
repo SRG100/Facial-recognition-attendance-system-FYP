@@ -9,6 +9,19 @@ const Students = ({ userRole, userId }) => {
   const [students, setStudents] = useState([])
   const [section, setSection] = useState(null)
   const location = useLocation()
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filteredStudents, setFilteredStudents] = useState([]);
+
+  useEffect(() => {
+    const results = students.filter(student =>
+      student.Student_Id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.Student_Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.Modules.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.Courses.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.section_id.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredStudents(results)
+  }, [searchTerm, students])
 
   const Section_id = location.state?.Section_id
   useEffect(() => {
@@ -26,7 +39,7 @@ const Students = ({ userRole, userId }) => {
       getStudentDetails();
     }
     else if (userId && userRole == "admin") {
-      getStudentDetails();
+      getStudentDetails()
     }
   }, [section]);
 
@@ -41,14 +54,26 @@ const Students = ({ userRole, userId }) => {
     }
   }
   return (
-    <div>Students
+    <div>
       <SidebarComponent userRole={userRole} />
 
-      <div className='home-section'>
-        <div className="container p-0 m-0">
+      <div className=' home-section'>
+      <div className="d-flex justify-content-center pb-3 pt-0 mt-0">
+            <div className="input-group w-50">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search by ID, name, module, course, or section..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+        <div className="card  container p-0 m-0">
+          
 
-          <table className="table table-light table-hover text-center table-responsive">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <table className="table table-hover text-center table-responsive">
+            <thead className="">
 
               <tr>
                 <th scope="col" >Student id</th>
@@ -57,12 +82,13 @@ const Students = ({ userRole, userId }) => {
                 <th scope="col" >Courses</th>
                 <th scope="col" >Sections </th>
                 <th scope="col" >Review </th>
+                <th scope="col" >Attendance </th>
               </tr>
             </thead>
 
             <tbody>
               {
-                students.map((student, i) => {
+                filteredStudents.map((student, i) => {
                   return (
                     <tr scope="row" key={i}>
 
@@ -74,7 +100,7 @@ const Students = ({ userRole, userId }) => {
                       {userRole == "admin" ? (
                         <>
                           <td className="align-middle">
-                            <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: student.Student_Id, ReviewOf: "Student" } })}>View Student Reviews</button>
+                            <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: student.Student_Id, ReviewOf: "Student" } })}>View Reviews</button>
                           </td>
                         </>
                       ) : (
@@ -84,18 +110,21 @@ const Students = ({ userRole, userId }) => {
                           </td>
                         </>
                       )}
-
+                      <td className="align-middle">
+                        <button className="btn btn-outline-primary" onClick={() => navigate("/ViewAttendance", { state: { Id: student.Student_Id, From: "student" } })}>View Attendance</button>
+                      </td>
 
                     </tr>
                   )
                 })}
             </tbody>
           </table>
+          {userRole == "admin" && (
+            // console.log("User Role:", userRole)
+            <button className="btn btn-success" onClick={() => navigate("/Register")}>Add Students</button>
+          )}
         </div>
-        {userRole == "admin" && (
-          // console.log("User Role:", userRole)
-          <button className="btn btn-success" onClick={() => navigate("/Register")}>Add Students</button>
-        )}
+
       </div>
     </div>
   )

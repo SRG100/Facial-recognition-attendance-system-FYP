@@ -89,7 +89,25 @@ router.get('/getAcademicYears', async (req, res) => {
         })
     }
 })
-
+router.get('/getUserName', async (req, res) => {
+    try {
+        const {userId,userRole}=req.query
+        const db = await connectDatabase()
+        console.log("Database connected successfully in get user Name")
+        let dbQuery
+        if (userRole==="admin") dbQuery = 'Select Admin_Name from admin where admin_id = ?'
+        const [years] = await db.execute("Select * from Academic_year")
+        console.log("Sucessfully got the Academic year.")
+        res.json(years)
+    }
+    catch (e) {
+        console.log("error found:", e)
+        res.json({
+            success: false,
+            message: "Error occured while adding section",
+        })
+    }
+})
 router.post('/addSectionAssociations', async (req, res) => {
     try {
         const { Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id } = req.body
