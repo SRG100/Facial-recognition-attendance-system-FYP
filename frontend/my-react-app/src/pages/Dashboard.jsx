@@ -13,11 +13,14 @@ import 'chart.js/auto';
 const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
 
   const [attendanceData, setAttendanceData] = useState([])
+  const [dashboardData, setDashboardData] = useState([])
+
 
   useEffect(() => {
     getAttendanceByDate()
+    getDashboardDetails()
 
-  }, []);
+  }, [userId, userRole]);
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: true
@@ -27,6 +30,18 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
       const response = await axios.get(`http://localhost:3000/attendance/getAttendnaceByDate?Id=${userId}&userRole=${userRole}&`);
 
       setAttendanceData(Array.isArray(response.data) ? response.data : [])
+
+    } catch (error) {
+      console.error('Error while getting the student attendnace by date', error);
+    }
+  }
+  const getDashboardDetails = async () => {
+    try {
+      console.log(userId, String(userRole))
+      const response = await axios.get(`http://localhost:3000/crud/getDashboardDetails?userId=${userId}&userRole=${userRole}`);
+      console.log(response.data.data)
+
+      setDashboardData(response.data.data)
 
     } catch (error) {
       console.error('Error while getting the student attendnace by date', error);
@@ -71,6 +86,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
     <div>
       {/* <Nav /> */}
       <SidebarComponent userRole={userRole} />
+      
       <div className='home-section'>
         <div className="main-panel">
           <div className="content-wrapper">
@@ -109,21 +125,44 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
 
               <div className="col-md-6 grid-margin transparent">
                 <div className="row">
-                  <div className="col-md-6 mb-4 stretch-card transparent">
+                  <div className="col-md-6 mb-1 stretch-card transparent">
                     <div className="card dashboard card-tale" style={{ background: "#7da0fa", color: "white" }}>
                       <div className="card-body">
-                        <p className="mb-4">Total Students</p>
-                        <p className="fs-30 mb-2">4006</p>
-                        <p>10.00% (30 days)</p>
+                        {userRole === 'student' ? (
+                          <>
+                            <p className="mb-2">Upcoming Class</p>
+                            <h2 className="fs-30 mb-2">{dashboardData.upComingClass}</h2>
+                            <p>Classes remaining</p>
+                          </>
+                        ) : (
+                          <>
+                            <>
+                              <p className="mb-2">Total Students</p>
+                              <h2 className="fs-30 mb-2">{dashboardData.totalStudents}</h2>
+                              <p>The total students </p>
+                            </>
+                          </>
+                        )}
+
                       </div>
                     </div>
                   </div>
                   <div className="col-md-6 mb-4 stretch-card transparent">
                     <div className="card dashboard card-dark-blue " style={{ background: "#4746a0", color: "white" }}>
                       <div className="card-body">
-                        <p className="mb-4">Total Teachers</p>
-                        <p className="fs-30 mb-2">61344</p>
-                        <p>22.00% (30 days)</p>
+                        {userRole === 'teacher' ? (
+                          <>
+                            <p className="mb-2">Completed Classes</p>
+                            <h2 className="fs-30 mb-2 font-weight-bold">{dashboardData.completedClass}</h2>
+                            <p>2.00% (30 days)</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="mb-2">Total Teachers</p>
+                            <h2 className="fs-30 mb-2">{dashboardData.totalTeachers}</h2>
+                            <p>Number of teachers</p>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -133,18 +172,29 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
                   <div className="col-md-6 mb-4 mb-lg-0 stretch-card transparent">
                     <div className="card dashboard card-light-blue" style={{ background: "#7979e8", color: "white" }}>
                       <div className="card-body">
-                        <p className="mb-4">Total Modules</p>
-                        <p className="fs-30 mb-2 font-weight-bold">34040</p>
-                        <p>2.00% (30 days)</p>
+                        {userRole === 'teacher' ? (
+                          <>
+                            <p className="mb-2">Upcoming Class</p>
+                            <h2 className="fs-30 mb-2 font-weight-bold">{dashboardData.upComingClass}</h2>
+                            <p>Number of upcoming class</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="mb-2">Total Modules</p>
+                            <h2 className="fs-30 mb-2 font-weight-bold">{dashboardData.totalModules}</h2>
+                            <p>Number of modules</p>
+                          </>
+                        )}
+
                       </div>
                     </div>
                   </div>
                   <div className="col-md-6 stretch-card transparent">
                     <div className="card dashboard card-light-danger" style={{ background: "#f47c7c", color: "white" }}>
                       <div className="card-body">
-                        <p className="mb-4">Total Courses</p>
-                        <p className="fs-30 mb-2 font-weight-bold">47033</p>
-                        <p>0.22% (30 days)</p>
+                        <p className="mb-2">Total Courses</p>
+                        <h2 className="fs-30 mb-2 font-weight-bold">{dashboardData.totalCourses}</h2>
+                        <p>Number of total courses </p>
                       </div>
                     </div>
                   </div>
@@ -156,7 +206,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
               <div className="col-md-12 grid-margin stretch-card">
                 <div className="card dashboard">
                   <div className="card-body">
-                    
+
                     <div id="sales-chart-legend" className="chartjs-legend mt-4 mb-2">
 
                       <ChartCard title="Overall Attendnace Present Data">

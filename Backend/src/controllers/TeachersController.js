@@ -35,7 +35,7 @@ router.get('/getTeacherDetail', async (req, res) => {
         const { userId, userRole } = req.query
         const db = await connectDatabase()
         let classes = [];
-        if (userRole === 'admin') {
+        if (userRole === 'admin' ||userRole === 'teacher' ) {
             const [result] = await db.query(`SELECT 
                                             t.Teacher_id,
                                             t.Teacher_Name,

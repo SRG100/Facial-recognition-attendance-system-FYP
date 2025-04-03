@@ -22,7 +22,7 @@ body {
 
 input:not([type="radio"]),
 textarea,
-button ,select {
+.buttonCss ,select {
     padding: 8px 15px;
     border-radius: 5px !important;
     margin: 5px 0px;

@@ -42,6 +42,8 @@ router.get('/getAttendnaceByDate', async (req, res) => {
             WHERE 1=1
         `
         if (userRole === "student") query += ` AND aa.Student_ID = '${Id}'`
+        if (userRole === "teacher") query += ` AND aa.Teacher_id = '${Id}'`
+
         query += ` GROUP BY c.Class_date ORDER BY c.Class_date`
         
         const [results] = await db.execute(query)

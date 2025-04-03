@@ -26,16 +26,17 @@ import Examples from './pages/Example';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState();
-  const [userId, setUserId] = useState();
+  const [userRole, setUserRole] = useState("");
+  const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
-  const [userName, setUsername] = useState();
+  const [userName, setUsername] = useState("");
 
   useEffect(() => {
     const checkAuthorization = async () => {
       try {
         const response = await axios.get('http://localhost:3000/auth/isAuthorized', { withCredentials: true });
         setUserId(response.data.userId)
+        console.log(response.data.role)
         setUserRole(response.data.role)
         setUsername(response.data.userName)
         setIsLoggedIn(response.data.success)
@@ -50,8 +51,10 @@ function App() {
   }, []);
 
   if (loading) return <p>Loading...</p>;
+  console.log(userRole)
 
   return (
+    
     <BrowserRouter>
       <>
         <Routes>

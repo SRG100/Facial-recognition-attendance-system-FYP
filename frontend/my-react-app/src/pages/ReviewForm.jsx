@@ -97,11 +97,11 @@ function ReviewForm({ userId, userRole }) {
                   </div>
                   <div className="row justify-content-end">
                     {ReviewOf == "Student" ? (
-                      <div className="form-group col-sm-6"> <button type="submit" className="btn btn-outline-primary" onClick={handleSubmitStudentReview} >Review {ReviewOf} </button> </div>
+                      <div className="form-group col-sm-6"> <button type="submit" className=" buttonCss btn btn-outline-primary " onClick={handleSubmitStudentReview} >Review {ReviewOf} </button> </div>
                     ) : ReviewOf == "Teacher" ? (
-                      <div className="form-group col-sm-6"> <button type="submit" className="btn btn-outline-primary" onClick={handleSubmitTeacherReview}>Review {ReviewOf} </button> </div>
+                      <div className="form-group col-sm-6"> <button type="submit" className="buttonCss btn btn-outline-primary " onClick={handleSubmitTeacherReview}>Review {ReviewOf} </button> </div>
                     ) : (
-                      <div className="form-group col-sm-6"> <button type="submit" className="btn btn-outline-primary" onClick={handleSubmitModuleReview}>Review {ReviewOf} </button> </div>
+                      <div className="form-group col-sm-6"> <button type="submit" className="buttonCss btn btn-outline-primary " onClick={handleSubmitModuleReview}>Review {ReviewOf} </button> </div>
                     )}
                   </div>
                 </div>

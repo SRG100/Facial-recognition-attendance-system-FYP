@@ -96,7 +96,7 @@ const SidebarComponent = ({userId, userRole }) => {
                                 <div className="job">{userRole}</div>
                             </div>
                             <button 
-                                className="logout-btn" 
+                                className="logout-btn buttonCss" 
                                 onClick={handleLogout}
                             >
                                 <i className='bx bx-log-out'></i>

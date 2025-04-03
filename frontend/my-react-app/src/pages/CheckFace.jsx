@@ -68,11 +68,8 @@ const CheckFace = ({ userId ,userRole }) => {
 
       if (verified) {
         
-        await axios.post("http://localhost:3000/verification/faceVerified", formData1, {
-          headers: {
-            "Content-Type": "application/formdata",
-          },
-        })
+        await axios.get(`http://localhost:3000/verification/faceVerified?Attendance_id=${Attendance_id}`);
+
         alert("Your face has been verified")
         navigate("/verifylocation", { state: { Class_Id, Attendance_id } })
       } else {

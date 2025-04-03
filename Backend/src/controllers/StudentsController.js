@@ -47,6 +47,7 @@ router.post('/registerStudent', async (req, res) => {
 router.get('/getStudentDetail', async (req, res) => {
     try {
         const { userId, userRole, section_id } = req.query
+        console.log("The user role in studenty is:",userRole)
         console.log("Got the student details and the student section is :",section_id)
 
         const db = await connectDatabase()

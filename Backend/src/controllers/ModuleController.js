@@ -13,7 +13,7 @@ router.get('/getModulesDetails', async (req, res) => {
         const { userId, userRole } = req.query
         const db = await connectDatabase()
         let modules = []
-        if (userRole === 'admin') {
+        if (userRole === 'admin' || userRole==="teacher") {
             const [result] = await db.query(`SELECT * from module`)
 
             modules = result
@@ -26,10 +26,10 @@ router.get('/getModulesDetails', async (req, res) => {
             modules = result
         }
         else {
-            res.status(500).json({ success: false, message: "Wrong" });
+          return  res.status(500).json({ success: false, message: "Wrong" });
         }
         console.log("Got the modules ")
-        res.status(200).json(modules)
+         return res.status(200).json(modules)
     } catch (err) {
         console.error("Overall Class js error:", err);
         res.status(500).json({ success: false, message: "Failed to get teachers" });

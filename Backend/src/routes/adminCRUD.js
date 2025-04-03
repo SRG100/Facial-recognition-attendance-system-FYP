@@ -91,11 +91,11 @@ router.get('/getAcademicYears', async (req, res) => {
 })
 router.get('/getUserName', async (req, res) => {
     try {
-        const {userId,userRole}=req.query
+        const { userId, userRole } = req.query
         const db = await connectDatabase()
         console.log("Database connected successfully in get user Name")
         let dbQuery
-        if (userRole==="admin") dbQuery = 'Select Admin_Name from admin where admin_id = ?'
+        if (userRole === "admin") dbQuery = 'Select Admin_Name from admin where admin_id = ?'
         const [years] = await db.execute("Select * from Academic_year")
         console.log("Sucessfully got the Academic year.")
         res.json(years)
@@ -105,6 +105,83 @@ router.get('/getUserName', async (req, res) => {
         res.json({
             success: false,
             message: "Error occured while adding section",
+        })
+    }
+})
+
+router.get('/getDashboardDetails', async (req, res) => {
+    try {
+        const { userId, userRole } = req.query
+        const db = await connectDatabase()
+
+        let students = []
+
+        if (userRole === "teacher") {
+            [students] = await db.query(`SELECT COUNT(DISTINCT s.Student_Id) AS Total_Students FROM Student s LEFT JOIN student_association sa ON s.Student_Id = sa.Student_Id
+                                        JOIN section_association sec ON sa.Section_id = sec.Section_Id WHERE sec.teacher_id = ? `, [userId])
+        }
+        else {
+            [students] = await db.query('Select Count(*) As Total_Students from student')
+        }
+
+
+        let Modules = []
+        if (userRole === 'student') {
+            [Modules] = await db.query('Select Count(m.Module_id) As Total_Modules  from module m join student_association sa on m.Module_id = sa.Module_id where sa.Student_Id=?', [userId])
+        } else {
+            [Modules] = await db.query('Select Count(*) As Total_Modules from module')
+        }
+
+
+        const [course] = await db.query('Select Count(*) As Total_Courses from course')
+
+
+        let teachers = []
+        if (userRole === 'student') {
+            [teachers] = await db.query('Select Count(DISTINCT t.Teacher_id) As Total_Teachers from teacher t join section_association sea on t.Teacher_id = sea.Teacher_id join student_association sa on sea.Section_id = sa.Section_id where sa.Student_Id=?', [userId])
+        } else {
+            [teachers] = await db.query('Select Count(*) As Total_Teachers from teacher')
+        }
+
+
+        let classes = []
+
+        if (userRole === 'student') {
+            [classes] = await db.query(`SELECT COUNT(DISTINCT c.Class_Id) AS Total_Classes, COUNT(DISTINCT CASE WHEN c.Class_Completion = 1 THEN c.Class_Id END) AS Completed_Classes, 
+                                        COUNT(DISTINCT CASE WHEN c.Class_Completion = 0 THEN c.Class_Id END) AS Remaining_Classes FROM student s JOIN student_association sa ON s.Student_Id = sa.Student_Id 
+                                        JOIN section sec ON sa.Section_Id = sec.Section_Id JOIN section_association sec_a ON sec.Section_Id = sec_a.Section_Id JOIN class_association ca ON sec_a.Section_Id = ca.Section_Id 
+                                        AND sa.Course_id = ca.Course_id AND sa.Module_id = ca.Module_id 
+                                        JOIN class c ON ca.Class_Id = c.Class_Id WHERE s.Student_Id =?`, [userId]);
+
+        } 
+        if (userRole === 'teacher') {
+            [classes] = await db.query(`SELECT COUNT(DISTINCT c.Class_Id) AS Total_Classes, COUNT(DISTINCT CASE WHEN c.Class_Completion = 1 THEN c.Class_Id END) AS Completed_Classes, 
+                                    COUNT(DISTINCT CASE WHEN c.Class_Completion = 0 THEN c.Class_Id END) AS Remaining_Classes FROM teacher t 
+                                    JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id JOIN class_association ca ON ta.Module_id = ca.Module_Id AND ta.Course_id = ca.Course_id 
+                                    JOIN class c ON ca.Class_Id = c.Class_Id JOIN section sec ON ca.Section_Id = sec.Section_Id JOIN module m ON ca.Module_Id = m.Module_Id
+                                    WHERE t.Teacher_Id = 1`,[userId])
+
+        } 
+        console.log(userId, classes)
+
+        res.json({
+            success: true,
+            data: {
+                totalStudents: students[0]?.Total_Students || 0,
+                totalModules: Modules[0]?.Total_Modules || 0,
+                totalCourses: course[0]?.Total_Courses || 0,
+                totalTeachers: teachers[0]?.Total_Teachers || 0,
+                upComingClass:classes[0]?.Remaining_Classes || 0,
+                completedClass:classes[0]?.Completed_Classes || 0,
+            }
+        });
+
+
+    } catch (err) {
+        console.log("error found:", err)
+        res.json({
+            success: false,
+            message: "Error occured getting dashboard details",
         })
     }
 })

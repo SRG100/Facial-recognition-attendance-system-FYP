@@ -106,20 +106,23 @@ const Sections = ({ userRole, userId }) => {
       <SidebarComponent userRole={userRole} />
       <div className='home-section'>
         <table>
-          <tbody>
+          <tbody className='text-align-center' >
             {sections.map((section, i) => (
               <tr key={section.Section_id || i}>
-                <td className="align-middle">{section.Section_id}</td>
-                {userRole === 'teacher' && (
-                  <td className="align-middle">
-                    <button
-                      className="btn btn-outline-warning"
-                      onClick={() => navigate('/viewStudents', { state: { Section_id: section.Section_id } })}
-                    >
-                      View Students
-                    </button>
-                  </td>
+                <div className=''> 
+                  <td className=" align-middle">{section.Section_id}</td>
+                  {userRole === 'teacher' && (
+                    <td className="align-middle">
+                      <button
+                        className="btn btn-outline-warning"
+                        onClick={() => navigate('/viewStudents', { state: { Section_id: section.Section_id } })}
+                      >
+                        View Students
+                      </button>
+                    </td>
+                  
                 )}
+                </div>
               </tr>
             ))}
           </tbody>
