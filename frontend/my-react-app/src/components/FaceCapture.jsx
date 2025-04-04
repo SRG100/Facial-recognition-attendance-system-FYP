@@ -43,13 +43,13 @@ export const FaceCapture = ({image,setImage}) => {
                         e.preventDefault();
                         setImage('')
                     }}
-                        className="webcam-btn">
+                        className="btn btn-success">
                         Retake Image</button> :
                     <button onClick={(e) => {
                         e.preventDefault();
                         capture();
                     }}
-                        className="webcam-btn"> <i class='bx bxs-camera' style={{ fontSize: "30px" }}></i> Capture</button>
+                        className="btn btn-success">Capture</button>
                 }
             </div>
         </div>

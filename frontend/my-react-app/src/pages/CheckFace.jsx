@@ -91,7 +91,7 @@ const CheckFace = ({ userId ,userRole }) => {
       <FaceCapture image={image} setImage={setImage} />
 
       {image !== '' && (
-        <button onClick={VerifyFace}>
+        <button className='btn btn-success' onClick={VerifyFace}>
           Verify Face
         </button>
       )}

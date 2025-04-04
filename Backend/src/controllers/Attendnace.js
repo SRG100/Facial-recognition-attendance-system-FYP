@@ -45,7 +45,7 @@ router.get('/getAttendnaceByDate', async (req, res) => {
         if (userRole === "teacher") query += ` AND aa.Teacher_id = '${Id}'`
 
         query += ` GROUP BY c.Class_date ORDER BY c.Class_date`
-        
+
         const [results] = await db.execute(query)
         console.log("Got the attendnace by date")
         const formattedData = results.map(item => ({
@@ -137,7 +137,6 @@ router.get('/getAttendanceBySubject', async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to get absence month" })
     }
 })
-
 
 
 

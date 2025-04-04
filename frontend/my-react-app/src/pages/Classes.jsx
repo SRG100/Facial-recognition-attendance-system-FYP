@@ -16,6 +16,8 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
     const [showCompletedClasses, setShowCompletedClasses] = useState(false);
 
     const [isPopupOpen, setIsPopupOpen] = useState(false)
+    const [attendnaceExists, setAttendanceExists] = useState(false)
+
 
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
@@ -27,41 +29,53 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             getSectionDetails()
 
         }
-    }, [userId]);
+    }, [userId])
 
+    const endClass = async (classDetail) => {
+        try {
+
+            const endClassData = {
+                Class_Id: classDetail.Class_Id
+            }
+            const response = await axios.post('http://localhost:3000/classes/endClass', endClassData)
+            
+        } catch (e) {
+            console.error('Error while getting the sections', e)
+        }
+    }
 
     const getSectionDetails = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/sections/getSection');
-            setSections(Array.isArray(response.data) ? response.data : []);
+            const response = await axios.get('http://localhost:3000/sections/getSection')
+            setSections(Array.isArray(response.data) ? response.data : [])
         } catch (error) {
-            console.error('Error while getting the sections', error);
+            console.error('Error while getting the sections', error)
         }
     };
     const getModuleDetails = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/modules/getModulesDetails?userId=${userId}&userRole=${userRole}`);
-            setModules(Array.isArray(response.data) ? response.data : []);
+            const response = await axios.get(`http://localhost:3000/modules/getModulesDetails?userId=${userId}&userRole=${userRole}`)
+            setModules(Array.isArray(response.data) ? response.data : [])
         } catch (error) {
-            console.error('Error while getting the modules', error);
+            console.error('Error while getting the modules', error)
         }
     }
     const getTeacherDetails = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/teachers/getTeacherDetail?userId=${userId}&userRole=${userRole}`);
-            setTeachers(Array.isArray(response.data) ? response.data : []);
+            const response = await axios.get(`http://localhost:3000/teachers/getTeacherDetail?userId=${userId}&userRole=${userRole}`)
+            setTeachers(Array.isArray(response.data) ? response.data : [])
         } catch (error) {
-            console.error('Error while getting the teachers', error);
+            console.error('Error while getting the teachers', error)
         }
     }
     const addNewClass = async (e) => {
         console.log("Well the data before sending is :", newClass)
         e.preventDefault()
         try {
-            const response = await axios.post(`http://localhost:3000/classes/addClass`, newClass);
+            const response = await axios.post(`http://localhost:3000/classes/addClass`, newClass)
             console.log(response.message)
         } catch (error) {
-            console.error('Error while getting the teachers', error);
+            console.error('Error while getting the teachers', error)
         }
     }
 
@@ -119,7 +133,6 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             )
         })
     }
-
     const startClass = async (classDetail) => {
         try {
             const teacherLocation = await getUserLocation()
@@ -133,6 +146,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             }
             const response = await axios.post('http://localhost:3000/classes/startAttendance', startClassData)
             const classCode = response.data.classCode
+
 
             console.log(classCode)
             if (response.data.classCode) {
@@ -168,14 +182,23 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             const response = await axios.post('http://localhost:3000/classes/markAttendance', attendanceData)
             console.log(response.message)
             const Attendance_id = response.data.Attendance_Id
+            const attendnaceExistance= response.data.attendanceExists
+            setAttendanceExists(response.data.attendanceExists)
+            if (attendnaceExistance){
+                alert(response.data.message)
+            }
+            else{
+                navigate("/verifycode", { state: { Class_Id, Attendance_id } })
 
-            navigate("/verifycode", { state: { Class_Id, Attendance_id } })
+            }
+
 
         } catch (err) {
             console.log(err)
         }
 
     }
+    
 
     const getClassDetails = async () => {
         try {
@@ -257,28 +280,31 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                                         <span className="text-primary">Class not started</span>
                                                     )}
 
-                                                </td>) : userRole === "teacher" ? (<td >
-                                                    {classDetail.Class_Status === 1 ? (
-                                                        <button className="btn btn-outline-success">Class Ongoing</button>
-                                                    ) : (
-                                                        <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
-                                                    )}
-
-                                                    {/* 
-                                                {isClassLive(classDetail.Class_Start_Time, classDetail.Class_End_Time) ? (
-                                                    <button className="font-medium text-blue-600 dark:text-blue-500" onClick={startClass}>Start Class</button>
-                                                ) : (
-                                                    <span className="text-gray-400">Class not started</span>
-                                                )} */}
-                                                </td>) : (<td>
-                                                    {classDetail.Class_Status === 1 ? (
-                                                        <button className="btn btn-outline-success" >Class Ongoing</button>
+                                                </td>) : userRole === "teacher" ? (
+                                                    <td >
 
 
-                                                    ) : (
-                                                        <button className="btn btn-outline-success" >No Class Yet</button>
-                                                    )}
-                                                </td>)}
+
+                                                        {isClassLive(classDetail.Class_Start_Time, classDetail.Class_End_Time) ? (
+                                                            <>
+                                                                {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
+                                                                    <button className="btn btn-outline-danger" onClick={() =>endClass(classDetail)} > End Class</button>
+                                                                ) : (
+                                                                    <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
+                                                                )}
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-gray-400">Class not started</span>
+                                                        )}
+                                                    </td>) : (<td>
+                                                        {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0  ? (
+                                                            <button className="btn btn-outline-success" >Class Ongoing</button>
+
+
+                                                        ) : (
+                                                            <button className="btn btn-outline-success" >No Class Yet</button>
+                                                        )}
+                                                    </td>)}
 
                                         </tr>
                                     )
@@ -305,82 +331,82 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                         <i className={`fas fa-chevron-${showCompletedClasses ? 'up' : 'down'}`}></i>
                     </div>
                     {showCompletedClasses && (
-                    <div >
-                    <table className="table table-hover text-center " >
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <div >
+                            <table className="table table-hover text-center " >
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
-                            <tr>
-                                <th scope="col" >Class Id </th>
-                                <th scope="col" >Module Name </th>
-                                <th scope="col" >Class Start Time </th>
-                                <th scope="col" >Class End Time </th>
-                                <th scope="col" >Class Type </th>
-                                <th scope="col" >Class Day </th>
-                                {userRole === "student" ? (
-                                    <th scope="col">Teacher Name</th>
-                                ) : (<th scope="col">Section Name</th>)}
-                                <th scope="col" >
-                                    <span className="sr-only"> Class </span>
-                                </th>
-                            </tr>
+                                    <tr>
+                                        <th scope="col" >Class Id </th>
+                                        <th scope="col" >Module Name </th>
+                                        <th scope="col" >Class Start Time </th>
+                                        <th scope="col" >Class End Time </th>
+                                        <th scope="col" >Class Type </th>
+                                        <th scope="col" >Class Day </th>
+                                        {userRole === "student" ? (
+                                            <th scope="col">Teacher Name</th>
+                                        ) : (<th scope="col">Section Name</th>)}
+                                        <th scope="col" >
+                                            <span className="sr-only"> Class </span>
+                                        </th>
+                                    </tr>
 
-                        </thead>
-                        <tbody>
-                            {
-                                completedClass.map((classDetail, i) => {
-                                    return (
+                                </thead>
+                                <tbody>
+                                    {
+                                        completedClass.map((classDetail, i) => {
+                                            return (
 
-                                        <tr scope="row" key={i}>
-                                            <td className="align-middle" >{classDetail.Class_Id}</td>
-                                            <td className="align-middle">{classDetail.Module_Name}</td>
-                                            <td className="align-middle">{classDetail.Class_Start_Time}</td>
-                                            <td className="align-middle">{classDetail.Class_End_Time}</td>
-                                            <td className="align-middle">{classDetail.Class_Type}</td>
-                                            <td className="align-middle">{classDetail.Class_Day}</td>
+                                                <tr scope="row" key={i}>
+                                                    <td className="align-middle" >{classDetail.Class_Id}</td>
+                                                    <td className="align-middle">{classDetail.Module_Name}</td>
+                                                    <td className="align-middle">{classDetail.Class_Start_Time}</td>
+                                                    <td className="align-middle">{classDetail.Class_End_Time}</td>
+                                                    <td className="align-middle">{classDetail.Class_Type}</td>
+                                                    <td className="align-middle">{classDetail.Class_Day}</td>
 
-                                            {userRole === "student" ? (
-                                                <td className="align-middle" >{classDetail.Teacher_Name}</td>
-                                            ) : (<td className="align-middle">{classDetail.Section_Id}</td>)}
+                                                    {userRole === "student" ? (
+                                                        <td className="align-middle" >{classDetail.Teacher_Name}</td>
+                                                    ) : (<td className="align-middle">{classDetail.Section_Id}</td>)}
 
-                                            {userRole === "student" ? (
-                                                <td >
-                                                    {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
-                                                        <button className="btn btn-outline-success" onClick={() => joinClass(classDetail)}>Join Class</button>
-                                                    ) : classDetail.Class_Completion === 1 ? (
-                                                        <span className="text-primary">Class Completed</span>
-                                                    ) : (
-                                                        <span className="text-primary">Class not started</span>
-                                                    )}
+                                                    {userRole === "student" ? (
+                                                        <td >
+                                                            {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
+                                                                <button className="btn btn-outline-success" onClick={() => joinClass(classDetail)}>Join Class</button>
+                                                            ) : classDetail.Class_Completion === 1 ? (
+                                                                <span className="text-primary">Class Completed</span>
+                                                            ) : (
+                                                                <span className="text-primary">Class not started</span>
+                                                            )}
 
-                                                </td>) : userRole === "teacher" ? (<td >
-                                                    {classDetail.Class_Status === 1 ? (
-                                                        <button className="btn btn-outline-success">Class Ongoing</button>
-                                                    ) : (
-                                                        <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
-                                                    )}
+                                                        </td>) : userRole === "teacher" ? (<td >
+                                                            {classDetail.Class_Status === 1 && classDetail.Class_Completion === 1  ? (
+                                                                <button className="btn btn-outline-success">View Attendnace</button>
+                                                            ) : (
+                                                                <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
+                                                            )}
 
-                                                    {/* 
+                                                            {/* 
                                                 {isClassLive(classDetail.Class_Start_Time, classDetail.Class_End_Time) ? (
                                                     <button className="font-medium text-blue-600 dark:text-blue-500" onClick={startClass}>Start Class</button>
                                                 ) : (
                                                     <span className="text-gray-400">Class not started</span>
                                                 )} */}
-                                                </td>) : (<td>
-                                                    {classDetail.Class_Status === 1 ? (
-                                                        <button className="btn btn-outline-success" onClick={() => viewAttendance(classDetail)}>View Attendance</button>
+                                                        </td>) : (<td>
+                                                            {classDetail.Class_Status === 1 ? (
+                                                                <button className="btn btn-outline-success" onClick={() => viewAttendance(classDetail)}>View Attendance</button>
 
-                                                    ) : (
-                                                        <button className="btn btn-outline-success" >No Class Yet</button>
-                                                    )}
-                                                </td>)}
+                                                            ) : (
+                                                                <button className="btn btn-outline-success" >No Class Yet</button>
+                                                            )}
+                                                        </td>)}
 
-                                        </tr>
-                                    )
-                                })
-                            }
-                        </tbody>
-                    </table>
-                    </div>
+                                                </tr>
+                                            )
+                                        })
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </div>
             </div>

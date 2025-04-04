@@ -43,7 +43,8 @@ router.get('/scheduledClass', async (req, res) => {
                                                 c.Class_End_Time, 
                                                 c.Class_Type, 
                                                 c.Class_Status, 
-                                                c.Class_Day
+                                                c.Class_Day,
+                                                c.Class_Completion
                                             FROM teacher t
                                             JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id
                                             JOIN class_association ca ON t.teacher_id= ca.teacher_id
@@ -64,7 +65,8 @@ router.get('/scheduledClass', async (req, res) => {
                                         c.Class_End_Time, 
                                         c.Class_Type, 
                                         c.Class_Status, 
-                                        c.Class_Day
+                                        c.Class_Day,
+                                        c.Class_Completion
                                     FROM teacher t
                                     JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id
                                     JOIN class_association ca ON ta.Teacher_Id = ca.Teacher_Id 
@@ -125,7 +127,8 @@ router.get('/completedClass', async (req, res) => {
                                                 c.Class_End_Time, 
                                                 c.Class_Type, 
                                                 c.Class_Status, 
-                                                c.Class_Day
+                                                c.Class_Day,
+                                                c.Class_Completion
                                             FROM teacher t
                                             JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id
                                             JOIN class_association ca ON ta.Module_id = ca.Module_Id 
@@ -147,7 +150,8 @@ router.get('/completedClass', async (req, res) => {
                                         c.Class_End_Time, 
                                         c.Class_Type, 
                                         c.Class_Status, 
-                                        c.Class_Day
+                                        c.Class_Day,
+                                        c.Class_Completion
                                     FROM teacher t
                                     JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id
                                     JOIN class_association ca ON ta.Teacher_Id = ca.Teacher_Id 
@@ -196,6 +200,23 @@ router.post('/startAttendance', async (req, res) => {
     }
 })
 
+
+router.post('/endClass', async (req, res) => {
+    try {
+        const { Class_Id } = req.body
+        const db = await connectDatabase()
+        console.log("Database connected successfully in class end!")
+
+        await db.query("UPDATE class SET Class_Completion = 1   WHERE Class_id = ?", [Class_Id]);
+
+        res.status(201).json({ message: "Class ended sucessfully" })
+    } catch (err) {
+        res.status(500).json(err)
+        console.log("Error occurred", err);
+    }
+})
+
+
 router.post('/markAttendance', async (req, res) => {
     try {
         const { Module_id,
@@ -210,10 +231,16 @@ router.post('/markAttendance', async (req, res) => {
         console.log(Attendance_Id)
         const Attendance_Status = "Not Verified"
         const db = await connectDatabase()
-        const Attendance_Date = new Date().toISOString().split('T')[0];
-        const Attendance_Time = new Date().toTimeString().split(' ')[0];
+        const Attendance_Date = new Date().toISOString().split('T')[0]
+        const Attendance_Time = new Date().toTimeString().split(' ')[0]
 
-        console.log("Database connected successfully!");
+        const [attendnace_Data] = await db.query(`Select * from attendance_association where student_id =? and Class_id = ?`, [Student_Id, Class_Id])
+        if (attendnace_Data.length > 0) {
+            console.log("Similar data found");
+           return res.status(201).json({ message: "Already Joined the class", attendanceExists: true })
+
+        }
+        console.log("Database connected successfully in mark attendnace!");
         await db.query(
             "INSERT INTO attendance (Attendance_Id, Attendance_Date, Attendance_Status, Attendance_Time) VALUES (?, ?, ?, ?)",
             [
@@ -246,7 +273,7 @@ router.post('/markAttendance', async (req, res) => {
 router.post('/addClass', async (req, res) => {
     try {
         const { Class_Start_Time, Class_End_Time, Class_Date, Class_Type, Section_Id, Module_Id, Teacher_Id } = req.body
-        console.log("successfully in add class !",req.body)
+        console.log("successfully in add class !", req.body)
 
         const db = await connectDatabase()
         const [rows] = await db.execute("SELECT MAX(class_id) as maxId FROM class")

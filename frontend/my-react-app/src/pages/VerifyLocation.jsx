@@ -5,35 +5,54 @@ import SidebarComponent from '../components/SideBar';
 
 const VerifyLocation = ({ userId, userRole }) => {
     const [loading, setLoading] = useState(false);
-    const [distance, setDistance] = useState(null);
-    const [verificationActive, setVerificationActive] = useState(false);
-    const [classCompletion, setClassCompletion] = useState(0);
+    const [distance, setDistance] = useState(null)
+    const [success, setSuccess] = useState(true)
+    const [verified, setVerified] = useState(true)
 
-    const navigate = useNavigate();
-    const location = useLocation();
+    const [message, setMessage] = useState(true)
+
+
+    const [verificationActive, setVerificationActive] = useState(false)
+    const [classCompletion, setClassCompletion] = useState(0)
+
+    const navigate = useNavigate()
+    const location = useLocation()
     const Class_Id = location.state?.Class_Id;
-    const Attendance_id = location.state?.Attendance_id;
+    const Attendance_id = location.state?.Attendance_id
+
+    useEffect(() => {
+        if (!verified) {
+            alert(message);
+        }
+    }, [verified, message]);
+    
+    useEffect(() => {
+        if (!success) {
+            alert(message)
+            navigate("/")
+        }
+    }, [success, message, navigate])
 
     useEffect(() => {
         let interval;
 
         if (verificationActive && classCompletion !== 1) {
             interval = setInterval(() => {
-                verifyLocation();
-                checkClassCompletion();
-            }, 5000); // Runs every 5 seconds
+                verifyLocation()
+                checkClassCompletion()
+            }, 5000) // Runs every 5 seconds
         }
 
-        return () => clearInterval(interval); // Cleanup on unmount
-    }, [verificationActive, classCompletion]);
+        return () => clearInterval(interval)
+    }, [verificationActive, classCompletion])
 
     const getUserLocation = async () => {
-        setLoading(true);
+        setLoading(true)
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
-                console.error("Geolocation is not supported by this browser.");
-                setLoading(false);
-                reject(new Error("Geolocation not supported"));
+                console.error("Geolocation is not supported by this browser.")
+                setLoading(false)
+                reject(new Error("Geolocation not supported"))
                 return;
             }
 
@@ -79,11 +98,14 @@ const VerifyLocation = ({ userId, userRole }) => {
             const { longitude: studentLongitude, latitude: studentLatitude } = studentLocation;
             const response = await axios.get(`http://localhost:3000/verification/locationVerification?Class_Id=${Class_Id}&studentLongitude=${studentLongitude}&studentLatitude=${studentLatitude}&Attendance_id=${Attendance_id}`);
 
-            setDistance(response.data?.distance);
-            console.log("Verification response:", response.data);
+            setDistance(response.data?.distance)
+            setSuccess(response.data?.success)
+            setVerified(response.data?.verified)
+            setMessage(response.data?.message)
+            console.log("Verification response:", response.data)
 
         } catch (err) {
-            console.error("Error while verifying location:", err);
+            console.error("Error while verifying location:", err)
         }
     };
 
@@ -106,6 +128,7 @@ const VerifyLocation = ({ userId, userRole }) => {
             ) : (
                 <p>Verifying location every 5 seconds...</p>
             )}
+        
         </div>
     );
 };
