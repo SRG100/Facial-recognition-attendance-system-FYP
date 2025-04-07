@@ -8,17 +8,14 @@ import 'chart.js/auto';
 import 'boxicons/css/boxicons.min.css'
 
 
-const Attendance = ({ userId, userRole }) => {
+const AttendanceClass = ({ userId, userRole }) => {
   const location = useLocation()
-  const Id = location.state?.Id || userId
-  const From = location.state?.From || "student"
-  const For = location.state?.From || "student"
-  const [studentData, setStudentData] = useState([])
+  const Id = location.state?.Id 
+  const From = location.state?.From || "class"
+  const [classDetails, setClassDetails] = useState([])
   const [attendanceData, setAttendanceData] = useState([])
-  const [absenceData, setAbsenceData] = useState([])
+  const [studentData, setStudentData] = useState([])
   const [attendanceBySubject, setAttendanceBySubject] = useState([])
-  const [isPopupOpen, setIsPopupOpen] = useState(false)
-  const [reportCredit, setReportCredit] = useState({ Module: '', From: '', To: '' });
 
 
 
@@ -32,7 +29,7 @@ const Attendance = ({ userId, userRole }) => {
     getAbsenceByMonth()
     getAbsenceBySubject()
 
-  }, [Id]);
+  }, [Id])
 
   const getAttendnaceDetails = async () => {
     try {
@@ -61,34 +58,12 @@ const Attendance = ({ userId, userRole }) => {
       console.error('Error while getting the student absence by month', error)
     }
   }
-  const getAbsenceBySubject = async () => {
-    try {
-      const response = await axios.get(`http://localhost:3000/attendance/getAttendanceBySubject?Id=${Id}`);
-      setAttendanceBySubject(Array.isArray(response.data) ? response.data : [])
-
-    } catch (error) {
-      console.error('Error while getting the student absence by month', error)
-    }
-  }
-  const generateReport = async () => {
-    try {
-      console.log(reportCredit)
-      const response = await axios.get(`http://localhost:3000/generate/generateReport?Module=${reportCredit.Module}&From=${reportCredit.From}&To=${reportCredit.To}&Id=${Id}`, { responseType: 'blob' });
-      const blob = response.data
-      const pdfUrl = URL.createObjectURL(blob)
-      console.log(response)
-      window.open(pdfUrl, "_blank")
-    } catch (error) {
-      console.error('Error while getting the student absence by month', error)
-    }
-  }
 
   // Chart data configurations
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: true
   }
-  console.log(studentData)
 
   const doughnutChart = {
     labels: ['Present', 'Absent', 'Late'],
@@ -97,52 +72,7 @@ const Attendance = ({ userId, userRole }) => {
       backgroundColor: ['#4CAF50', '#F44336', '#FFC107'],
       borderWidth: 0
     }]
-  };
-
-  const subjectBarChart = {
-    labels: ['Math', 'Science', 'English', 'Social Studies', 'Computer Science'],
-    datasets: [{
-      label: 'Attendance %',
-      data: [90, 85, 80, 70, 95],
-      backgroundColor: '#2196f3',
-    }]
   }
-  const subjectBarChartConfig = (attendanceBySubject) => {
-    const labels = [];
-    const presentData = [];
-    const lateData = [];
-    const absentData = [];
-
-    // Process attendance data
-    attendanceBySubject.forEach(entry => {
-      labels.push(entry.Module_name);
-      presentData.push(entry.Present_Count);
-      lateData.push(entry.Late_Count);
-      absentData.push(entry.Absent_Count);
-    });
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: 'Present',
-          data: presentData,
-          backgroundColor: '#4caf50',
-        },
-        {
-          label: 'Late',
-          data: lateData,
-          backgroundColor: '#ff9800',
-        },
-        {
-          label: 'Absent',
-          data: absentData,
-          backgroundColor: '#f44336',
-        }
-      ]
-    };
-  };
-
 
   const lineChartConfig = (attendanceData) => {
     const labels = []
@@ -221,54 +151,6 @@ const Attendance = ({ userId, userRole }) => {
               </div>
             </div>
           </div>
-          <Popup open={isPopupOpen} closeOnDocumentClick onClose={() => setIsPopupOpen(false)}>
-            <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-
-              <div className="modal-header mb-3">
-                <h3 className="modal-title">Generate Attendance Report</h3>
-
-              </div>
-
-              <div className="modal-body">
-                <h5>Select creterias</h5>
-                <div className="form-group mb-3">
-                  <label className="form-label">Modules:</label>
-                  <select
-                    className="form-select"
-                    onChange={(e) => setReportCredit({ ...reportCredit, Module: e.target.value })}
-                  >
-                    <option value="">-- Selelct Module --</option>
-                    <option value="All">All</option>
-
-                    {attendanceBySubject.map((module) => (
-                      <option key={module.Module_id} value={module.Module_id}>
-                        {module.Module_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-group mb-3">
-                  <label className="form-label"   >From:</label>
-                  <input type="date"
-                    value={reportCredit.From}
-                    onChange={(e) => {
-                      setReportCredit((prev) => ({ ...prev, From: e.target.value }));
-                    }} className="form-control" />
-                  <label className="form-label"   >To:</label>
-                  <input type="date"
-                    value={reportCredit.To}
-                    onChange={(e) => {
-                      setReportCredit((prev) => ({ ...prev, To: e.target.value }));
-                    }}
-                    className="form-control" />
-                </div>
-                <button className='btn btn-outline-primary' onClick={generateReport} >Generate Report</button>
-
-
-              </div>
-            </div>
-          </Popup>
 
           <div className="row mt-2">
 
@@ -316,4 +198,4 @@ const Attendance = ({ userId, userRole }) => {
   );
 };
 
-export default Attendance;
+export default AttendanceClass;

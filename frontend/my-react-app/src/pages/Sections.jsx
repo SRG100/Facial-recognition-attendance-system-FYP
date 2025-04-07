@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import 'reactjs-popup/dist/index.css';
 import '../assets/MyPopup.css';
+import toast from 'react-hot-toast'
 
 const Sections = ({ userRole, userId }) => {
   const navigate = useNavigate();
@@ -91,7 +92,15 @@ const Sections = ({ userRole, userId }) => {
         }))
       }
       console.log(newSectionDetails)
-      await axios.post('http://localhost:3000/sections/addSection', newSectionDetails);
+      const response = await axios.post('http://localhost:3000/sections/addSection', newSectionDetails)
+      if (response.data.success) {
+        toast.success(response.data.message)
+
+      } else {
+        toast.error(response.data.message)
+
+      }
+
       setIsPopupOpen(false)
       getSectionDetails()
       setSelectedTeachers({})
@@ -102,128 +111,150 @@ const Sections = ({ userRole, userId }) => {
 
   return (
     <div>
-      <h2>Sections</h2>
       <SidebarComponent userRole={userRole} />
       <div className='home-section'>
-        <table>
-          <tbody className='text-align-center' >
-            {sections.map((section, i) => (
-              <tr key={section.Section_id || i}>
-                <div className=''> 
-                  <td className=" align-middle">{section.Section_id}</td>
+
+        <h3 className="m-0 mb-3  text-start">Sections</h3>
+
+        <div className="card container p-0 m-0">
+          <table className="table table-hover text-center table-responsive">
+            <thead className="">
+
+              <tr>
+                <th scope="col" >Section id</th>
+                <th scope="col" >Modules </th>
+                <th scope="col" >Academic Year </th>
+                <th scope="col" >Course</th>
+
+                <th scope="col" >Total_Students </th>
+
+              </tr>
+            </thead>
+            <tbody >
+              {sections.map((section, i) => (
+                <tr key={section.Section_id || i}>
+                  <td className="align-middle">{section.Section_id}</td>
+                  <td className="align-middle">{section.Modules}</td>
+                  <td className="align-middle">{section.Academic_Years}</td>
+                  <td className="align-middle">{section.Courses}</td>
+                  <td className="align-middle">{section.Total_Students}</td>
+
                   {userRole === 'teacher' && (
                     <td className="align-middle">
-                      <button
-                        className="btn btn-outline-warning"
-                        onClick={() => navigate('/viewStudents', { state: { Section_id: section.Section_id } })}
-                      >
+                      <button className="btn btn-outline-warning" onClick={() => navigate('/viewStudents', { state: { Section_id: section.Section_id } })} >
                         View Students
                       </button>
                     </td>
-                  
-                )}
-                </div>
-              </tr>
-            ))}
-          </tbody>
-        </table>
 
-        {userRole === 'admin' && (
-          <button className="btn btn-outline-warning" onClick={() => setIsPopupOpen(true)}>
-            Add Section
-          </button>
-        )}
+                  )}
+                </tr>
+              ))}
+            </tbody>
+
+          </table>
+          {userRole === 'admin' && (
+            <button className="btn btn-success" onClick={() => setIsPopupOpen(true)}>
+              Add Section
+            </button>
+          )}
+        </div>
+
+
+
 
         <Popup open={isPopupOpen} closeOnDocumentClick onClose={() => setIsPopupOpen(false)}>
-          <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-            <div className="modal-header mb-3">
-              <h3 className="modal-title">Add New Section</h3>
-            </div>
-
-            <div className="modal-body">
-              <div className="form-group mb-3">
-                <label className="form-label">Section Name:</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={newSection.name}
-                  onChange={(e) => setNewSection({ ...newSection, name: e.target.value })}
-                />
+          <div className='card'>
+            <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+              <div className="modal-header mb-3">
+                <h3 className="modal-title">Add New Section</h3>
               </div>
 
-              <div className="form-group mb-3">
-                <label className="form-label">Year:</label>
-                <select
-                  className="form-select"
-                  onChange={(e) => setNewSection({ ...newSection, Year: e.target.value })}>
-                  <option value="">-- Select a Section --</option>
-                  {years.map((year) => (
-                    <option key={year.Academic_Year_id} value={year.Academic_Year_id}>
-                      {year.Academic_Year_id}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group mb-3">
-                <label className="form-label">Course:</label>
-                <select
-                  className="form-select"
-                  onChange={(e) => setNewSection({ ...newSection, Course: e.target.value })}>
-                  <option value="">-- Select a Course --</option>
-                  {course.map((course) => (
-                    <option key={course.Course_id} value={course.Course_id}>
-                      {course.Course_Name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {gotTeacher ? (
-                <>
-                  <div className="mt-4 mb-3">
-                    <p className="text-muted">Here is the selection of a teacher for specific given modules:</p>
-                    <div className="p-3 border rounded">
-                      {Object.keys(modules).map((moduleId) => {
-                        const module = modules[moduleId];
-                        return (
-                          <div key={moduleId} className="mb-3">
-                            <p className="fw-semibold">{module.Module_id}:</p>
-                            <select
-                              className="form-select"
-                              value={selectedTeachers[moduleId] || ""}
-                              onChange={(e) => handleTeacherChange(moduleId, e.target.value)}>
-                              <option value="">Select a Teacher</option>
-                              {module.Teacher_id.map((teacherId, index) => (
-                                <option key={teacherId} value={teacherId}>
-                                  {module.teacher_name[index]}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="modal-footer mt-4">
-                    <button className="btn btn-primary me-2" onClick={handleAddSection}>
-                      Save Section
-                    </button>
-                    <button className="btn btn-secondary" onClick={cancelButton}>
-                      Cancel
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="mt-4">
-                  <button className="btn btn-primary" onClick={getModulesTeachers}>
-                    Assigns teachers
-                  </button>
+              <div className="modal-body">
+                <div className="form-group mb-3">
+                  <label className="form-label">Section Name:</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={newSection.name}
+                    onChange={(e) => setNewSection({ ...newSection, name: e.target.value })}
+                  />
                 </div>
-              )}
+
+                <div className="form-group mb-3">
+                  <label className="form-label">Year:</label>
+                  <select
+                    className="form-select"
+                    onChange={(e) => setNewSection({ ...newSection, Year: e.target.value })}>
+                    <option value="">-- Select a Section --</option>
+                    {years.map((year) => (
+                      <option key={year.Academic_Year_id} value={year.Academic_Year_id}>
+                        {year.Academic_Year_id}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group mb-3">
+                  <label className="form-label">Course:</label>
+                  <select
+                    className="form-select"
+                    onChange={(e) => setNewSection({ ...newSection, Course: e.target.value })}>
+                    <option value="">-- Select a Course --</option>
+                    {course.map((course) => (
+                      <option key={course.Course_id} value={course.Course_id}>
+                        {course.Course_Name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {gotTeacher ? (
+                  <>
+                    <div className="mt-4 mb-3">
+                      <p className="text-muted">Here is the selection of a teacher for specific given modules:</p>
+                      <div className="p-3 border rounded">
+                        {Object.keys(modules).map((moduleId) => {
+                          const module = modules[moduleId];
+                          return (
+                            <div key={moduleId} className="mb-3">
+                              <p className="fw-semibold">{module.Module_id}:</p>
+                              <select
+                                className="form-select"
+                                value={selectedTeachers[moduleId] || ""}
+                                onChange={(e) => handleTeacherChange(moduleId, e.target.value)}>
+                                <option value="">Select a Teacher</option>
+                                {module.Teacher_id.map((teacherId, index) => (
+                                  <option key={teacherId} value={teacherId}>
+                                    {module.teacher_name[index]}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="modal-footer mt-4">
+                      <button className="btn btn-primary me-2" onClick={handleAddSection}>
+                        Save Section
+                      </button>
+                      <button className="btn btn-secondary" onClick={cancelButton}>
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="mt-4">
+                    <button className="btn btn-primary" onClick={getModulesTeachers}>
+                      Assigns teachers
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+
         </Popup>
       </div>
     </div>

@@ -3,29 +3,106 @@ import React from 'react'
 import axios from 'axios'
 import SidebarComponent from '../components/SideBar'
 import { Link, useNavigate } from 'react-router-dom'
+import Popup from 'reactjs-popup'
+import toast from 'react-hot-toast'
+
+
 
 const Modules = ({ userId, userRole }) => {
   const navigate = useNavigate();
-  const [modules, serModules] = useState([])
+  const [modules, setModules] = useState([])
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [course, setCourse] = useState([])
+  const [moduleValues, setModuleValues] = useState({
+    moduleId: '',
+    moduleName: '',
+    moduleDetails: '',
+    moduleCredit: '',
+    year: '',
+    courses: []
+  })
   useEffect(() => {
     if (userId) {
-      getModuleDetails();
+      getModuleDetails()
+      getCourse()
     }
   }, [userId, userRole]);
+  const getCourse = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/courses/getCourseDetails`);
+      setCourse(Array.isArray(response.data) ? response.data : []);
+    } catch (err) {
+      console.log('Error while getting the student', err);
+
+      toast.error('Error while getting the student');
+    }
+  }
 
 
   const getModuleDetails = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/modules/getModulesDetails?userId=${userId}&userRole=${userRole}`);
-      serModules(Array.isArray(response.data) ? response.data : []);
+      setModules(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      console.error('Error while getting the modules', error);
+      toast.error('Error while getting the modules');
     }
   }
+  const handleChanges = (e) => {
+
+    const { name, value } = e.target;
+    setModuleValues(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  }
+
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+
+    setModuleValues((prev) => {
+      let updatedCourses = [...prev.courses];
+
+      if (checked) {
+        updatedCourses.push(value);
+      } else {
+        updatedCourses = updatedCourses.filter((courseId) => courseId !== value);
+      }
+
+      return {
+        ...prev,
+        courses: updatedCourses,
+      }
+    })
+  }
+
+  const addNewModule = async (e) => {
+    e.preventDefault()
+    if (!moduleValues.moduleId || !moduleValues.moduleName || !moduleValues.moduleDetails || !moduleValues.moduleCredit || !moduleValues.year || moduleValues.courses.length === 0) {
+      toast.error("Please fill all the fields.")
+      return
+    }
+
+    console.log("Well the data before sending is :", moduleValues)
+
+    try {
+      const response = await axios.post(`http://localhost:3000/modules/addModules`, moduleValues)
+      console.log(response.message)
+      if (response.data.success) {
+        toast.success(response.data.message)
+      } else {
+        toast.error(response.data.message)
+      }
+    } catch (error) {
+      toast.error("Error while getting the teachers")
+    }
+  };
+
   return (
-    <div>Modules
+    <div>
+
       <SidebarComponent userRole={userRole} />
       <div className='home-section'>
+        <h3 className="m-0 mb-3  text-start">Modules</h3>
 
         <div className="card container p-0 m-0">
           <table className="table table-hover text-center table-responsive">
@@ -34,8 +111,8 @@ const Modules = ({ userId, userRole }) => {
               <tr>
                 <th scope="col" >Module id</th>
                 <th scope="col" >Module name </th>
-                <th scope="col" >Module Credits </th>
                 <th scope="col" >Module Details </th>
+                <th scope="col" >Module Credits  </th>
 
                 <th scope="col" >Review </th>
 
@@ -60,7 +137,7 @@ const Modules = ({ userId, userRole }) => {
                           </>
                         ) : (
                           <>
-                            <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: module.Module_id, ReviewOf: "Module" } })}>View Module Reviews</button>
+                            <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: module.Module_id, ReviewOf: "Module" } })}>View Reviews</button>
                           </>
                         )}
                       </td>
@@ -72,11 +149,100 @@ const Modules = ({ userId, userRole }) => {
           </table>
           {userRole == "admin" && (
             // console.log("User Role:", userRole)
-            <button className="btn btn-success" onClick={() => navigate("/RegisterModule")}>Add Module</button>
+            <button className="btn btn-success" onClick={() => setIsPopupOpen(true)}>Add Module</button>
           )}
         </div>
 
       </div>
+
+      <Popup open={isPopupOpen} closeOnDocumentClick onClose={() => setIsPopupOpen(false)}>
+        <div className='card'>
+          <form onSubmit={addNewModule}>
+
+            <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+              <div className="modal-header mb-3">
+                <h3 className="modal-title">Add New module</h3>
+              </div>
+              <div className="modal-body">
+                <div className="form-group mb-3">
+                  <label className="form-label">Module Id:</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="moduleId"
+                    onChange={handleChanges}
+                  />
+                </div>
+                <div className="form-group mb-3">
+                  <label className="form-label">Module Name</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="moduleName"
+                    onChange={handleChanges}
+                  />
+                </div>
+                <div className="form-group mb-3">
+                  <label className="form-label">Module Details:</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="moduleDetails"
+                    onChange={handleChanges}
+                  />
+                </div>
+                <div className="form-group mb-3">
+                  <label className="form-label">Module Credit:</label>
+                  <select name="moduleCredit" onChange={handleChanges}
+                    className="form-select">
+                    <option value="">-- Select a Module Credit --</option>
+                    <option value="30">30 Credits</option>
+                    <option value="15">15 Credits</option>
+                  </select>
+                </div>
+                <div className="form-group mb-3">
+                  <label className="form-label">Academic year:</label>
+                  <select name="year" onChange={handleChanges}
+                    className="form-select">
+                    <option value="">-- Select a Year --</option>
+                    <option value="1">Year 1</option>
+                    <option value="2">Year 2</option>
+                    <option value="3">Year 3</option>
+                  </select>
+                </div>
+
+                <div className="form-group mb-3">
+                  <label className="form-label">Courses:</label>
+                  <div className="form-check-group">
+                    {course.map((courseItem) => (
+                      <div className="form-check" key={courseItem.Course_id}>
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          id={`course-${courseItem.Course_id}`}
+                          value={courseItem.Course_id}
+                          checked={moduleValues.courses.includes(courseItem.Course_id)}
+                          onChange={handleCheckboxChange}
+                        />
+                        <label className="form-check-label" htmlFor={`course-${courseItem.Course_id}`}>
+                          {courseItem.Course_Name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <button className="btn btn-primary">
+                    Add Module
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+      </Popup>
     </div>
   )
 }

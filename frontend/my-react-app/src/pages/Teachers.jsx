@@ -26,6 +26,8 @@ const Teachers = ({ userRole, userId }) => {
         <div>
             <SidebarComponent userRole={userRole} />
             <div className='home-section'>
+            <h3 className="m-0 mb-3  text-start">Teachers</h3>
+
                 <div className="card container p-0 m-0">
                     <table className="table  table-hover text-center table-responsive">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -55,7 +57,18 @@ const Teachers = ({ userRole, userId }) => {
                                     <td className="align-middle">{teacher.Teacher_Name}</td>
                                     {userRole === "admin" ? (
                                         <>
-                                            <td className="align-middle">{teacher.Module_id}</td>
+                                            <td className="align-middle">
+                                                {teacher.Module_id=="Not Assigned" ? (
+                                                    <>Not Assigned</>
+                                                ):(
+                                                    <>
+                                                    {teacher.Module_Name} ( 
+                                                        {teacher.Module_id} 
+                                                    )
+                                                    </>
+                                                    
+                                                )}
+                                                </td>
                                             <td className="align-middle">{teacher.Courses}</td>
                                             <td className="align-middle">{teacher.Sections}</td>
                                             <td className="align-middle">

@@ -5,6 +5,8 @@ import SidebarComponent from '../components/SideBar'
 import attendanceImage from "../assets/attendance.jpg";
 import { Line } from 'react-chartjs-2';
 import axios from 'axios'
+import toast from 'react-hot-toast'
+
 
 import '../assets/Dashboard.css'
 import 'chart.js/auto';
@@ -86,7 +88,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
     <div>
       {/* <Nav /> */}
       <SidebarComponent userRole={userRole} />
-      
+
       <div className='home-section'>
         <div className="main-panel">
           <div className="content-wrapper">
@@ -145,6 +147,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
                         )}
 
                       </div>
+                      
                     </div>
                   </div>
                   <div className="col-md-6 mb-4 stretch-card transparent">
@@ -166,6 +169,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
                       </div>
                     </div>
                   </div>
+                 
                 </div>
 
                 <div className="row">
@@ -192,13 +196,18 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
                   <div className="col-md-6 stretch-card transparent">
                     <div className="card dashboard card-light-danger" style={{ background: "#f47c7c", color: "white" }}>
                       <div className="card-body">
-                        <p className="mb-2">Total Courses</p>
-                        <h2 className="fs-30 mb-2 font-weight-bold">{dashboardData.totalCourses}</h2>
-                        <p>Number of total courses </p>
+                        <>
+                          <p className="mb-2">Total Courses</p>
+                          <h2 className="fs-30 mb-2 font-weight-bold">{dashboardData.totalCourses}</h2>
+                          <p>Number of total courses </p>
+                        </>
+                        
+
                       </div>
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
 

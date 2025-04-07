@@ -142,8 +142,7 @@ router.get('/getReviewDetails', async (req, res) => {
             console.log("It is an teacher")
             const [reviews] = await db.execute(`SELECT tr.*, t.Teacher_Name, t.Teacher_Email, s.student_name, s.student_email FROM teacher_review tr JOIN teacher_review_association ta ON tr.teacher_review_Id = ta.teacher_review_Id JOIN teacher t ON ta.teacher_id = t.teacher_id JOIN student s ON ta.Review_by_student_id=s.student_id WHERE t.teacher_id = ?`, [Id])
             review = reviews
-            console.log(review, reviews)
-            const [total_reviews] = await db.execute( `SELECT COUNT(*) AS total_reviews FROM teacher_review tr JOIN teacher_review_association ta ON tr.teacher_review_Id = ta.teacher_review_Id WHERE ta.teacher_id = 1`, [Id])
+            const [total_reviews] = await db.execute( `SELECT COUNT(*) AS total_reviews FROM teacher_review tr JOIN teacher_review_association ta ON tr.teacher_review_Id = ta.teacher_review_Id WHERE ta.teacher_id = ?`, [Id])
             const [average_rating] = await db.execute(
                 'SELECT AVG(tr.Rating) AS AVGreviews FROM teacher_review tr JOIN teacher_review_association ta ON tr.teacher_review_Id = ta.teacher_review_Id WHERE ta.teacher_id = ?',[Id]
             )
@@ -152,6 +151,7 @@ router.get('/getReviewDetails', async (req, res) => {
             totalReviews = total_reviews[0].total_reviews
             eachCount = total_count_each
             avgRatings = average_rating[0].AVGreviews
+            console.log(totalReviews,eachCount,avgRatings)
         } else {
             console.log("It is a module")
             const [reviews] = await db.execute(

@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Nav from '../components/Nav'
 import SidebarComponent from '../components/SideBar'
-const RegisterTeacher = ({userRole}) => {
 
-    
+const RegisterTeacher = ({ userId, userRole }) => {
+
+    const [isLoading, setIsLoading] = useState(false)
+
     const [teacherValues, setTeacherValues] = useState({
         teacherId: '',
         teacherName: '',
@@ -13,9 +15,11 @@ const RegisterTeacher = ({userRole}) => {
         teacherAddress: '',
         teacherDOB: '',
         teacherGender: '',
-
-        teacherPassword: ''
+        teacherPassword: '',
+        teacherModule: ''
     })
+    const [modules,setModule]=useState([])
+
 
     const handleChangesTeacher = (e) => {
         const { name, value } = e.target
@@ -35,6 +39,21 @@ const RegisterTeacher = ({userRole}) => {
         }
     }
 
+    useEffect(() => {
+            getModuleDetails();
+        
+    }, [userId, userRole]);
+
+
+    const getModuleDetails = async () => {
+        try {
+            const response = await axios.get(`http://localhost:3000/modules/getModulesDetails?userId=${userId}&userRole=${userRole}`);
+            setModule(Array.isArray(response.data) ? response.data : []);
+        } catch (error) {
+            console.error('Error while getting the modules', error);
+        }
+    }
+
     const handleSubmitTeacher = async (e) => {
         e.preventDefault()
         try {
@@ -48,57 +67,73 @@ const RegisterTeacher = ({userRole}) => {
     }
     return (
         <div>
-            <SidebarComponent userRole={userRole}/>
-<div className=''></div>
-            <div className="container-fluid px-1 py-5 mx-auto">
-                <div className="row d-flex justify-content-center">
-                    <div className="col-xl-7 col-lg-8 col-md-9 col-11 text-center">
-                        <div className="card">
-                            <h5 className="text-center mb-4">Register Teacher</h5>
-                            <form className="form-card" onSubmit={handleSubmitTeacher}>
-                                <div className="row justify-content-between text-left">
-                                    <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Teacher Id <span className="text-danger"> *</span></label>
-                                        <input type="text" placeholder="Teacher's Id" name="teacherId" value={teacherValues.teacherId} onChange={handleChangesTeacher} />
-                                    </div>
-                                    <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Teacher Name<span className="text-danger"> *</span></label>
-                                        <input type="text" placeholder="Teacher's name" name="teacherName" value={teacherValues.teacherName} onChange={handleChangesTeacher} />
-                                    </div>
+            <SidebarComponent userRole={userRole} />
+            <div className='home-section'>
+                <div className="container-fluid px-1 py-5 mx-auto">
+                    <div className="row d-flex justify-content-center">
+                        <div className="col-xl-7 col-lg-8 col-md-9 col-11 text-center">
+                            <div className="card shadow">
+                                <div className="card-header bg-primary text-white p-2 text-center">
+                                    <h5 className="text-center m-0">Register Teachers</h5>
                                 </div>
-                                <div className="row justify-content-between text-left">
-                                    <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Teacher's Loaction<span className="text-danger"> *</span></label>
-                                        <input type="text" placeholder="teacher's address" name="teacherAddress" value={teacherValues.teacherAddress} onChange={handleChangesTeacher} />
+                                <form className="form-card mt-4" onSubmit={handleSubmitTeacher}>
+                                    <div className="row justify-content-between mb-3">
+                                        
+                                        <div className="form-group col-sm-6 flex-column d-flex">
+                                            <label className="form-label fw-bold">Teacher Name<span className="text-danger"> *</span></label>
+                                            <input type="text" placeholder="Teacher's name" name="teacherName" value={teacherValues.teacherName} onChange={handleChangesTeacher} />
+                                        </div>
+                                        <div className="form-group col-sm-6 flex-column d-flex">
+                                            <label className="form-label fw-bold">Teacher's Gender<span className="text-danger"> *</span></label>
+                                            <select name="teacherGender" onChange={handleChangesTeacher}>
+                                                <option value="">-- Select Gender --</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Teacher's Email<span className="text-danger"> *</span></label>
-                                        <input type='email' placeholder="Teacher's email" name="teacherEmail" value={teacherValues.teacherEmail} onChange={handleChangesTeacher} />
+                                    <div className="row justify-content-between text-left">
+                                        <div className="form-group col-sm-6 flex-column d-flex">
+                                            <label className="form-label fw-bold">Teacher's Loaction<span className="text-danger"> *</span></label>
+                                            <input type="text" placeholder="teacher's address" name="teacherAddress" value={teacherValues.teacherAddress} onChange={handleChangesTeacher} />
+                                        </div>
+                                        <div className="form-group col-sm-6 flex-column d-flex">
+                                            <label className="form-label fw-bold">Teacher's Email<span className="text-danger"> *</span></label>
+                                            <input type='email' placeholder="Teacher's email" name="teacherEmail" value={teacherValues.teacherEmail} onChange={handleChangesTeacher} />
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="row justify-content-between text-left">
-                                    <div className="form-group col-sm-6 flex-column d-flex">
-                                        <label className="form-control-label px-3">Student's DOB<span className="text-danger"> *</span></label>
-                                        <input type='date' placeholder="Teacher's DOB" name="teacherDOB" value={teacherValues.teacherDOB} onChange={handleChangesTeacher} />
+                                    <div className="row justify-content-between text- mt-3">
+                                        <div className="form-group col-sm-6 flex-column d-flex">
+                                            <label className="form-label fw-bold">Teacher's DOB<span className="text-danger"> *</span></label>
+                                            <input type='date' placeholder="Teacher's DOB" name="teacherDOB" value={teacherValues.teacherDOB} onChange={handleChangesTeacher} />
+                                        </div>
+                                        <div className="form-group col-sm-6 flex-column d-flex">
+                                            <label className="form-label fw-bold">Teacher's Module<span className="text-danger"> *</span></label>
+                                            <select
+                                                name="teacherModule"
+                                                onChange={handleChangesTeacher}>
+                                                <option value="">-- Select a Module --</option>
+                                                {modules.map((module) => (
+                                                    <option key={module.Module_id} value={module.Module_id}>
+                                                        {module.Module_Name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        
                                     </div>
-                                    <label htmlFor='teacherGender'>Teacher Gender</label>
-                                    <input type="radio" name="teacherGender" value="Male" onChange={handleChangesTeacher} /> Male
-                                    <input type="radio" name="teacherGender" value="Female" onChange={handleChangesTeacher} /> Female
 
-                                    <div>
-
-
+                                    <div className="row justify-content-end mt-4">
+                                        <div className="form-group"> <button className="btn btn-primary">Add Teacher</button> </div>
                                     </div>
-                                </div>
-
-                                <div className="row justify-content-end">
-                                    <div className="form-group col-sm-6"> <button className="btn btn-outline-primary">Add Teacher</button> </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     )
 }

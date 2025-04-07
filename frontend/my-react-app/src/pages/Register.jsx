@@ -61,6 +61,7 @@ const Register = ({ userRole }) => {
     return (
         <div className='d-flex'>
             <SidebarComponent userRole={userRole} />
+            <div className='home-section'>
             <div className="container-fluid px-1 py-3 mx-auto flex-grow-1">
                 <div className="row d-flex justify-content-center">
                     <div className="col-xl-7 col-lg-8 col-md-9 col-11 ">
@@ -121,13 +122,15 @@ const Register = ({ userRole }) => {
                                 </div>
 
                                 <div className="row justify-content-end">
-                                    <div className="form-group col-sm-6"> <button type="submit" className="btn btn-outline-primary">Add Student</button> </div>
+                                    <div className="form-group mt-4"> <button type="submit" className="btn btn-primary">Add Student</button> </div>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
+            </div>
+            
 
         </div>
     )

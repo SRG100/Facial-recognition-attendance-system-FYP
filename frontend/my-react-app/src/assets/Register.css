@@ -20,7 +20,7 @@ body {
     margin-bottom: 0
 }
 
-input:not([type="radio"]),
+input:not([type="radio"]):not([type="checkbox"]),
 textarea,
 .buttonCss ,select {
     padding: 8px 15px;
@@ -31,11 +31,11 @@ textarea,
     font-size: 18px !important;
     font-weight: 300
 }
-input[type="radio"] {
+input[type="radio"][type="checkbox"] {
     margin: 0 5px 0 0;
 }
 
-input:not([type="radio"]):focus,
+input:not([type="radio"]):not([type="checkbox"]):focus,
 textarea:focus {
     -moz-box-shadow: none !important;
     -webkit-box-shadow: none !important;

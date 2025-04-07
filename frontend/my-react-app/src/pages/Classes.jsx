@@ -4,6 +4,8 @@ import axios from 'axios'
 import Popup from 'reactjs-popup';
 import { Link, useNavigate } from 'react-router-dom'
 import SidebarComponent from '../components/SideBar'
+import toast from 'react-hot-toast'
+
 
 
 const Classes = ({ isLoggedIn, userRole, userId }) => {
@@ -24,6 +26,13 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
 
     useEffect(() => {
         if (userId) {
+            getClassDetails();
+        }
+    }, [userId, userRole]);
+
+
+    useEffect(() => {
+        if (userId) {
             getModuleDetails()
             getTeacherDetails()
             getSectionDetails()
@@ -38,9 +47,10 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                 Class_Id: classDetail.Class_Id
             }
             const response = await axios.post('http://localhost:3000/classes/endClass', endClassData)
-            
+
         } catch (e) {
             console.error('Error while getting the sections', e)
+            toast.error("Error getting the sections")
         }
     }
 
@@ -49,7 +59,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             const response = await axios.get('http://localhost:3000/sections/getSection')
             setSections(Array.isArray(response.data) ? response.data : [])
         } catch (error) {
-            console.error('Error while getting the sections', error)
+            toast.error('Error while getting the sections', error)
         }
     };
     const getModuleDetails = async () => {
@@ -58,6 +68,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             setModules(Array.isArray(response.data) ? response.data : [])
         } catch (error) {
             console.error('Error while getting the modules', error)
+            toast.error("Error while getting modules")
         }
     }
     const getTeacherDetails = async () => {
@@ -66,16 +77,30 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             setTeachers(Array.isArray(response.data) ? response.data : [])
         } catch (error) {
             console.error('Error while getting the teachers', error)
+            toast.error("Error while getting tecahers")
         }
     }
+
     const addNewClass = async (e) => {
         console.log("Well the data before sending is :", newClass)
         e.preventDefault()
         try {
             const response = await axios.post(`http://localhost:3000/classes/addClass`, newClass)
             console.log(response.message)
+            if (response.data.success) {
+                toast.success(response.data.message)
+
+            } else {
+                toast.error(response.data.message)
+
+            }
+            getClassDetails()
+            setIsPopupOpen(false)
+
         } catch (error) {
-            console.error('Error while getting the teachers', error)
+            console.error('Error while adding new class ', error)
+            toast.error("Error while adding new class")
+
         }
     }
 
@@ -87,12 +112,6 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             [name]: value
         }));
     }
-
-    useEffect(() => {
-        if (userId) {
-            getClassDetails();
-        }
-    }, [userId, userRole]);
 
 
 
@@ -121,7 +140,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                     resolve({ latitude, longitude })
                 },
                 (error) => {
-                    console.error("Error getting user location:", error)
+                    toast.error("Error getting user location:", error)
                     setLoading(false)
                     reject(error)
                 },
@@ -182,12 +201,12 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             const response = await axios.post('http://localhost:3000/classes/markAttendance', attendanceData)
             console.log(response.message)
             const Attendance_id = response.data.Attendance_Id
-            const attendnaceExistance= response.data.attendanceExists
+            const attendnaceExistance = response.data.attendanceExists
             setAttendanceExists(response.data.attendanceExists)
-            if (attendnaceExistance){
+            if (attendnaceExistance) {
                 alert(response.data.message)
             }
-            else{
+            else {
                 navigate("/verifycode", { state: { Class_Id, Attendance_id } })
 
             }
@@ -198,7 +217,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
         }
 
     }
-    
+
 
     const getClassDetails = async () => {
         try {
@@ -232,9 +251,11 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             <SidebarComponent userRole={userRole} />
 
             <div className='home-section'>
+                <h3 className="m-0 mb-3  text-start">Classes</h3>
 
                 <div className="card container p-0 m-0 table-responsive">
-                    <table className="table table-hover text-center ">
+
+                    <table className="table table-hover text-center m-2 ">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
                             <tr>
@@ -288,7 +309,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                                         {isClassLive(classDetail.Class_Start_Time, classDetail.Class_End_Time) ? (
                                                             <>
                                                                 {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
-                                                                    <button className="btn btn-outline-danger" onClick={() =>endClass(classDetail)} > End Class</button>
+                                                                    <button className="btn btn-outline-danger" onClick={() => endClass(classDetail)} > End Class</button>
                                                                 ) : (
                                                                     <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
                                                                 )}
@@ -297,7 +318,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                                             <span className="text-gray-400">Class not started</span>
                                                         )}
                                                     </td>) : (<td>
-                                                        {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0  ? (
+                                                        {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
                                                             <button className="btn btn-outline-success" >Class Ongoing</button>
 
 
@@ -379,7 +400,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                                             )}
 
                                                         </td>) : userRole === "teacher" ? (<td >
-                                                            {classDetail.Class_Status === 1 && classDetail.Class_Completion === 1  ? (
+                                                            {classDetail.Class_Status === 1 && classDetail.Class_Completion === 1 ? (
                                                                 <button className="btn btn-outline-success">View Attendnace</button>
                                                             ) : (
                                                                 <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
@@ -411,104 +432,106 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                 </div>
             </div>
             <Popup open={isPopupOpen} closeOnDocumentClick onClose={() => setIsPopupOpen(false)}>
-                <form onSubmit={addNewClass}>
+                <div className='card'>
+                    <form onSubmit={addNewClass}>
 
-                    <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-                        <div className="modal-header mb-3">
-                            <h3 className="modal-title">Add New Class</h3>
+                        <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+                            <div className="modal-header mb-3">
+                                <h3 className="modal-title">Add New Class</h3>
+                            </div>
+
+
+                            <div className="modal-body">
+                                <div className="form-group mb-3">
+                                    <label className="form-label">Class Start Time:</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="Class_Start_Time"
+                                        onChange={handleChanges}
+                                    />
+                                </div>
+                                <div className="form-group mb-3">
+                                    <label className="form-label">Class End Time:</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="Class_End_Time"
+                                        onChange={handleChanges}
+                                    />
+                                </div>
+                                <div className="form-group mb-3">
+                                    <label className="form-label">Class Date:</label>
+                                    <input
+                                        type="date"
+                                        className="form-control"
+                                        name="Class_Date"
+                                        onChange={handleChanges}
+                                    />
+                                </div>
+                                <div className="form-group mb-3">
+                                    <label className="form-label">Class Type:</label>
+                                    <select name="Class_Type" onChange={handleChanges}
+                                        className="form-select">
+                                        <option value="">-- Select a Class Type --</option>
+                                        <option value="Lecture">Lecture</option>
+                                        <option value="Tutorial">Tutorial</option>
+                                        <option value="Lab">Lab</option>
+
+                                    </select>
+                                </div>
+
+                                <div className="form-group mb-3">
+                                    <label className="form-label">Section:</label>
+                                    <select name="Section_Id" onChange={handleChanges}
+                                        className="form-select">
+                                        <option value="">-- Select a Section --</option>
+                                        {sections.map((section) => (
+                                            <option key={section.Section_id} value={section.Section_id}>
+                                                {section.Section_id}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group mb-3">
+                                    <label className="form-label">Module:</label>
+                                    <select
+                                        className="form-select"
+                                        name="Module_Id"
+                                        onChange={handleChanges}>
+                                        <option value="">-- Select a Module --</option>
+                                        {modules.map((module) => (
+                                            <option key={module.Module_id} value={module.Module_id}>
+                                                {module.Module_id}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="form-group mb-3">
+                                    <label className="form-label">Teacher:</label>
+                                    <select
+                                        className="form-select"
+                                        name="Teacher_Id"
+                                        onChange={handleChanges}>
+                                        <option value="">-- Select a Teacher --</option>
+                                        {teachers.map((teacher) => (
+                                            <option key={teacher.Teacher_id} value={teacher.Teacher_id} >
+                                                {teacher.Teacher_Name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="mt-4">
+                                    <button className="btn btn-primary">
+                                        Add Class
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        Class_Start_Time :'', Class_End_Time:'', Class_Date:'', Class_Type:'', Section_Id:'', Module_Id:'', Teacher_Id:''
+                    </form>
+                </div>
 
-
-                        <div className="modal-body">
-                            <div className="form-group mb-3">
-                                <label className="form-label">Class Start Time:</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    name="Class_Start_Time"
-                                    onChange={handleChanges}
-                                />
-                            </div>
-                            <div className="form-group mb-3">
-                                <label className="form-label">Class End Time:</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    name="Class_End_Time"
-                                    onChange={handleChanges}
-                                />
-                            </div>
-                            <div className="form-group mb-3">
-                                <label className="form-label">Class Date:</label>
-                                <input
-                                    type="date"
-                                    className="form-control"
-                                    name="Class_Date"
-                                    onChange={handleChanges}
-                                />
-                            </div>
-                            <div className="form-group mb-3">
-                                <label className="form-label">Class Type:</label>
-                                <select name="Class_Type" onChange={handleChanges}
-                                    className="form-select">
-                                    <option value="">-- Select a Class Type --</option>
-                                    <option value="Lecture">Lecture</option>
-                                    <option value="Tutorial">Tutorial</option>
-                                    <option value="Lab">Lab</option>
-
-                                </select>
-                            </div>
-
-                            <div className="form-group mb-3">
-                                <label className="form-label">Section:</label>
-                                <select name="Section_Id" onChange={handleChanges}
-                                    className="form-select">
-                                    <option value="">-- Select a Section --</option>
-                                    {sections.map((section) => (
-                                        <option key={section.Section_id} value={section.Section_id}>
-                                            {section.Section_id}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="form-group mb-3">
-                                <label className="form-label">Module:</label>
-                                <select
-                                    className="form-select"
-                                    name="Module_Id"
-                                    onChange={handleChanges}>
-                                    <option value="">-- Select a Module --</option>
-                                    {modules.map((module) => (
-                                        <option key={module.Module_id} value={module.Course_id}>
-                                            {module.Module_id}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group mb-3">
-                                <label className="form-label">Module:</label>
-                                <select
-                                    className="form-select"
-                                    name="Teacher_Id"
-                                    onChange={handleChanges}>
-                                    <option value="">-- Select a Teacher --</option>
-                                    {teachers.map((teacher) => (
-                                        <option key={teacher.Teacher_id} value={teacher.Teacher_id} >
-                                            {teacher.Teacher_Name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="mt-4">
-                                <button className="btn btn-primary">
-                                    Add Class
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
             </Popup>
         </div>
 

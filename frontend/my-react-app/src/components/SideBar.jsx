@@ -72,7 +72,9 @@ const SidebarComponent = ({userId, userRole }) => {
         return (
             <div className={`sidebar ${isOpen ? 'open' : ''}`}>
                 <div className="logo-details">
-                    <div className="logo-name">School Portal</div>
+                {/* <img src={logo} alt="logo" /> */}
+
+                    <div className="logo-name" style={{color:"#4a48ac"}}>Attendnace System</div>
                     <i 
                         className={`bx ${isOpen ? 'bx-x' : 'bx-menu'}`} 
                         id="btn"

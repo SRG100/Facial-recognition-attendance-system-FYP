@@ -58,8 +58,11 @@ const Students = ({ userRole, userId }) => {
       <SidebarComponent userRole={userRole} />
 
       <div className=' home-section'>
-      <div className="d-flex justify-content-center pb-3 pt-0 mt-0" style={{transition: "all 0.3s ease"}}>
-            <div className="input-group w-50">
+
+        <div className="d-flex pb-3 pt-0 mt-0" style={{ transition: "all 0.3s ease" }}>
+          <div className="d-flex justify-content-between align-items-center w-100 mb-3">
+            <h3 className="m-0">Students</h3>
+            <div className="input-group w-50 ms-auto">
               <input
                 type="text"
                 className="form-control"
@@ -69,8 +72,9 @@ const Students = ({ userRole, userId }) => {
               />
             </div>
           </div>
+        </div>
         <div className="card  container p-0 m-0 ">
-          
+
 
           <table className="table table-hover text-center table-responsive" >
             <thead className="">
@@ -90,8 +94,8 @@ const Students = ({ userRole, userId }) => {
               {
                 filteredStudents.map((student, i) => {
                   return (
-                    <tr scope="row"         style={{transition: "all 0.3s ease"}}
-                    key={i}>
+                    <tr scope="row" style={{ transition: "all 0.3s ease" }}
+                      key={i}>
 
                       <td className="align-middle" >{student.Student_Id}</td>
                       <td className="align-middle">{student.Student_Name}</td>

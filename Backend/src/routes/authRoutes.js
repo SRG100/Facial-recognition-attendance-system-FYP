@@ -3,7 +3,7 @@ import { connectDatabase } from '../config/database.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import cookieParser from 'cookie-parser';
-const app = express();
+const app = express()
 
 app.use(cookieParser());
 const router = express.Router()
@@ -19,27 +19,34 @@ router.post('/login', async (req, res) => {
         console.log("Database connected successfully!");
         if (role === 'student') {
             [rows] = await db.query('SELECT * FROM student WHERE Student_Email=?', [email])
-            id = rows[0].Student_Id
-            userName= rows[0].Student_Name
+            if (rows.length > 0) {
+
+                id = rows[0].Student_Id
+                userName = rows[0].Student_Name
+            }
 
         } else if (role === 'teacher') {
             [rows] = await db.query('SELECT * FROM teacher WHERE Teacher_Email=?', [email])
-            id = rows[0].Teacher_id
-            userName=rows[0].Teacher_Name
+            if (rows.length > 0) {
+                id = rows[0].Teacher_id
+                userName = rows[0].Teacher_Name
+            }
 
         } else if (role === 'admin') {
             [rows] = await db.query('SELECT * FROM admin WHERE Admin_Email=?', [email])
-            id = rows[0].Admin_id
-            userName=rows[0].Admin_Name
+            if (rows.length > 0) {
+                id = rows[0].Admin_id
+                userName = rows[0].Admin_Name
+            }
 
         } else {
-            return res.status(400).json({ message: "Invalid role provided" });
+            return res.json({ message: "Invalid role provided", success: false });
         }
 
 
         if (rows.length === 0) {
             console.log("User with this email doesn't exists");
-            return res.status(404).json({ message: "User with this email doesn't exists" })
+            return res.json({ message: "Invalid Credentials", success: false })
         }
         let isMatch
         if (role === 'admin') {
@@ -51,27 +58,25 @@ router.post('/login', async (req, res) => {
             isMatch = isCorrect
         }
         else {
-            console.log("inside the password check for users except admin")
+            console.log("Inside the password check for users except admin")
             isMatch = await bcrypt.compare(password, rows[0].Password)
         }
 
         if (!isMatch) {
             console.log("Wrong Password");
-            return res.status(401).json({ message: "Wrong Password" })
+            return res.json({ message: "Wrong Password", success: false })
         }
-        console.log("Login ok");
-
-        console.log("the user id is:", id)
+        console.log("Login ok")
         const token = jwt.sign(
-            { id: id, role: role , userName:userName },
+            { id: id, role: role, userName: userName },
             process.env.JWT_KEY,
-            { expiresIn: "1h" }
-        );
+            { expiresIn: "3h" }
+        )
         res.cookie("token", token, {
             httpOnly: true,
             secure: false,
             sameSite: "Strict",
-            maxAge: 3600000,
+            maxAge: 3 * 60 * 60 * 1000,
             path: '/'
         });
 
@@ -81,7 +86,7 @@ router.post('/login', async (req, res) => {
             const Faceid = rows[0].Face_id;
             if (Faceid == null) {
                 console.log("No face ID");
-                return res.status(201).json({ success: false, message: "Face ID is not registered", redirect: "/registerface" });
+                return res.status(201).json({ success: false, message: "Login Sucessful, No Face id deteched", redirect: "/registerface" });
             }
         }
         console.log("Login")
@@ -90,7 +95,7 @@ router.post('/login', async (req, res) => {
 
     } catch (err) {
         console.log("The following error has occured", err);
-        res.status(500).json(err)
+        res.status(500).json({ message: err, success: false })
     }
 
 })
@@ -108,7 +113,6 @@ router.get('/isAuthorized', async (req, res) => {
             role: decoded.role,
             userName: decoded.userName
         })
-
 
     } catch (err) {
         console.error("Authorization error:", err);

@@ -20,8 +20,9 @@ import Students from './pages/Students';
 import Modules from './pages/Modules';
 import Attendance from './pages/Attendance';
 import ViewReview from './pages/ViewReview';
-import Toast from './components/Toast';
+
 import Examples from './pages/Example';
+import './assets/MyPopup.css'
 
 
 function App() {
@@ -61,7 +62,7 @@ function App() {
           <Route path="/login" element={isLoggedIn ?  <Navigate to="/" /> : <Login /> } />
 
           <Route element={<ProtectedRoute isLoggedIn={isLoggedIn} />}>
-            <Route path="/register" element={ <Register userRole={userRole}/>  } />
+            <Route path="/register" element={ <Register userId={userId} userRole={userRole}/>  } />
             <Route path="/registerTeacher" element={<RegisterTeacher userRole={userRole} />  } />
           
             <Route path="/" element={<Dashboard isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} userName={userName}/>} />
@@ -78,7 +79,6 @@ function App() {
             <Route path="/viewSections" element={<Sections userId={userId} userRole={userRole} />} />
             <Route path="/ReviewForm" element={<ReviewForm userId={userId} userRole={userRole} />} />
             <Route path="/ViewReview" element={<ViewReview userId={userId} userRole={userRole} />} />
-            <Route path="/toast" element={<Toast userId={userId} userRole={userRole} />} />
             <Route path="/example" element={<Examples userId={userId} userRole={userRole} />} />
 
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { toast } from "react-toastify"
+import toast from 'react-hot-toast'
 
 // import Cookies from 'universal-cookies'
 const Login = () => {
@@ -10,7 +10,6 @@ const Login = () => {
     const navigate = useNavigate();
 
     const [values, setValues] = useState({
-
         email: '',
         password: '',
         role: ''
@@ -23,33 +22,41 @@ const Login = () => {
         })
 
     }
-    //when the admin presses add student
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
             const response = await axios.post('http://localhost:3000/auth/login', values, { withCredentials: true })
             console.log("Response:", response.data);
             if (response.status === 201) {
-
                 if (response.data.redirect) {
-                    alert("Login Success")
-                    navigate(response.data.redirect)
+                    if (response.data.success) {
+                        toast.success(response.data.message)
+                        navigate(response.data.redirect, { replace: true })
+                        window.location.reload()
+
+                    } else {
+                        toast(response.data.message,{icon: '👏'})
+                        navigate(response.data.redirect, { replace: true })
+                        window.location.reload()
+                    }     
                 }
+            }else{
+                toast.error(response.data.message)
             }
-            window.location.reload();
             console.log(response.data.message)
-            // errorMessage=response.data.message
 
         } catch (err) {
             console.log(err)
+            toast.error(response.data.message)
+
         }
 
     }
     return (
         <div>
             <div>
-                <form onSubmit={handleSubmit}> 
-                    <div> 
+                <form onSubmit={handleSubmit}>
+                    <div>
                         <label htmlFor='role'>Role:</label>
                         <select name="role" value={values.role} onChange={handleChanges}>
                             <option value="">Select Role</option>
@@ -78,7 +85,7 @@ const Login = () => {
                 {errorMessage}
             </div>
 
-            
+
         </div>
     )
 }

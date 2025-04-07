@@ -290,7 +290,7 @@ router.post('/addClass', async (req, res) => {
         console.log("Sucessfully added the sections associations")
         res.json({
             success: true,
-            message: "Added the sections",
+            message: "Added the class sucessfully!!!",
         })
     }
     catch (e) {
