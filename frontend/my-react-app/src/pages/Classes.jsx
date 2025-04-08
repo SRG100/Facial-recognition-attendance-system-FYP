@@ -401,7 +401,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
 
                                                         </td>) : userRole === "teacher" ? (<td >
                                                             {classDetail.Class_Status === 1 && classDetail.Class_Completion === 1 ? (
-                                                                <button className="btn btn-outline-success">View Attendnace</button>
+                                                                <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class" } })} >View Attendnace</button>
                                                             ) : (
                                                                 <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
                                                             )}
@@ -414,7 +414,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                                 )} */}
                                                         </td>) : (<td>
                                                             {classDetail.Class_Status === 1 ? (
-                                                                <button className="btn btn-outline-success" onClick={() => viewAttendance(classDetail)}>View Attendance</button>
+                                                                <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class" } })}>View Attendance</button>
 
                                                             ) : (
                                                                 <button className="btn btn-outline-success" >No Class Yet</button>
@@ -447,7 +447,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                     <input
                                         type="text"
                                         className="form-control"
-                                        name="Class_Start_Time"
+                                        name="Class_Start_Time" required
                                         onChange={handleChanges}
                                     />
                                 </div>
@@ -455,7 +455,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                     <label className="form-label">Class End Time:</label>
                                     <input
                                         type="text"
-                                        className="form-control"
+                                        className="form-control" required
                                         name="Class_End_Time"
                                         onChange={handleChanges}
                                     />
@@ -463,7 +463,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                 <div className="form-group mb-3">
                                     <label className="form-label">Class Date:</label>
                                     <input
-                                        type="date"
+                                        type="date" required
                                         className="form-control"
                                         name="Class_Date"
                                         onChange={handleChanges}
@@ -471,7 +471,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                 </div>
                                 <div className="form-group mb-3">
                                     <label className="form-label">Class Type:</label>
-                                    <select name="Class_Type" onChange={handleChanges}
+                                    <select name="Class_Type" onChange={handleChanges} required
                                         className="form-select">
                                         <option value="">-- Select a Class Type --</option>
                                         <option value="Lecture">Lecture</option>
@@ -483,7 +483,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
 
                                 <div className="form-group mb-3">
                                     <label className="form-label">Section:</label>
-                                    <select name="Section_Id" onChange={handleChanges}
+                                    <select name="Section_Id" onChange={handleChanges} required
                                         className="form-select">
                                         <option value="">-- Select a Section --</option>
                                         {sections.map((section) => (
@@ -496,7 +496,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
 
                                 <div className="form-group mb-3">
                                     <label className="form-label">Module:</label>
-                                    <select
+                                    <select required
                                         className="form-select"
                                         name="Module_Id"
                                         onChange={handleChanges}>
@@ -510,7 +510,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                 </div>
                                 <div className="form-group mb-3">
                                     <label className="form-label">Teacher:</label>
-                                    <select
+                                    <select required
                                         className="form-select"
                                         name="Teacher_Id"
                                         onChange={handleChanges}>

@@ -70,7 +70,8 @@ const Attendance = ({ userId, userRole }) => {
       console.error('Error while getting the student absence by month', error)
     }
   }
-  const generateReport = async () => {
+  const generateReport = async (e) => {
+    e.preventDefault()
     try {
       console.log(reportCredit)
       const response = await axios.get(`http://localhost:3000/generate/generateReport?Module=${reportCredit.Module}&From=${reportCredit.From}&To=${reportCredit.To}&Id=${Id}`, { responseType: 'blob' });
@@ -222,7 +223,12 @@ const Attendance = ({ userId, userRole }) => {
             </div>
           </div>
           <Popup open={isPopupOpen} closeOnDocumentClick onClose={() => setIsPopupOpen(false)}>
+          <div className='card'>
+                  
+                  
             <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+              <form onSubmit={generateReport}>
+                
 
               <div className="modal-header mb-3">
                 <h3 className="modal-title">Generate Attendance Report</h3>
@@ -233,7 +239,7 @@ const Attendance = ({ userId, userRole }) => {
                 <h5>Select creterias</h5>
                 <div className="form-group mb-3">
                   <label className="form-label">Modules:</label>
-                  <select
+                  <select required
                     className="form-select"
                     onChange={(e) => setReportCredit({ ...reportCredit, Module: e.target.value })}
                   >
@@ -250,23 +256,25 @@ const Attendance = ({ userId, userRole }) => {
 
                 <div className="form-group mb-3">
                   <label className="form-label"   >From:</label>
-                  <input type="date"
+                  <input type="date" required
                     value={reportCredit.From}
                     onChange={(e) => {
                       setReportCredit((prev) => ({ ...prev, From: e.target.value }));
                     }} className="form-control" />
                   <label className="form-label"   >To:</label>
-                  <input type="date"
+                  <input type="date" required
                     value={reportCredit.To}
                     onChange={(e) => {
                       setReportCredit((prev) => ({ ...prev, To: e.target.value }));
                     }}
                     className="form-control" />
                 </div>
-                <button className='btn btn-outline-primary' onClick={generateReport} >Generate Report</button>
+                <button className='btn btn-outline-primary'>Generate Report</button>
 
 
               </div>
+              </form>
+            </div>
             </div>
           </Popup>
 
@@ -315,5 +323,6 @@ const Attendance = ({ userId, userRole }) => {
     </div>
   );
 };
+
 
 export default Attendance;

@@ -74,31 +74,31 @@ const Register = ({ userRole }) => {
                                 <div className="row justify-content-between mb-3">
                                     <div className="form-group col-sm-6 flex-column d-flex">
                                         <label className="form-label fw-bold">Student Id <span className="text-danger"> *</span></label>
-                                        <input type="text" placeholder="Enter the Student's Id name" name="studentId" onChange={handleChanges} />
+                                        <input type="text" required placeholder="Enter the Student's Id name" name="studentId" onChange={handleChanges} />
                                     </div>
                                     <div className="form-group col-sm-6 flex-column d-flex">
                                         <label className="form-label fw-bold">Student Name<span className="text-danger"> *</span></label>
-                                        <input type="text"  name="studentName" placeholder="Enter the students name" onChange={handleChanges} />
+                                        <input type="text" required  name="studentName" placeholder="Enter the students name" onChange={handleChanges} />
                                     </div>
                                 </div>
                                 <div className="row justify-content-between mb-3">
                                     <div className="form-group col-sm-6 flex-column d-flex">
                                         <label className="form-label fw-bold">Student's Loaction<span className="text-danger"> *</span></label>
-                                        <input type="text" name="studentAddress" onChange={handleChanges} placeholder="Student's Location" />
+                                        <input type="text" required name="studentAddress" onChange={handleChanges} placeholder="Student's Location" />
                                     </div>
                                     <div className="form-group col-sm-6 flex-column d-flex">
                                         <label className="form-label fw-bold">Student's Email<span className="text-danger"> *</span></label>
-                                        <input type="text" placeholder="Student's email" name="studentEmail" onChange={handleChanges} />
+                                        <input type="text" required placeholder="Student's email" name="studentEmail" onChange={handleChanges} />
                                     </div>
                                 </div>
                                 <div className="row justify-content-between mb-3">
                                     <div className="form-group col-sm-6 flex-column d-flex">
                                         <label className="form-label fw-bold">Student's DOB<span className="text-danger"> *</span></label>
-                                        <input type='date' placeholder="Student's DOB" name="studentDOB" onChange={handleChanges} />
+                                        <input type='date' required placeholder="Student's DOB" name="studentDOB" onChange={handleChanges} />
                                     </div>
                                     <div className="form-group col-sm-6 flex-column d-flex">
                                         <label className="form-label fw-bold">Student's Section<span className="text-danger"> *</span></label>
-                                        <select name="section" onChange={handleChanges}>
+                                        <select required name="section" onChange={handleChanges}>
                                         <option value="">-- Select a Section --</option>
                                         {sections.map((section) => (
                                             <option key={section.Section_id}  value={section.Section_id} >
@@ -112,7 +112,7 @@ const Register = ({ userRole }) => {
                                     
                                     <div className="form-group col-sm-6 flex-column d-flex">
                                         <label className="form-label fw-bold">Student's Gender<span className="text-danger"> *</span></label>
-                                        <select name="studentGender" onChange={handleChanges}>
+                                        <select name="studentGender" onChange={handleChanges} required>
                                         <option value="">-- Select Gender --</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>

@@ -20,6 +20,7 @@ import Students from './pages/Students';
 import Modules from './pages/Modules';
 import Attendance from './pages/Attendance';
 import ViewReview from './pages/ViewReview';
+import ClassAttendance from './pages/ClassAttendance';
 
 import Examples from './pages/Example';
 import './assets/MyPopup.css'
@@ -80,6 +81,9 @@ function App() {
             <Route path="/ReviewForm" element={<ReviewForm userId={userId} userRole={userRole} />} />
             <Route path="/ViewReview" element={<ViewReview userId={userId} userRole={userRole} />} />
             <Route path="/example" element={<Examples userId={userId} userRole={userRole} />} />
+            <Route path="/ViewClassAttendance" element={<ClassAttendance userId={userId} userRole={userRole}/>} />
+
+            
 
 
             <Route path="/login" element={<Navigate to="/" />} />

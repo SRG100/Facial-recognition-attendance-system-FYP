@@ -40,3 +40,15 @@
         }
     }
 }
+
+  
+  .dropdown-menu {
+    z-index: 20;
+  }
+  .dropdown-menu.show {
+    z-index: 1050;
+  }
+  .table-responsive.attendnace {
+    overflow: visible !important;
+  }
+  

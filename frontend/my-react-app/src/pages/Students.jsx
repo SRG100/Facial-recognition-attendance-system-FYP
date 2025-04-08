@@ -73,10 +73,10 @@ const Students = ({ userRole, userId }) => {
             </div>
           </div>
         </div>
-        <div className="card  container p-0 m-0 ">
+        <div className="card  container p-0 m-0 table-responsive ">
 
 
-          <table className="table table-hover text-center table-responsive" >
+          <table className="table table-hover text-center " >
             <thead className="">
 
               <tr>

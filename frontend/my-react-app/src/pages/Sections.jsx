@@ -55,6 +55,10 @@ const Sections = ({ userRole, userId }) => {
 
   const getModulesTeachers = async () => {
     try {
+      if (!newSection.Course || !newSection.Year || !newSection.name === null) {
+        toast.error("Please fill all the fields.")
+        return
+      }
       const response = await axios.get(`http://localhost:3000/modules/getSpecificModules?Course=${newSection.Course}&Year=${newSection.Year}`)
       setModuleTeachers(response.data)
       setGotTeachers(true)
@@ -75,6 +79,9 @@ const Sections = ({ userRole, userId }) => {
     try {
       setIsPopupOpen(false)
       setGotTeachers(false)
+      setModuleTeachers([])
+      setNewSection({ name: '', Year: '', Course: '' })
+      setSelectedTeachers({})
 
 
     } catch (error) {
@@ -84,6 +91,11 @@ const Sections = ({ userRole, userId }) => {
 
   const handleAddSection = async () => {
     try {
+      if(selectedTeachers.teacherId===null){
+        toast.error("Select respective teachers")
+        return
+        
+      }
       const newSectionDetails = {
         ...newSection,
         modules: Object.entries(selectedTeachers).map(([moduleId, teacherId]) => ({
@@ -103,7 +115,10 @@ const Sections = ({ userRole, userId }) => {
 
       setIsPopupOpen(false)
       getSectionDetails()
+      setGotTeachers(false)
+      setModuleTeachers([])
       setSelectedTeachers({})
+      setNewSection({ name: '', Year: '', Course: '' })
     } catch (error) {
       console.error('Error adding section:', error);
     }
@@ -116,8 +131,8 @@ const Sections = ({ userRole, userId }) => {
 
         <h3 className="m-0 mb-3  text-start">Sections</h3>
 
-        <div className="card container p-0 m-0">
-          <table className="table table-hover text-center table-responsive">
+        <div className="card container p-0 m-0 table-responsive">
+          <table className="table table-hover text-center">
             <thead className="">
 
               <tr>
@@ -172,7 +187,7 @@ const Sections = ({ userRole, userId }) => {
               <div className="modal-body">
                 <div className="form-group mb-3">
                   <label className="form-label">Section Name:</label>
-                  <input
+                  <input required
                     type="text"
                     className="form-control"
                     value={newSection.name}
@@ -182,7 +197,7 @@ const Sections = ({ userRole, userId }) => {
 
                 <div className="form-group mb-3">
                   <label className="form-label">Year:</label>
-                  <select
+                  <select required
                     className="form-select"
                     onChange={(e) => setNewSection({ ...newSection, Year: e.target.value })}>
                     <option value="">-- Select a Section --</option>
@@ -196,7 +211,7 @@ const Sections = ({ userRole, userId }) => {
 
                 <div className="form-group mb-3">
                   <label className="form-label">Course:</label>
-                  <select
+                  <select required
                     className="form-select"
                     onChange={(e) => setNewSection({ ...newSection, Course: e.target.value })}>
                     <option value="">-- Select a Course --</option>
@@ -218,7 +233,7 @@ const Sections = ({ userRole, userId }) => {
                           return (
                             <div key={moduleId} className="mb-3">
                               <p className="fw-semibold">{module.Module_id}:</p>
-                              <select
+                              <select required
                                 className="form-select"
                                 value={selectedTeachers[moduleId] || ""}
                                 onChange={(e) => handleTeacherChange(moduleId, e.target.value)}>
@@ -236,7 +251,7 @@ const Sections = ({ userRole, userId }) => {
                     </div>
 
                     <div className="modal-footer mt-4">
-                      <button className="btn btn-primary me-2" onClick={handleAddSection}>
+                      <button className="btn btn-primary me-2"  onClick={handleAddSection}>
                         Save Section
                       </button>
                       <button className="btn btn-secondary" onClick={cancelButton}>

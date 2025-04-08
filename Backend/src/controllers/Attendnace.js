@@ -139,5 +139,102 @@ router.get('/getAttendanceBySubject', async (req, res) => {
 })
 
 
+// Add this endpoint to your existing attendance router file
+// Add these endpoints to your existing attendance router file
 
+// Update attendance status
+router.post('/updateAttendanceStatus', async (req, res) => {
+    try {
+        const { changes, classId, updatedBy } = req.body;
+        
+        if (!changes || !Array.isArray(changes) || changes.length === 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "No attendance changes provided" 
+            });
+        }
+        
+        const db = await connectDatabase();
+        
+        // Start a transaction to ensure data consistency
+        await db.beginTransaction()
+        
+        try {
+            // Update each attendance record
+            for (const change of changes) {
+                const { attendanceId, newStatus } = change
+                
+                // Update the attendance status
+                await db.execute(
+                    `UPDATE attendance 
+                     SET Attendance_Status = ?
+                     WHERE Attendance_Id = ?`,
+                    [newStatus, attendanceId]
+                )
+            }
+            
+            await db.commit()
+            
+            console.log(`Updated ${changes.length} attendance records for class ${classId}`);
+            
+            res.json({ 
+                success: true, 
+                message: `Successfully updated ${changes.length} attendance records` 
+            });
+            
+        } catch (error) {
+            // If an error occurs, roll back the transaction
+            await db.rollback();
+            throw error;
+        }
+        
+    } catch (err) {
+        console.error("Update attendance status error:", err);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to update attendance status" 
+        });
+    }
+});
+
+// Update the getClassAttendance endpoint to include the Attendance_Id
+router.get('/getClassAttendance', async (req, res) => {
+    try {
+        const { classId } = req.query;
+        
+        if (!classId) {
+            return res.status(400).json({ success: false, message: "Class ID is required" });
+        }
+        
+        const db = await connectDatabase();
+        
+        const query = `
+            SELECT 
+                a.Attendance_Id,
+                s.Student_ID, 
+                s.Student_Name, 
+                a.Attendance_Status,
+                a.Attendance_Time,
+                a.Attendance_Date,
+                c.Class_Date
+            FROM 
+                attendance a 
+                JOIN attendance_association aa ON a.Attendance_Id = aa.Attendance_Id
+                JOIN student s ON aa.Student_Id = s.Student_ID
+                JOIN class c ON aa.Class_Id = c.Class_Id
+            WHERE 
+                aa.Class_Id = ?
+            ORDER BY 
+                s.Student_Name
+        `;
+        
+        const [results] = await db.execute(query, [classId]);
+        console.log("Got class attendance records");
+        
+        res.json(results);
+    } catch (err) {
+        console.error("Class attendance error:", err);
+        res.status(500).json({ success: false, message: "Failed to get class attendance" });
+    }
+});
 export default router

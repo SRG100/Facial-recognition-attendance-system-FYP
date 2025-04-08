@@ -5,6 +5,7 @@
   padding: 2rem;
   text-align: center;
   z-index: 1;
+  font-family: 'Roboto';
 }
 
 @keyframes logo-spin {

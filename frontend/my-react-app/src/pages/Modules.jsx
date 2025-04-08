@@ -104,8 +104,8 @@ const Modules = ({ userId, userRole }) => {
       <div className='home-section'>
         <h3 className="m-0 mb-3  text-start">Modules</h3>
 
-        <div className="card container p-0 m-0">
-          <table className="table table-hover text-center table-responsive">
+        <div className="card container p-0 m-0 table-responsive">
+          <table className="table table-hover text-center ">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 
               <tr>
@@ -166,7 +166,7 @@ const Modules = ({ userId, userRole }) => {
               <div className="modal-body">
                 <div className="form-group mb-3">
                   <label className="form-label">Module Id:</label>
-                  <input
+                  <input required
                     type="text"
                     className="form-control"
                     name="moduleId"
@@ -175,7 +175,7 @@ const Modules = ({ userId, userRole }) => {
                 </div>
                 <div className="form-group mb-3">
                   <label className="form-label">Module Name</label>
-                  <input
+                  <input required
                     type="text"
                     className="form-control"
                     name="moduleName"
@@ -184,7 +184,7 @@ const Modules = ({ userId, userRole }) => {
                 </div>
                 <div className="form-group mb-3">
                   <label className="form-label">Module Details:</label>
-                  <input
+                  <input required
                     type="text"
                     className="form-control"
                     name="moduleDetails"
@@ -193,7 +193,7 @@ const Modules = ({ userId, userRole }) => {
                 </div>
                 <div className="form-group mb-3">
                   <label className="form-label">Module Credit:</label>
-                  <select name="moduleCredit" onChange={handleChanges}
+                  <select name="moduleCredit" onChange={handleChanges} required
                     className="form-select">
                     <option value="">-- Select a Module Credit --</option>
                     <option value="30">30 Credits</option>
@@ -202,7 +202,7 @@ const Modules = ({ userId, userRole }) => {
                 </div>
                 <div className="form-group mb-3">
                   <label className="form-label">Academic year:</label>
-                  <select name="year" onChange={handleChanges}
+                  <select name="year" onChange={handleChanges} required
                     className="form-select">
                     <option value="">-- Select a Year --</option>
                     <option value="1">Year 1</option>
@@ -217,7 +217,7 @@ const Modules = ({ userId, userRole }) => {
                     {course.map((courseItem) => (
                       <div className="form-check" key={courseItem.Course_id}>
                         <input
-                          className="form-check-input"
+                          className="form-check-input" required
                           type="checkbox"
                           id={`course-${courseItem.Course_id}`}
                           value={courseItem.Course_id}

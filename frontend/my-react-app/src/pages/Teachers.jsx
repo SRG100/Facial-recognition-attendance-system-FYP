@@ -4,23 +4,23 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Teachers = ({ userRole, userId }) => {
-    const navigate = useNavigate();
-    const [teachers, setTeachers] = useState([]);
+    const navigate = useNavigate()
+    const [teachers, setTeachers] = useState([])
 
     useEffect(() => {
         if (userId) {
-            getTeacherDetails();
+            getTeacherDetails()
         }
-    }, [userId, userRole]);
+    }, [userId, userRole])
 
     const getTeacherDetails = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/teachers/getTeacherDetail?userId=${userId}&userRole=${userRole}`);
-            setTeachers(Array.isArray(response.data) ? response.data : []);
+            const response = await axios.get(`http://localhost:3000/teachers/getTeacherDetail?userId=${userId}&userRole=${userRole}`)
+            setTeachers(Array.isArray(response.data) ? response.data : [])
         } catch (error) {
-            console.error('Error while getting the teachers', error);
+            console.error('Error while getting the teachers', error)
         }
-    };
+    }
 
     return (
         <div>
@@ -28,7 +28,7 @@ const Teachers = ({ userRole, userId }) => {
             <div className='home-section'>
             <h3 className="m-0 mb-3  text-start">Teachers</h3>
 
-                <div className="card container p-0 m-0">
+                <div className="card container p-0 m-0 table-responsive">
                     <table className="table  table-hover text-center table-responsive">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
