@@ -26,9 +26,9 @@ const Classes = ({ userRole, userId }) => {
 
     useEffect(() => {
         if (userId) {
-            getClassDetails();
+            getClassDetails()
         }
-    }, [userId, userRole]);
+    }, [userId, userRole])
 
 
     useEffect(() => {
@@ -114,6 +114,13 @@ const Classes = ({ userRole, userId }) => {
         }));
     }
 
+    useEffect(() => {
+          const  interval = setInterval(() => {
+            getClassDetails()
+            }, 1000 *60)
+        
+        return () => clearInterval(interval)
+    }, [])
 
 
     const isClassLive = (classDetail) => {
@@ -131,10 +138,10 @@ const Classes = ({ userRole, userId }) => {
         const isActive = currentTime >= startTime && currentTime <= endTime
         if (!isActive && currentTime > endTime &&
             classDetail.Class_Status === 1 && classDetail.Class_Completion === 0) {
-            console.log(`Auto-ending expired class: ${classDetail.Class_Id}`);
-            endClass(classDetail);
+            console.log(`Auto-ending expired class: ${classDetail.Class_Id}`)
+            endClass(classDetail)
         }
-        return isActive;
+        return isActive
     }
 
 
@@ -307,14 +314,13 @@ const Classes = ({ userRole, userId }) => {
 
                                                 </td>) : userRole === "teacher" ? (
                                                     <td >
-
-
-
                                                         {isClassLive(classDetail) ? (
                                                             <>
                                                                 {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
                                                                     <button className="btn btn-outline-danger" onClick={() => endClass(classDetail)} > End Class</button>
-                                                                ) : (
+                                                                ) :(classDetail.Class_Status === 0 && classDetail.Class_Completion === 1 )? (
+                                                                    <span className="text-danger">Class Cancelled</span>
+                                                                ):(
                                                                     <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
                                                                 )}
                                                             </>
@@ -400,22 +406,26 @@ const Classes = ({ userRole, userId }) => {
                                                             ) : classDetail.Class_Completion === 1 ? (
                                                                 <span className="text-primary">Class Completed</span>
                                                             ) : (
-                                                                <span className="text-primary">Class not started</span>
+                                                                <span className="text-danger">Class Cancelled</span>
                                                             )}
 
                                                         </td>) : userRole === "teacher" ? (<td >
-                                                            {classDetail.Class_Status === 1 && classDetail.Class_Completion === 1 ? (
-                                                                <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class" } })} >View Attendnace</button>
-                                                            ) : (
-                                                                <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
-                                                            )}
+                                                            <>
+                                                                {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
+                                                                    <button className="btn btn-outline-danger" onClick={() => endClass(classDetail)} > End Class</button>
+                                                                ) :(classDetail.Class_Status === 0 && classDetail.Class_Completion === 1 )? (
+                                                                    <span className="text-danger">Class Cancelled</span>
+                                                                ):(
+                                                                    <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
+                                                                )}
+                                                            </>
 
                                                         </td>) : (<td>
                                                             {classDetail.Class_Status === 1 ? (
                                                                 <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class" } })}>View Attendance</button>
 
                                                             ) : (
-                                                                <button className="btn btn-outline-success" >No Class Yet</button>
+                                                                <span className="text-danger">Class Cancelled</span>
                                                             )}
                                                         </td>)}
 
