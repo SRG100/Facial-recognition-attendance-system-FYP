@@ -29,15 +29,20 @@ const Login = () => {
             console.log("Response:", response.data);
             if (response.status === 201) {
                 if (response.data.redirect) {
+                    localStorage.setItem("justLoggedIn", "true")
+
                     if (response.data.success) {
                         toast.success(response.data.message)
                         navigate(response.data.redirect, { replace: true })
-                        window.location.reload()
+                        
                     } else {
                         toast(response.data.message, { icon: '👏' })
                         navigate(response.data.redirect, { replace: true })
-                        window.location.reload()
+                        
                     }
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 500)
                 }
             } else {
                 toast.error(response.data.message)

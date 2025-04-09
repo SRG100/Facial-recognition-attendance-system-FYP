@@ -1,42 +1,56 @@
 import React, { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import axios from 'axios'
+import { toast } from 'react-hot-toast'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'boxicons/css/boxicons.min.css'
 import '../assets/SideBar-light.css'
 
-const SidebarComponent = ({userId, userRole }) => {
+const SidebarComponent = ({ userId, userRole }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [isLoggedIn, setIsLoggedIn] = useState(false)
-    const [userName,setUserName]=useState()
-
+    const [userName, setUserName] = useState()
     useEffect(() => {
         const checkAuthorization = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/auth/isAuthorized', { withCredentials: true });
-                const isVerified = response.data?.success;
-                setUserName(response.data?.userName)
+                const isVerified = response.data?.success
+                const userName = response.data?.userName
+    
+                setUserName(userName);
                 setIsLoggedIn(isVerified);
+    
+                const justLoggedIn = localStorage.getItem("justLoggedIn");
+                if (isVerified && justLoggedIn === "true") {
+                    toast.success(`Welcome back, ${userName}!`)
+                    localStorage.removeItem("justLoggedIn")
+                }
+    
             } catch (error) {
-                console.error('Error checking authorization:', error);
-                setIsLoggedIn(false);
+                console.error('Error checking authorization:', error)
+                setIsLoggedIn(false)
+                toast.error("Authorization failed. Please login.")
             }
         };
-
+    
         checkAuthorization();
-    }, [])
-
+    }, []);
+    
     const handleLogout = async () => {
         try {
             const response = await axios.get('http://localhost:3000/auth/logout', { withCredentials: true });
             if (response.data.success) {
-                alert(response.data.message);
-                window.location.reload();
+                toast.success(response.data.message || "Logged out successfully.");
+                setTimeout(() => {
+                    window.location.reload()
+                }, 500)
             } else {
                 console.error("Logout failed:", response.data.message);
+                toast.error("Logout failed. Please try again.")
             }
         } catch (err) {
-            console.log("error while logging out", err);
+            console.log("error while logging out", err)
+            toast.error("Something went wrong during logout.")
         }
     };
 
@@ -65,16 +79,13 @@ const SidebarComponent = ({userId, userRole }) => {
                 { to: "/viewTeachers", icon: "bx-transfer-alt", tooltip: "View Teachers" },
                 { to: "/viewModules", icon: "bx-user", tooltip: "View Modules" },
                 { to: "/viewAttendance", icon: "bx-book-open", tooltip: "View Attendance" }
-
             ]
         };
 
         return (
             <div className={`sidebar ${isOpen ? 'open' : ''}`}>
                 <div className="logo-details">
-                {/* <img src={logo} alt="logo" /> */}
-
-                    <div className="logo-name" style={{color:"#4a48ac"}}>Attendnace System</div>
+                    <div className="logo-name" style={{ color: "#4a48ac" }}>Attendance System</div>
                     <i 
                         className={`bx ${isOpen ? 'bx-x' : 'bx-menu'}`} 
                         id="btn"

@@ -2,19 +2,19 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Popup from 'reactjs-popup';
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import SidebarComponent from '../components/SideBar'
 import toast from 'react-hot-toast'
 
 
 
-const Classes = ({ isLoggedIn, userRole, userId }) => {
+const Classes = ({ userRole, userId }) => {
     const [scheduledClasses, setScheduledClasses] = useState([])
     const [completedClass, setCompletedClass] = useState([])
     const [teachers, setTeachers] = useState([])
     const [sections, setSections] = useState([]);
     const [modules, setModules] = useState([])
-    const [newClass, setNewClass] = useState({ Class_Start_Time: '', Class_End_Time: '', Class_Date: '', Class_Type: '', Section_Id: '', Module_Id: '', Teacher_Id: '' });
+    const [newClass, setNewClass] = useState({ Class_Start_Time: '', Class_End_Time: '', Class_Date: '', Class_Type: '', Section_Id: '', Module_Id: '', Teacher_Id: '' ,userRole:userRole});
     const [showCompletedClasses, setShowCompletedClasses] = useState(false);
 
     const [isPopupOpen, setIsPopupOpen] = useState(false)
@@ -42,11 +42,9 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
 
     const endClass = async (classDetail) => {
         try {
-
-            const endClassData = {
-                Class_Id: classDetail.Class_Id
-            }
+            const endClassData = { Class_Id: classDetail.Class_Id }
             const response = await axios.post('http://localhost:3000/classes/endClass', endClassData)
+            getClassDetails();
 
         } catch (e) {
             console.error('Error while getting the sections', e)
@@ -61,7 +59,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
         } catch (error) {
             toast.error('Error while getting the sections', error)
         }
-    };
+    }
     const getModuleDetails = async () => {
         try {
             const response = await axios.get(`http://localhost:3000/modules/getModulesDetails?userId=${userId}&userRole=${userRole}`)
@@ -82,6 +80,9 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
     }
 
     const addNewClass = async (e) => {
+        if (userRole === 'teacher') {
+            setNewClass(prev => ({ ...prev, Teacher_Id: userId }));
+        }
         console.log("Well the data before sending is :", newClass)
         e.preventDefault()
         try {
@@ -115,10 +116,25 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
 
 
 
-    const isClassLive = (startTime, endTime) => {
+    const isClassLive = (classDetail) => {
+        const { Class_Date: classDateISO, Class_Start_Time: startTime, Class_End_Time: endTime } = classDetail;
+
         const now = new Date();
-        const currentTime = now.toTimeString().split(" ")[0];
-        return currentTime >= startTime && currentTime <= endTime;
+        const todayNPT = now.toISOString().split("T")[0]
+        const classDateUTC = new Date(classDateISO)
+        const classDateNPT = new Date(classDateUTC.getTime() + (5 * 60 + 45) * 60 * 1000)
+        const classDateOnly = classDateNPT.toISOString().split("T")[0]
+        if (classDateOnly !== todayNPT) {
+            return false
+        }
+        const currentTime = now.toTimeString().split(" ")[0]
+        const isActive = currentTime >= startTime && currentTime <= endTime
+        if (!isActive && currentTime > endTime &&
+            classDetail.Class_Status === 1 && classDetail.Class_Completion === 0) {
+            console.log(`Auto-ending expired class: ${classDetail.Class_Id}`);
+            endClass(classDetail);
+        }
+        return isActive;
     }
 
 
@@ -165,29 +181,20 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             }
             const response = await axios.post('http://localhost:3000/classes/startAttendance', startClassData)
             const classCode = response.data.classCode
-
-
             console.log(classCode)
             if (response.data.classCode) {
-                alert(`The class code is: ${classCode}`);
-
+                toast.success(`The class code is: ${classCode}`)
             }
+            getClassDetails()
             console.log("The user location is :", teacherLocation)
-            window.location.reload()
+
         } catch (err) {
             console.log(err)
         }
 
     }
-    const viewAttendance = async (classDetail) => {
-        const viewAttendnace = {
-            Section_Id: classDetail.Section_Id,
-            Class_Id: classDetail.Class_Id
-        }
-    }
     const joinClass = async (classDetail) => {
         try {
-
             const attendanceData = {
                 Module_id: classDetail.Module_Id,
                 Academic_Year_id: classDetail.Academic_Year_id,
@@ -204,20 +211,17 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
             const attendnaceExistance = response.data.attendanceExists
             setAttendanceExists(response.data.attendanceExists)
             if (attendnaceExistance) {
-                alert(response.data.message)
+                toast.error(response.data.message)
+
             }
             else {
                 navigate("/verifycode", { state: { Class_Id, Attendance_id } })
-
             }
-
-
         } catch (err) {
             console.log(err)
         }
 
     }
-
 
     const getClassDetails = async () => {
         try {
@@ -306,7 +310,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
 
 
 
-                                                        {isClassLive(classDetail.Class_Start_Time, classDetail.Class_End_Time) ? (
+                                                        {isClassLive(classDetail) ? (
                                                             <>
                                                                 {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
                                                                     <button className="btn btn-outline-danger" onClick={() => endClass(classDetail)} > End Class</button>
@@ -333,7 +337,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                             }
                         </tbody>
                     </table>
-                    {userRole === 'admin' && (
+                    {userRole === 'admin' || userRole === 'teacher' && (
                         <button className="btn btn-success" onClick={() => setIsPopupOpen(true)}>
                             Add Class
                         </button>
@@ -406,12 +410,6 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                                                 <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
                                                             )}
 
-                                                            {/* 
-                                                {isClassLive(classDetail.Class_Start_Time, classDetail.Class_End_Time) ? (
-                                                    <button className="font-medium text-blue-600 dark:text-blue-500" onClick={startClass}>Start Class</button>
-                                                ) : (
-                                                    <span className="text-gray-400">Class not started</span>
-                                                )} */}
                                                         </td>) : (<td>
                                                             {classDetail.Class_Status === 1 ? (
                                                                 <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class" } })}>View Attendance</button>
@@ -445,7 +443,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                 <div className="form-group mb-3">
                                     <label className="form-label">Class Start Time:</label>
                                     <input
-                                        type="text"
+                                        type="time"
                                         className="form-control"
                                         name="Class_Start_Time" required
                                         onChange={handleChanges}
@@ -454,7 +452,7 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                 <div className="form-group mb-3">
                                     <label className="form-label">Class End Time:</label>
                                     <input
-                                        type="text"
+                                        type="time"
                                         className="form-control" required
                                         name="Class_End_Time"
                                         onChange={handleChanges}
@@ -493,35 +491,40 @@ const Classes = ({ isLoggedIn, userRole, userId }) => {
                                         ))}
                                     </select>
                                 </div>
+                                {userRole === "admin" && (
+                                    <>
+                                        <div className="form-group mb-3">
+                                            <label className="form-label">Module:</label>
+                                            <select required
+                                                className="form-select"
+                                                name="Module_Id"
+                                                onChange={handleChanges}>
+                                                <option value="">-- Select a Module --</option>
+                                                {modules.map((module) => (
+                                                    <option key={module.Module_id} value={module.Module_id}>
+                                                        {module.Module_id}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="form-group mb-3">
+                                            <label className="form-label">Teacher:</label>
+                                            <select required
+                                                className="form-select"
+                                                name="Teacher_Id"
+                                                onChange={handleChanges}>
+                                                <option value="">-- Select a Teacher --</option>
+                                                {teachers.map((teacher) => (
+                                                    <option key={teacher.Teacher_id} value={teacher.Teacher_id} >
+                                                        {teacher.Teacher_Name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </>
+                                )}
 
-                                <div className="form-group mb-3">
-                                    <label className="form-label">Module:</label>
-                                    <select required
-                                        className="form-select"
-                                        name="Module_Id"
-                                        onChange={handleChanges}>
-                                        <option value="">-- Select a Module --</option>
-                                        {modules.map((module) => (
-                                            <option key={module.Module_id} value={module.Module_id}>
-                                                {module.Module_id}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="form-group mb-3">
-                                    <label className="form-label">Teacher:</label>
-                                    <select required
-                                        className="form-select"
-                                        name="Teacher_Id"
-                                        onChange={handleChanges}>
-                                        <option value="">-- Select a Teacher --</option>
-                                        {teachers.map((teacher) => (
-                                            <option key={teacher.Teacher_id} value={teacher.Teacher_id} >
-                                                {teacher.Teacher_Name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+
                                 <div className="mt-4">
                                     <button className="btn btn-primary">
                                         Add Class

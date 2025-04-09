@@ -21,13 +21,10 @@ def base64_to_image(base64_string):
     return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
 
 def verify_face(registeredFace,providedFace):
-    # try:
 
-        #rgb image
         registeredRGB=cv2.cvtColor(registeredFace, cv2.COLOR_BGR2RGB)
         uploadedFaceRGB=cv2.cvtColor(providedFace, cv2.COLOR_BGR2RGB)
 
-        # encodings
         registeredFaceEncoding =face_recognition.face_encodings(registeredRGB)
         uploadedFaceEncoding = face_recognition.face_encodings(uploadedFaceRGB)
 

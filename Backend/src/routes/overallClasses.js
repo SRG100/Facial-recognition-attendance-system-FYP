@@ -44,6 +44,7 @@ router.get('/scheduledClass', async (req, res) => {
                                                 c.Class_Type, 
                                                 c.Class_Status, 
                                                 c.Class_Day,
+                                                DATE(c.class_date) AS Class_Date,
                                                 c.Class_Completion
                                             FROM teacher t
                                             JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id
@@ -66,6 +67,7 @@ router.get('/scheduledClass', async (req, res) => {
                                         c.Class_Type, 
                                         c.Class_Status, 
                                         c.Class_Day,
+                                        c.Class_Date,
                                         c.Class_Completion
                                     FROM teacher t
                                     JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id
@@ -272,18 +274,28 @@ router.post('/markAttendance', async (req, res) => {
 
 router.post('/addClass', async (req, res) => {
     try {
-        const { Class_Start_Time, Class_End_Time, Class_Date, Class_Type, Section_Id, Module_Id, Teacher_Id } = req.body
+        let { Class_Start_Time, Class_End_Time, Class_Date, Class_Type, Section_Id, Module_Id, Teacher_Id ,userRole} = req.body
         console.log("successfully in add class !", req.body)
+        if (Module_Id === null){
+            console.log("In add class and is a teacher")
+        }
+        console.log("The user role is:", userRole)
 
         const db = await connectDatabase()
         const [rows] = await db.execute("SELECT MAX(class_id) as maxId FROM class")
         const Class_Id = rows[0].maxId ? rows[0].maxId + 1 : 1
         const Class_Day = new Date(Class_Date).toLocaleDateString("en-US", { weekday: "long" });
-
-        const [associations] = await db.execute("Select Course_id, Academic_Year_id from section_association where Module_Id=? and Section_Id =?", [Module_Id, Section_Id])
+        let associations=[]
+        if(userRole==="teacher"){
+            [associations] = await db.execute("Select Course_id, Module_id ,Academic_Year_id from section_association where Teacher_id=? and Section_Id =?", [Teacher_Id, Section_Id])
+        }
+        else{
+            [associations] = await db.execute("Select Course_id, Academic_Year_id from section_association where Module_Id=? and Section_Id =?", [Module_Id, Section_Id])
+        }
         const Academic_Year_id = associations[0].Academic_Year_id
         const Course_id = associations[0].Course_id
-
+        Module_Id=associations[0].Module_id
+        console.log(Class_Start_Time, Class_End_Time, Class_Date, Class_Type, Section_Id, Module_Id, Teacher_Id ,userRole)
         await db.execute("INSERT INTO `class` (`Class_id`, `Class_Start_Time`, `Class_End_Time`, `Class_Day`, `Class_Date`, `Class_Type`) VALUES (?, ?, ?, ?, ?, ?)", [Class_Id, Class_Start_Time, Class_End_Time, Class_Day, Class_Date, Class_Type])
         await db.execute(`INSERT INTO class_association (Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id, Class_id) VALUES (?,?,?,?,?,?)`, [Module_Id, Academic_Year_id, Course_id, Teacher_Id, Section_Id, Class_Id])
 
