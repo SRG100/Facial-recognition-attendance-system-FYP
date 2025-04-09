@@ -5,7 +5,6 @@ import toast from 'react-hot-toast'
 import AttendanceImage from '../assets/Attendance.png'
 
 const Login = () => {
-    const errorMessage = ''
     const navigate = useNavigate();
 
     const [values, setValues] = useState({
@@ -16,38 +15,25 @@ const Login = () => {
 
     const handleChanges = (e) => {
         const { name, value } = e.target
-        setValues({
-            ...values,
-            [name]: value,
-        })
+        setValues({ ...values, [name]: value })
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
             const response = await axios.post('http://localhost:3000/auth/login', values, { withCredentials: true })
-            console.log("Response:", response.data);
             if (response.status === 201) {
-                if (response.data.redirect) {
-                    localStorage.setItem("justLoggedIn", "true")
-
-                    if (response.data.success) {
-                        toast.success(response.data.message)
-                        navigate(response.data.redirect, { replace: true })
-                        
-                    } else {
-                        toast(response.data.message, { icon: '👏' })
-                        navigate(response.data.redirect, { replace: true })
-                        
-                    }
-                    setTimeout(() => {
-                        window.location.reload()
-                    }, 500)
+                localStorage.setItem("justLoggedIn", "true")
+                if (response.data.success) {
+                    toast.success(response.data.message)
+                } else {
+                    toast(response.data.message, { icon: '👏' })
                 }
+                navigate(response.data.redirect, { replace: true })
+                setTimeout(() => window.location.reload(), 500)
             } else {
                 toast.error(response.data.message)
             }
-            console.log(response.data.message)
         } catch (err) {
             console.log(err)
             toast.error(err.response?.data?.message || "Login failed")
@@ -55,35 +41,34 @@ const Login = () => {
     }
 
     return (
-        <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
-            <div className="card shadow-lg border-0" style={{ maxWidth: "1000px", width: "100%" }}>
-                <div className=" text-center py-3">
-                    <h4 className="mb-0">Login to Your Account</h4>
-                </div>
+        <div className="d-flex justify-content-center align-items-center bg-light" style={{ minHeight: "100vh" }}>
+            <div className="card shadow-lg border-0 rounded-4 overflow-hidden" style={{ maxWidth: "900px", width: "100%" }}>
                 <div className="row g-0">
-                    <div className="col-md-5 d-flex align-items-center justify-content-center" >
+                    <div className="col-md-6 d-none d-md-flex align-items-center justify-content-center bg-gradient text-white" style={{background:"#98bad5"}}>
                         <img
                             src={AttendanceImage}
-                            alt="Login"
-                            className="img-fluid p-3"
-                            style={{ maxHeight: "1000px", scale: "1.5" }}
+                            alt="Login Visual"
+                            className="img-fluid p-4"
+                            style={{ maxHeight: "420px" }}
                         />
                     </div>
-
-                    <div className="col-md-5">
-                        <div className="card-body p-4">
+                    <div className="col-md-6 bg-white">
+                        <div className="p-5">
+                            <h3 className="text-center mb-4 text-dark">Welcome Back 👋</h3>
+                            <p className="text-center text-muted mb-4" style={{ fontSize: '0.9rem' }}>
+                                Please login to continue using the system.
+                            </p>
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
-                                    <label htmlFor="role" className="form-label" style={{ fontSize: '0.85rem', fontWeight: '400' }}>Role:</label>
+                                    <label htmlFor="role" className="form-label fw-semibold">Select Role</label>
                                     <select
-                                        className="form-select form-select-sm"
                                         name="role"
                                         value={values.role}
                                         onChange={handleChanges}
                                         required
-                                        style={{ fontSize: '0.85rem', fontWeight: '300', padding: '6px 10px' }}
+                                        className="form-select rounded-3 py-2"
                                     >
-                                        <option value="">Select Role</option>
+                                        <option value="">Choose your role</option>
                                         <option value="admin">Admin</option>
                                         <option value="teacher">Teacher</option>
                                         <option value="student">Student</option>
@@ -91,55 +76,41 @@ const Login = () => {
                                 </div>
 
                                 <div className="mb-3">
-                                    <label htmlFor="email" className="form-label" style={{ fontSize: '0.85rem', fontWeight: '400' }}>Email Address:</label>
+                                    <label htmlFor="email" className="form-label fw-semibold">Email Address</label>
                                     <input
                                         type="email"
-                                        className="form-control form-control-sm"
-                                        placeholder="Enter your email"
                                         name="email"
                                         value={values.email}
                                         onChange={handleChanges}
                                         required
-                                        style={{ fontSize: '0.85rem', fontWeight: '300', padding: '6px 10px' }}
+                                        className="form-control rounded-3 py-2"
+                                        placeholder="you@example.com"
                                     />
                                 </div>
 
                                 <div className="mb-4">
-                                    <label htmlFor="password" className="form-label" style={{ fontSize: '0.85rem', fontWeight: '400' }}>Password:</label>
+                                    <label htmlFor="password" className="form-label fw-semibold">Password</label>
                                     <input
                                         type="password"
-                                        className="form-control form-control-sm"
-                                        placeholder="Enter your password"
                                         name="password"
                                         value={values.password}
                                         onChange={handleChanges}
                                         required
-                                        style={{ fontSize: '0.85rem', fontWeight: '300', padding: '6px 10px' }}
+                                        className="form-control rounded-3 py-2"
+                                        placeholder="Enter your password"
                                     />
                                 </div>
 
-                                <div className="d-grid gap-2">
+                                <div className="d-grid">
                                     <button
                                         type="submit"
-                                        className="btn text-white py-2"
-                                        style={{
-                                            backgroundColor: "#4a48ac",
-                                            fontSize: "0.9rem",
-                                            fontWeight: "400",
-                                            borderRadius: "6px"
-                                        }}
+                                        className="btn text-white py-2 rounded-3 fw-semibold"
+                                        style={{background:"#98bad5"}}
                                     >
                                         Login
                                     </button>
                                 </div>
                             </form>
-
-
-                            {errorMessage && (
-                                <div className="alert alert-danger mt-3" role="alert">
-                                    {errorMessage}
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>

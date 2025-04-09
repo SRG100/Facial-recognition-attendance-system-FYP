@@ -95,7 +95,7 @@ router.post('/login', async (req, res) => {
 
     } catch (err) {
         console.log("The following error has occured", err);
-        res.status(500).json({ message: err, success: false })
+        res.status(500).json({ message: "Error while Logging in/ Please turn xaamp on", success: false })
     }
 
 })

@@ -117,7 +117,7 @@ const Classes = ({ userRole, userId }) => {
     useEffect(() => {
           const  interval = setInterval(() => {
             getClassDetails()
-            }, 1000 *60)
+            }, 1000)
         
         return () => clearInterval(interval)
     }, [])
@@ -416,7 +416,7 @@ const Classes = ({ userRole, userId }) => {
                                                                 ) :(classDetail.Class_Status === 0 && classDetail.Class_Completion === 1 )? (
                                                                     <span className="text-danger">Class Cancelled</span>
                                                                 ):(
-                                                                    <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
+                                                                    <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class" } })}>View Attendance</button>
                                                                 )}
                                                             </>
 
