@@ -72,7 +72,7 @@ const Teachers = ({ userRole, userId }) => {
                                             <td className="align-middle">{teacher.Courses}</td>
                                             <td className="align-middle">{teacher.Sections}</td>
                                             <td className="align-middle">
-                                                <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: teacher.Teacher_id, ReviewOf: "Teacher" } })}>View Reviews</button>
+                                                <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: teacher.Teacher_id, ReviewOf: "Teacher", fromNavigate:true } })}>View Reviews</button>
                                             </td>
                                         </>
                                     ) : (
@@ -81,7 +81,7 @@ const Teachers = ({ userRole, userId }) => {
                                             <td className="align-middle">{teacher.Teacher_Gender}</td>
                                             <td className="align-middle">{teacher.Section_id}</td>
                                             <td className="align-middle">
-                                                <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: teacher.Teacher_id, ReviewOf: "Teacher" } })}>Review Teacher</button>
+                                                <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: teacher.Teacher_id, ReviewOf: "Teacher",fromNavigate:true } })}>Review Teacher</button>
                                             </td>
                                         </>
                                     )}

@@ -45,7 +45,8 @@ router.get('/scheduledClass', async (req, res) => {
                                                 c.Class_Status, 
                                                 c.Class_Day,
                                                 DATE(c.class_date) AS Class_Date,
-                                                c.Class_Completion
+                                                c.Class_Completion,
+                                                c.Class_Code
                                             FROM teacher t
                                             JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id
                                             JOIN class_association ca ON t.teacher_id= ca.teacher_id
@@ -202,19 +203,64 @@ router.post('/startAttendance', async (req, res) => {
     }
 })
 
-
 router.post('/endClass', async (req, res) => {
     try {
         const { Class_Id } = req.body
         const db = await connectDatabase()
         console.log("Database connected successfully in class end!")
+        await db.query("UPDATE class SET Class_Completion = 1 WHERE Class_id = ?", [Class_Id]);
+        const [classSection] = await db.query("Select section_id from class_association WHERE Class_id = ?", [Class_Id]);
+        const Section_Id = classSection[0].section_id
+        console.log(Section_Id)
+        const [sectionStudents] = await db.query(
+            "SELECT DISTINCT Student_Id FROM student_association WHERE Section_id = ?", 
+            [Section_Id]
+        )
+        
+        const [attendedStudents] = await db.query(
+            "SELECT Student_Id FROM attendance_association WHERE Class_id = ? AND Section_id = ?", 
+            [Class_Id, Section_Id]
+        )
 
-        await db.query("UPDATE class SET Class_Completion = 1   WHERE Class_id = ?", [Class_Id]);
+        const attendedStudentIds = new Set(attendedStudents.map(student => student.Student_Id));
+        
+        const Attendance_Date = new Date().toISOString().split('T')[0];
+        const Attendance_Time = new Date().toTimeString().split(' ')[0];
+        
+        for (const student of sectionStudents) {
+            if (!attendedStudentIds.has(student.Student_Id)) {
+                const Attendance_Id = String(Section_Id) + "_" + String(Class_Id) + "_" + String(student.Student_Id);
+                
+                await db.query(
+                    "INSERT INTO attendance (Attendance_Id, Attendance_Date, Attendance_Status, Attendance_Time) VALUES (?, ?, ?, ?)",
+                    [
+                        Attendance_Id,
+                        Attendance_Date,
+                        "Absent",
+                        Attendance_Time
+                    ]
+                );
+                
+                const [classDetails] = await db.query(
+                    "SELECT Module_id, Academic_Year_id, Course_id, Teacher_id FROM class_association WHERE Class_id = ?",
+                    [Class_Id]
+                );
+                
+                if (classDetails.length > 0) {
+                    const { Module_id, Academic_Year_id, Course_id, Teacher_id } = classDetails[0];
+                    
+                    await db.query(
+                        "INSERT INTO attendance_association (Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id, Class_id, Student_Id, Attendance_Id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                        [Module_id, Academic_Year_id, Course_id, Teacher_id, Section_Id, Class_Id, student.Student_Id, Attendance_Id  ]
+                    )
+                }
+            }
+        }
 
-        res.status(201).json({ message: "Class ended sucessfully" })
+        res.status(201).json({ message: "Class ended successfully and absent students marked" })
     } catch (err) {
         res.status(500).json(err)
-        console.log("Error occurred", err);
+        console.log("Error occurred", err)
     }
 })
 

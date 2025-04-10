@@ -6,20 +6,22 @@ import SidebarComponent from '../components/SideBar';
 import { Doughnut, Line, Bar } from 'react-chartjs-2';
 import 'chart.js/auto';
 import 'boxicons/css/boxicons.min.css'
+import toast from 'react-hot-toast'
+import PageNotFound from '../components/PageNotFound';
 
 
 const Attendance = ({ userId, userRole }) => {
   const location = useLocation()
   const Id = location.state?.Id || userId
   const From = location.state?.From || "student"
-  const For = location.state?.From || "student"
+  const fromNavigate = location.state?.fromNavigate
+  console.log(From)
   const [studentData, setStudentData] = useState([])
   const [attendanceData, setAttendanceData] = useState([])
   const [absenceData, setAbsenceData] = useState([])
   const [attendanceBySubject, setAttendanceBySubject] = useState([])
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [reportCredit, setReportCredit] = useState({ Module: '', From: '', To: '' });
-
 
 
   useEffect(() => {
@@ -36,7 +38,7 @@ const Attendance = ({ userId, userRole }) => {
 
   const getAttendnaceDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/attendance/getAttendnaceDetails?Id=${Id}&From=${From}`);
+      const response = await axios.get(`http://localhost:3000/attendance/getAttendnaceDetails?Id=${Id}&From=${From}&userRole=${userRole}&userId=${userId}`);
       setStudentData(Array.isArray(response.data) ? response.data : []);
 
     } catch (error) {
@@ -74,10 +76,12 @@ const Attendance = ({ userId, userRole }) => {
     e.preventDefault()
     try {
       console.log(reportCredit)
-      const response = await axios.get(`http://localhost:3000/generate/generateReport?Module=${reportCredit.Module}&From=${reportCredit.From}&To=${reportCredit.To}&Id=${Id}`, { responseType: 'blob' });
+      let url = `http://localhost:3000/generate/generateReport?Module=${reportCredit.Module}&From=${reportCredit.From}&To=${reportCredit.To}&Id=${Id}`
+      if (userRole === "teacher") url += `&Teacher_Id=${userId}&UserRole=${userRole}`
+      const response = await axios.get(url, { responseType: 'blob' });
       const blob = response.data
       const pdfUrl = URL.createObjectURL(blob)
-      console.log(response)
+      toast.success(response)
       window.open(pdfUrl, "_blank")
     } catch (error) {
       console.error('Error while getting the student absence by month', error)
@@ -89,7 +93,6 @@ const Attendance = ({ userId, userRole }) => {
     responsive: true,
     maintainAspectRatio: true
   }
-  console.log(studentData)
 
   const doughnutChart = {
     labels: ['Present', 'Absent', 'Late'],
@@ -114,7 +117,6 @@ const Attendance = ({ userId, userRole }) => {
     const lateData = [];
     const absentData = [];
 
-    // Process attendance data
     attendanceBySubject.forEach(entry => {
       labels.push(entry.Module_name);
       presentData.push(entry.Present_Count);
@@ -187,7 +189,13 @@ const Attendance = ({ userId, userRole }) => {
         </div>
       </div>
     </div>
-  );
+  )
+  if (!fromNavigate && userRole === "teacher") {
+    return <PageNotFound />
+  }
+  if (!fromNavigate && userRole === "admin") {
+    return <PageNotFound />
+  }
 
   return (
     <div className="attendance-dashboard">
@@ -223,58 +231,61 @@ const Attendance = ({ userId, userRole }) => {
             </div>
           </div>
           <Popup open={isPopupOpen} closeOnDocumentClick onClose={() => setIsPopupOpen(false)}>
-          <div className='card'>
-                  
-                  
-            <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-              <form onSubmit={generateReport}>
-                
+            <div className='card'>
 
-              <div className="modal-header mb-3">
-                <h3 className="modal-title">Generate Attendance Report</h3>
 
+              <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+                <form onSubmit={generateReport}>
+
+
+                  <div className="modal-header mb-3">
+                    <h3 className="modal-title">Generate Attendance Report</h3>
+
+                  </div>
+
+                  <div className="modal-body">
+                    <h5>Select creterias</h5>
+                    {(userRole === "admin" || userRole === "student") && (
+                      <div className="form-group mb-3">
+                        <label className="form-label">Modules:</label>
+                        <select required
+                          className="form-select"
+                          onChange={(e) => setReportCredit({ ...reportCredit, Module: e.target.value })}
+                        >
+                          <option value="">-- Selelct Module --</option>
+                          <option value="All">All</option>
+
+                          {attendanceBySubject.map((module) => (
+                            <option key={module.Module_id} value={module.Module_id}>
+                              {module.Module_name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+
+                    <div className="form-group mb-3">
+                      <label className="form-label"   >From:</label>
+                      <input type="date" required
+                        value={reportCredit.From}
+                        onChange={(e) => {
+                          setReportCredit((prev) => ({ ...prev, From: e.target.value }));
+                        }} className="form-control" />
+                      <label className="form-label"   >To:</label>
+                      <input type="date" required
+                        value={reportCredit.To}
+                        onChange={(e) => {
+                          setReportCredit((prev) => ({ ...prev, To: e.target.value }));
+                        }}
+                        className="form-control" />
+                    </div>
+                    <button className='btn btn-outline-primary'>Generate Report</button>
+
+
+                  </div>
+                </form>
               </div>
-
-              <div className="modal-body">
-                <h5>Select creterias</h5>
-                <div className="form-group mb-3">
-                  <label className="form-label">Modules:</label>
-                  <select required
-                    className="form-select"
-                    onChange={(e) => setReportCredit({ ...reportCredit, Module: e.target.value })}
-                  >
-                    <option value="">-- Selelct Module --</option>
-                    <option value="All">All</option>
-
-                    {attendanceBySubject.map((module) => (
-                      <option key={module.Module_id} value={module.Module_id}>
-                        {module.Module_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-group mb-3">
-                  <label className="form-label"   >From:</label>
-                  <input type="date" required
-                    value={reportCredit.From}
-                    onChange={(e) => {
-                      setReportCredit((prev) => ({ ...prev, From: e.target.value }));
-                    }} className="form-control" />
-                  <label className="form-label"   >To:</label>
-                  <input type="date" required
-                    value={reportCredit.To}
-                    onChange={(e) => {
-                      setReportCredit((prev) => ({ ...prev, To: e.target.value }));
-                    }}
-                    className="form-control" />
-                </div>
-                <button className='btn btn-outline-primary'>Generate Report</button>
-
-
-              </div>
-              </form>
-            </div>
             </div>
           </Popup>
 
@@ -301,9 +312,9 @@ const Attendance = ({ userId, userRole }) => {
             </div>
           </div>
           <div className="row">
-            
+
             <div className="col-lg-6 grid-margin ml-1">
-              
+
               <ChartCard title="Overall Attendnace Present Data">
                 <div style={{ position: 'relative', height: '230px' }}>
                   <Line data={lineChartConfig(attendanceData)} options={chartOptions} />
@@ -325,4 +336,4 @@ const Attendance = ({ userId, userRole }) => {
 };
 
 
-export default Attendance;
+export default Attendance

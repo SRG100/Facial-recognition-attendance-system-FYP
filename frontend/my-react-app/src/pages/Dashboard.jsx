@@ -3,40 +3,63 @@ import { Link, useNavigate } from 'react-router-dom'
 import Nav from '../components/Nav'
 import SidebarComponent from '../components/SideBar'
 import attendanceImage from "../assets/attendance.jpg";
-import { Line } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
 
 import '../assets/Dashboard.css'
-import 'chart.js/auto';
+import 'chart.js/auto'
 
 
 const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
 
   const [attendanceData, setAttendanceData] = useState([])
   const [dashboardData, setDashboardData] = useState([])
-
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
+  const [hasFiltered, setHasFiltered] = useState(false)
+  const [dateFilters, setDateFilters] = useState({ fromDate: '', toDate: '' })
 
   useEffect(() => {
     getAttendanceByDate()
     getDashboardDetails()
-
   }, [userId, userRole]);
+  
+  useEffect(() => {
+    if (hasFiltered) {
+      getAttendanceByDate();
+    }
+  }, [dateFilters])
+  
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: true
   }
+  
   const getAttendanceByDate = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/attendance/getAttendnaceByDate?Id=${userId}&userRole=${userRole}&`);
-
+      let url = `http://localhost:3000/attendance/getAttendnaceByDate?Id=${userId}&userRole=${userRole}`;
+      
+      if (dateFilters.fromDate) url += `&fromDate=${dateFilters.fromDate}`
+      if (dateFilters.toDate) url += `&toDate=${dateFilters.toDate}`
+      
+      const response = await axios.get(url);
       setAttendanceData(Array.isArray(response.data) ? response.data : [])
 
     } catch (error) {
-      console.error('Error while getting the student attendnace by date', error);
+      console.error('Error while getting the student attendance by date', error)
+      toast.error("Failed to fetch attendance data")
     }
   }
+  
+  const handleDateFilter = (e) => {
+    e.preventDefault()
+    setDateFilters({ fromDate, toDate })
+    setHasFiltered(true)
+  };
+  
+  
   const getDashboardDetails = async () => {
     try {
       console.log(userId, String(userRole))
@@ -46,7 +69,8 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
       setDashboardData(response.data.data)
 
     } catch (error) {
-      console.error('Error while getting the student attendnace by date', error);
+      console.error('Error while getting the student attendance by date', error);
+      toast.error("Failed to fetch dashboard data");
     }
   }
 
@@ -73,16 +97,43 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
       ]
     };
   }
+  
   const ChartCard = ({ title, children }) => (
     <div className="card dashboard mt-4">
       <div className="card-body">
-        <h4 className="card-title">{title}</h4>
+        <div className=" justify-content-between align-items-center mb-3">
+          <h4 className="card-title">{title}</h4>
+          <form className="d-flex" onSubmit={handleDateFilter}>
+            <div className="me-2">
+              <label className="form-label">From:</label>
+              <input 
+                type="date" 
+                className="form-control" 
+                value={fromDate} 
+                onChange={(e) => setFromDate(e.target.value)} 
+              />
+            </div>
+            <div className="me-2">
+              <label className="form-label">To:</label>
+              <input 
+                type="date" 
+                className="form-control " 
+                value={toDate} 
+                onChange={(e) => setToDate(e.target.value)} 
+              />
+            </div>
+            <div className="d-flex align-items-end mb-2">
+              <button type="submit" className="btn btn-primary  "><i className='bx bx-filter-alt' style={{scale:"1.5"}}></i>
+              </button>
+            </div>
+          </form>
+        </div>
         <div className="chart-container">
           {children}
         </div>
       </div>
     </div>
-  );
+  )
 
   return (
     <div>
@@ -102,7 +153,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
                     <div className="justify-content-end d-flex">
                       <div className="dropdown flex-md-grow-1 flex-xl-grow-0">
                         <button className="btn btn-sm btn-light bg-white" type="button" >
-                          <i class='bx bxs-calendar'></i> {new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit' }).replace(' ', ' - ')}
+                          <i className='bx bxs-calendar'></i> {new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit' }).replace(' ', ' - ')}
                         </button>
                       </div>
                     </div>
@@ -218,10 +269,14 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
 
                     <div id="sales-chart-legend" className="chartjs-legend mt-4 mb-2">
 
-                      <ChartCard title="Overall Attendnace Present Data">
+                      <ChartCard title="Overall Attendance Present Data">
 
                         <div style={{ position: 'relative' }}>
-                          <Line data={lineChartConfig(attendanceData)} options={chartOptions} />
+                          {attendanceData.length > 0 ? (
+                            <Line data={lineChartConfig(attendanceData)} options={chartOptions} />
+                          ) : (
+                            <div className="text-center p-4">No attendance data available for the selected date range</div>
+                          )}
                         </div>
                       </ChartCard>
                     </div>

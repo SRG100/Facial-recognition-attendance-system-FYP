@@ -2,8 +2,13 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import "../assets/Register.css"
 import SidebarComponent from '../components/SideBar'
+import PageNotFound from '../components/PageNotFound'
 
 const Register = ({ userRole }) => {
+
+    if(userRole==="student" || userRole==="teacher"){
+return <PageNotFound/>
+    }
 
     const [sections, setSections] = useState([])
 

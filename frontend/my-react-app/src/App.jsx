@@ -23,6 +23,7 @@ import Modules from './pages/Modules';
 import Attendance from './pages/Attendance';
 import ViewReview from './pages/ViewReview';
 import ClassAttendance from './pages/ClassAttendance';
+import PageNotFound from './components/PageNotFound';
 
 import Examples from './pages/Example';
 import './assets/MyPopup.css'
@@ -67,7 +68,7 @@ function App() {
           <Route element={<ProtectedRoute isLoggedIn={isLoggedIn} />}>
             <Route path="/register" element={ <Register userId={userId} userRole={userRole}/>  } />
             <Route path="/registerTeacher" element={<RegisterTeacher userRole={userRole} />  } />
-          
+           {/* ---common access-- */}
             <Route path="/" element={<Dashboard isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} userName={userName}/>} />
             <Route path="/checkface" element={<CheckFace userId={userId} userRole={userRole}/>} />
             <Route path="/classes" element={<Classes isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} />} />
@@ -84,11 +85,11 @@ function App() {
             <Route path="/ViewReview" element={<ViewReview userId={userId} userRole={userRole} />} />
             <Route path="/example" element={<Examples userId={userId} userRole={userRole} />} />
             <Route path="/ViewClassAttendance" element={<ClassAttendance userId={userId} userRole={userRole}/>} />
-
-            
-
-
             <Route path="/login" element={<Navigate to="/" />} />
+
+
+            {/* Catch-all 404 route */}
+  <Route path="*" element={<PageNotFound />} />
           </Route>
         </Routes>
       </>

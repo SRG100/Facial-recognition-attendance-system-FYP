@@ -3,6 +3,7 @@ import axios from 'axios';
 import SidebarComponent from '../components/SideBar';
 import { useLocation } from 'react-router-dom';
 import '../assets/ViewReview.css';
+import PageNotFound from '../components/PageNotFound';
 
 const ViewReview = ({ userId, userRole }) => {
 
@@ -10,6 +11,8 @@ const ViewReview = ({ userId, userRole }) => {
 
   const ReviewOf = location.state?.ReviewOf
   const Id = location.state?.Id
+  const fromNavigate = location.state?.fromNavigate
+
 
   const [reviewData, setReviewData] = useState({
     review: [],
@@ -89,6 +92,12 @@ const ViewReview = ({ userId, userRole }) => {
       </div>
     );
   }
+  if (userRole==="student") {
+    return <PageNotFound />
+}
+if (!fromNavigate) {
+  return <PageNotFound />
+}
 
   return (
     <div>

@@ -19,6 +19,7 @@ router.post('/studentReview', async (req, res) => {
         const Course_id = rows[0].Course_id
         const Section_id = rows[0].Section_id
         console.log(Section_id, Course_id, Academic_Year_id, Module_id)
+        console.log(rating,Suggestions)
 
         const [result] = await db.execute(
             "INSERT INTO `Student_Review` ( `Rating`, `Suggestions`) VALUES ( ?, ?)",

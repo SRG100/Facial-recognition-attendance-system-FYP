@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import SidebarComponent from '../components/SideBar'
+import PageNotFound from '../components/PageNotFound'
 
 const VerifyCode = ({ userId, userRole }) => {
     const navigate = useNavigate()
@@ -9,6 +10,7 @@ const VerifyCode = ({ userId, userRole }) => {
 
     const Class_Id = location.state?.Class_Id
     const Attendance_id = location.state?.Attendance_id
+    const fromNavigate = location.state?.fromNavigate
 
     const [code, setCode] = useState({ classCode: '' })
     const [loading, setLoading] = useState(false)
@@ -47,7 +49,7 @@ const VerifyCode = ({ userId, userRole }) => {
 
                     if (seconds <= 0) {
                         clearInterval(timer)
-                        navigate("/checkface", { state: { Class_Id, Attendance_id } })
+                        navigate("/checkface", { state: { Class_Id, Attendance_id ,fromNavigate:true} })
                     }
                 }, 1000)
             } else {
@@ -59,6 +61,9 @@ const VerifyCode = ({ userId, userRole }) => {
             setError('An error occurred. Please try again later.')
             console.error("Error while verifying class:", err)
         }
+    }
+    if (!fromNavigate){
+        return <PageNotFound/>
     }
 
     return (

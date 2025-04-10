@@ -30,6 +30,13 @@ const Classes = ({ userRole, userId }) => {
         }
     }, [userId, userRole])
 
+    
+
+    useEffect(() => {
+        if (userRole === 'teacher') {
+            setNewClass(prev => ({ ...prev, Teacher_Id: userId }));
+        }
+    }, [userRole])
 
     useEffect(() => {
         if (userId) {
@@ -80,9 +87,7 @@ const Classes = ({ userRole, userId }) => {
     }
 
     const addNewClass = async (e) => {
-        if (userRole === 'teacher') {
-            setNewClass(prev => ({ ...prev, Teacher_Id: userId }));
-        }
+       
         console.log("Well the data before sending is :", newClass)
         e.preventDefault()
         try {
@@ -177,28 +182,36 @@ const Classes = ({ userRole, userId }) => {
     }
     const startClass = async (classDetail) => {
         try {
+            toast.loading("Getting your location...")
+            
             const teacherLocation = await getUserLocation()
             console.log("The user location is :", teacherLocation)
-
+            
+            toast.dismiss()
+            
             const startClassData = {
-
                 Section_Id: classDetail.Section_Id,
                 Class_Id: classDetail.Class_Id,
                 teacherLocation: teacherLocation
             }
+            toast.loading("Starting class...")
+            
             const response = await axios.post('http://localhost:3000/classes/startAttendance', startClassData)
             const classCode = response.data.classCode
             console.log(classCode)
+            
+            toast.dismiss();
+            
             if (response.data.classCode) {
-                toast.success(`The class code is: ${classCode}`)
+                toast.success(`Class started! The class code is: ${classCode}`);
             }
-            getClassDetails()
-            console.log("The user location is :", teacherLocation)
-
+            
+            getClassDetails();
         } catch (err) {
-            console.log(err)
+            toast.dismiss(); // Dismiss any loading toasts
+            toast.error("Failed to start class: " + (err.message || "Unknown error"));
+            console.log(err);
         }
-
     }
     const joinClass = async (classDetail) => {
         try {
@@ -222,7 +235,7 @@ const Classes = ({ userRole, userId }) => {
 
             }
             else {
-                navigate("/verifycode", { state: { Class_Id, Attendance_id } })
+                navigate("/verifycode", { state: { Class_Id, Attendance_id,fromNavigate: true  } })
             }
         } catch (err) {
             console.log(err)
@@ -302,6 +315,7 @@ const Classes = ({ userRole, userId }) => {
                                                 <td className="align-middle" >{classDetail.Teacher_Name}</td>
                                             ) : (<td className="align-middle">{classDetail.Section_Id}</td>)}
 
+                                            
                                             {userRole === "student" ? (
                                                 <td >
                                                     {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
@@ -336,6 +350,11 @@ const Classes = ({ userRole, userId }) => {
                                                             <button className="btn btn-outline-success" >No Class Yet</button>
                                                         )}
                                                     </td>)}
+                                                    {userRole==="teacher" && classDetail.Class_Code!=null &&(
+                                            <td className="align-middle" >{classDetail.Class_Code}</td>
+
+                                            )}
+
 
                                         </tr>
                                     )
@@ -416,13 +435,13 @@ const Classes = ({ userRole, userId }) => {
                                                                 ) :(classDetail.Class_Status === 0 && classDetail.Class_Completion === 1 )? (
                                                                     <span className="text-danger">Class Cancelled</span>
                                                                 ):(
-                                                                    <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class" } })}>View Attendance</button>
+                                                                    <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class", fromNavigate:true } })}>View Attendance</button>
                                                                 )}
                                                             </>
 
                                                         </td>) : (<td>
                                                             {classDetail.Class_Status === 1 ? (
-                                                                <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class" } })}>View Attendance</button>
+                                                                <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class",fromNavigate:true } })}>View Attendance</button>
 
                                                             ) : (
                                                                 <span className="text-danger">Class Cancelled</span>

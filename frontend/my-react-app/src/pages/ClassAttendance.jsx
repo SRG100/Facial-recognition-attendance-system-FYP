@@ -5,12 +5,17 @@ import SidebarComponent from '../components/SideBar';
 import { Doughnut } from 'react-chartjs-2';
 import 'chart.js/auto';
 import 'boxicons/css/boxicons.min.css';
-import toast from 'react-hot-toast';
+import toast from 'react-hot-toast'
+import PageNotFound from '../components/PageNotFound';
 
 const ClassAttendance = ({ userId, userRole }) => {
   const location = useLocation()
   const classId = location.state?.Id || ''
   const className = location.state?.className || 'Class'
+  const fromNavigate = location.state?.fromNavigate
+  if(!fromNavigate){
+    return <PageNotFound/>
+  } 
   
   const [attendanceData, setAttendanceData] = useState([])
   const [loading, setLoading] = useState(true)
@@ -201,7 +206,11 @@ const ClassAttendance = ({ userId, userRole }) => {
   };
 
   // Check if there are unsaved changes
-  const hasUnsavedChanges = Object.keys(changedRecords).length > 0;
+  const hasUnsavedChanges = Object.keys(changedRecords).length > 0
+
+  if (userRole==="student") {
+    return <PageNotFound />
+}
 
   return (
     <div className="class-attendance-dashboard">

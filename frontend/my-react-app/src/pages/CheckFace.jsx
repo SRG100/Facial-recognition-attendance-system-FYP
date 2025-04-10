@@ -3,17 +3,22 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import FaceCapture from '../components/FaceCapture.jsx';
-import SidebarComponent from '../components/SideBar.jsx';
+import SidebarComponent from '../components/SideBar.jsx'
+import PageNotFound from '../components/PageNotFound.jsx';
 
 const CheckFace = ({ userId, userRole }) => {
-  const [faceImgRegister, setFaceImgRegister] = useState('');
-  const [image, setImage] = useState('');
-  const [registeredFace, setRegisteredFace] = useState(null);
+  const [faceImgRegister, setFaceImgRegister] = useState('')
+  const [image, setImage] = useState('')
+  const [registeredFace, setRegisteredFace] = useState(null)
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const Class_Id = location.state?.Class_Id;
-  const Attendance_id = location.state?.Attendance_id;
+  const navigate = useNavigate()
+  const location = useLocation()
+  const fromNavigate = location.state?.fromNavigate
+  if (!fromNavigate) {
+    return <PageNotFound />
+}
+  const Class_Id = location.state?.Class_Id
+  const Attendance_id = location.state?.Attendance_id
 
   useEffect(() => {
     const getFaceDetails = async () => {
@@ -64,7 +69,7 @@ const CheckFace = ({ userId, userRole }) => {
         await axios.get(
           `http://localhost:3000/verification/faceVerified?Attendance_id=${Attendance_id}`
         );
-        navigate('/verifylocation', { state: { Class_Id, Attendance_id } })
+        navigate('/verifylocation', { state: { Class_Id, Attendance_id, fromNavigate:true } })
       } else {
         toast.error('Face not verified. Please try again.')
       }
@@ -73,7 +78,8 @@ const CheckFace = ({ userId, userRole }) => {
       toast.error('Something went wrong during verification.')
       console.error('Error during face verification:', error)
     }
-  };
+  }
+  
 
   return (
     <div className="d-flex">

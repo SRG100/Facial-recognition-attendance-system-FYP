@@ -3,9 +3,13 @@ import FaceCapture from '../components/FaceCapture.jsx'
 import axios from 'axios'
 import Nav from '../components/Nav.jsx'
 import SidebarComponent from '../components/SideBar.jsx'
+import { useLocation } from 'react-router-dom'
 
 const RegisterFace = ({userId,userRole}) => {
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState("")
+  const location = useLocation()
+  const fromNavigate = location.state?.fromNavigate
+
 
   const base64ToFile = (base64String) => {
     const byteCharacters = atob(base64String.split(",")[1]);

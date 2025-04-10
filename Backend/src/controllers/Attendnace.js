@@ -6,7 +6,7 @@ const router = express.Router()
 
 router.get('/getAttendnaceDetails', async (req, res) => {
     try {
-        const { Id, From } = req.query
+        const { Id, From ,userRole,userId} = req.query
         const db = await connectDatabase()
         let query = `
             SELECT s.Student_ID, s.Student_Name, COUNT(a.Attendance_Id) AS Total_Classes, SUM(CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present_Count,
@@ -16,8 +16,9 @@ router.get('/getAttendnaceDetails', async (req, res) => {
             WHERE 1=1
         `
         if (From === "class") query += ` AND aa.Class_ID = '${Id}'`
-        if (From === "section") query += ` AND aa.Section_ID = '${Id}'`
         if (From === "student") query += ` AND aa.Student_ID = '${Id}'`
+        if (userRole === "teacher") query += ` AND aa.Teacher_id = '${userId}'`
+
         // if (startDate && endDate) query += ` AND a.Attendance_Date BETWEEN '${startDate}' AND '${endDate}'`;
 
         query += " GROUP BY s.Student_ID, s.Student_Name"
@@ -33,21 +34,27 @@ router.get('/getAttendnaceDetails', async (req, res) => {
 })
 router.get('/getAttendnaceByDate', async (req, res) => {
     try {
-        const { Id, userRole } = req.query
+        const { Id, userRole, fromDate, toDate } = req.query
         const db = await connectDatabase()
         let query = `
             SELECT c.Class_date, SUM(CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present_Count, 
-            SUM(CASE WHEN a.Attendance_Status = 'Late' THEN 1 ELSE 0 END) AS Late_Count, SUM(CASE WHEN a.Attendance_Status = 'Absent' THEN 1 ELSE 0 END) AS
-            Absent_Count FROM attendance a JOIN attendance_association aa ON a.Attendance_Id = aa.Attendance_Id Join class c on aa.Class_id= c.Class_id
+            SUM(CASE WHEN a.Attendance_Status = 'Late' THEN 1 ELSE 0 END) AS Late_Count, 
+            SUM(CASE WHEN a.Attendance_Status = 'Absent' THEN 1 ELSE 0 END) AS Absent_Count 
+            FROM attendance a 
+            JOIN attendance_association aa ON a.Attendance_Id = aa.Attendance_Id 
+            JOIN class c ON aa.Class_id = c.Class_id
             WHERE 1=1
         `
         if (userRole === "student") query += ` AND aa.Student_ID = '${Id}'`
         if (userRole === "teacher") query += ` AND aa.Teacher_id = '${Id}'`
+        
+        if (fromDate) query += ` AND c.Class_date >= '${fromDate}'`
+        if (toDate) query += ` AND c.Class_date <= '${toDate}'`
 
         query += ` GROUP BY c.Class_date ORDER BY c.Class_date`
 
         const [results] = await db.execute(query)
-        console.log("Got the attendnace by date")
+        console.log("Got the attendance by date")
         const formattedData = results.map(item => ({
             Attendance_Date: new Date(item.Class_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
             Count: parseInt(item.Present_Count, 10)
@@ -56,7 +63,7 @@ router.get('/getAttendnaceByDate', async (req, res) => {
 
     } catch (err) {
         console.error("Overall Class js error:", err);
-        res.status(500).json({ success: false, message: "Failed to get attendnace by date" })
+        res.status(500).json({ success: false, message: "Failed to get attendance by date" })
     }
 })
 

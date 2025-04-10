@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import SidebarComponent from '../components/SideBar'
 import axios from 'axios'
 import { useNavigate, useLocation } from 'react-router-dom'
+import PageNotFound from '../components/PageNotFound'
 
 const Students = ({ userRole, userId }) => {
   const navigate = useNavigate()
@@ -10,7 +11,11 @@ const Students = ({ userRole, userId }) => {
   const [section, setSection] = useState(null)
   const location = useLocation()
   const [searchTerm, setSearchTerm] = useState('')
-  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([])
+
+  if(userRole==="student"){
+ return <PageNotFound/>
+  }
 
   useEffect(() => {
     const results = students.filter(student =>
@@ -105,18 +110,18 @@ const Students = ({ userRole, userId }) => {
                       {userRole == "admin" ? (
                         <>
                           <td className="align-middle">
-                            <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: student.Student_Id, ReviewOf: "Student" } })}>View Reviews</button>
+                            <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: student.Student_Id, ReviewOf: "Student",fromNavigate:true } })}>View Reviews</button>
                           </td>
                         </>
                       ) : (
                         <>
                           <td className="align-middle">
-                            <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: student.Student_Id, ReviewOf: "Student" } })}>Review Student</button>
+                            <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: student.Student_Id, ReviewOf: "Student",fromNavigate:true  } })}>Review Student</button>
                           </td>
                         </>
                       )}
                       <td className="align-middle">
-                        <button className="btn btn-outline-primary" onClick={() => navigate("/ViewAttendance", { state: { Id: student.Student_Id, From: "student" } })}>View Attendance</button>
+                        <button className="btn btn-outline-primary" onClick={() => navigate("/ViewAttendance", { state: { Id: student.Student_Id, From: userRole,fromNavigate:true } })}>View Attendance</button>
                       </td>
 
                     </tr>

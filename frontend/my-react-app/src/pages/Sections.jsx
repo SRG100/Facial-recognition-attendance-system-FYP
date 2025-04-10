@@ -6,8 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import 'reactjs-popup/dist/index.css';
 import '../assets/MyPopup.css';
 import toast from 'react-hot-toast'
+import PageNotFound from '../components/PageNotFound';
 
 const Sections = ({ userRole, userId }) => {
+  if(userRole==="student"){
+    return <PageNotFound/>
+  }
   const navigate = useNavigate();
   const [sections, setSections] = useState([]);
   const [years, setYears] = useState([]);

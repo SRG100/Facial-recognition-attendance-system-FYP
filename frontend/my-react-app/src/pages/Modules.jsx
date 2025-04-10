@@ -5,11 +5,13 @@ import SidebarComponent from '../components/SideBar'
 import { Link, useNavigate } from 'react-router-dom'
 import Popup from 'reactjs-popup'
 import toast from 'react-hot-toast'
-
-
+import PageNotFound from '../components/PageNotFound'
 
 const Modules = ({ userId, userRole }) => {
-  const navigate = useNavigate();
+  if(userRole==="teacher"){
+    return <PageNotFound/>
+  }
+  const navigate = useNavigate()
   const [modules, setModules] = useState([])
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [course, setCourse] = useState([])

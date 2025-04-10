@@ -26,10 +26,13 @@ const Login = () => {
                 localStorage.setItem("justLoggedIn", "true")
                 if (response.data.success) {
                     toast.success(response.data.message)
+                    navigate(response.data.redirect, { replace: true } )
+
                 } else {
                     toast(response.data.message, { icon: '👏' })
+                    navigate(response.data.redirect, { replace: true })
+
                 }
-                navigate(response.data.redirect, { replace: true })
                 setTimeout(() => window.location.reload(), 500)
             } else {
                 toast.error(response.data.message)
@@ -49,7 +52,7 @@ const Login = () => {
                             src={AttendanceImage}
                             alt="Login Visual"
                             className="img-fluid p-4"
-                            style={{ maxHeight: "420px" }}
+                            style={{ maxHeight: "420px" ,scale:"1.2" }}
                         />
                     </div>
                     <div className="col-md-6 bg-white">

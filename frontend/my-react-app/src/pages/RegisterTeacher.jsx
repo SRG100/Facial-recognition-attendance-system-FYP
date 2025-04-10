@@ -3,8 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Nav from '../components/Nav'
 import SidebarComponent from '../components/SideBar'
+import PageNotFound from '../components/PageNotFound'
 
 const RegisterTeacher = ({ userId, userRole }) => {
+    if (userRole === "student" ) {
+        return <PageNotFound />
+    }
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -18,7 +22,7 @@ const RegisterTeacher = ({ userId, userRole }) => {
         teacherPassword: '',
         teacherModule: ''
     })
-    const [modules,setModule]=useState([])
+    const [modules, setModule] = useState([])
 
 
     const handleChangesTeacher = (e) => {
@@ -40,8 +44,8 @@ const RegisterTeacher = ({ userId, userRole }) => {
     }
 
     useEffect(() => {
-            getModuleDetails();
-        
+        getModuleDetails();
+
     }, [userId, userRole]);
 
 
@@ -78,7 +82,7 @@ const RegisterTeacher = ({ userId, userRole }) => {
                                 </div>
                                 <form className="form-card mt-4" onSubmit={handleSubmitTeacher}>
                                     <div className="row justify-content-between mb-3">
-                                        
+
                                         <div className="form-group col-sm-6 flex-column d-flex">
                                             <label className="form-label fw-bold">Teacher Name<span className="text-danger"> *</span></label>
                                             <input type="text" placeholder="Teacher's name" name="teacherName" value={teacherValues.teacherName} onChange={handleChangesTeacher} />
@@ -121,7 +125,7 @@ const RegisterTeacher = ({ userId, userRole }) => {
                                                 ))}
                                             </select>
                                         </div>
-                                        
+
                                     </div>
 
                                     <div className="row justify-content-end mt-4">

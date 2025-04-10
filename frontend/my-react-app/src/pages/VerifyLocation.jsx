@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import SidebarComponent from '../components/SideBar'
 import { toast } from 'react-hot-toast'
+import PageNotFound from '../components/PageNotFound'
 
 const VerifyLocation = ({ userId, userRole }) => {
     const [loading, setLoading] = useState(false)
@@ -17,6 +18,7 @@ const VerifyLocation = ({ userId, userRole }) => {
     const location = useLocation()
     const Class_Id = location.state?.Class_Id
     const Attendance_id = location.state?.Attendance_id
+    const fromNavigate = location.state?.fromNavigate
 
 
     useEffect(() => {
@@ -75,7 +77,7 @@ const VerifyLocation = ({ userId, userRole }) => {
             if (response.data.classCompletion === 1) {
                 toast.success("Class has ended!")
                 setVerificationActive(false)
-                navigate('/',1000)
+                navigate('/', 1000)
             }
         } catch (error) {
             toast.error("Error checking class status")
@@ -109,7 +111,10 @@ const VerifyLocation = ({ userId, userRole }) => {
         setVerificationActive(true)
         verifyLocation()
         checkClassCompletion()
-    };
+    }
+    if (!fromNavigate) {
+        return <PageNotFound />
+    }
 
     return (
         <div className="d-flex">
@@ -130,37 +135,37 @@ const VerifyLocation = ({ userId, userRole }) => {
                 />
             )}
 
-<div className='home-section'>
-            <div className=" container mt-4 ms-4">
-                <h2 className="mb-3">📍 Location Verification</h2>
+            <div className='home-section'>
+                <div className=" container mt-4 ms-4">
+                    <h2 className="mb-3">📍 Location Verification</h2>
 
-                <div className="alert alert-warning" role="alert">
-                    ✅ Be within <strong>50 meters</strong> of your teacher's location. <br />
-                    🚨 You will receive <strong>3 warnings</strong> before class ends. <br />
-                    ❗ <strong>Do not close this page.</strong><br />
-                    📘 Happy learning!
+                    <div className="alert alert-warning" role="alert">
+                        ✅ Be within <strong>50 meters</strong> of your teacher's location. <br />
+                        🚨 You will receive <strong>3 warnings</strong> before class ends. <br />
+                        ❗ <strong>Do not close this page.</strong><br />
+                        📘 Happy learning!
+                    </div>
+
+                    {distance !== null && (
+                        <div className="alert alert-info">
+                            Your distance: <strong>{distance.toFixed(2)} meters</strong>
+                        </div>
+                    )}
+
+                    {!verificationActive ? (
+                        <button
+                            className="btn btn-primary"
+                            onClick={startVerification}
+                            disabled={loading}
+                        >
+                            {loading ? "Locating..." : "Start Verification"}
+                        </button>
+                    ) : (
+                        <div className="alert alert-success mt-3">
+                            Location is being verified every 10 seconds...
+                        </div>
+                    )}
                 </div>
-
-                {distance !== null && (
-                    <div className="alert alert-info">
-                        Your distance: <strong>{distance.toFixed(2)} meters</strong>
-                    </div>
-                )}
-
-                {!verificationActive ? (
-                    <button
-                        className="btn btn-primary"
-                        onClick={startVerification}
-                        disabled={loading}
-                    >
-                        {loading ? "Locating..." : "Start Verification"}
-                    </button>
-                ) : (
-                    <div className="alert alert-success mt-3">
-                        Location is being verified every 10 seconds...
-                    </div>
-                )}
-            </div>
             </div>
         </div>
     )
