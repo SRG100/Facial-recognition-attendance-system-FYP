@@ -15,7 +15,9 @@ const Classes = ({ userRole, userId }) => {
     const [sections, setSections] = useState([]);
     const [modules, setModules] = useState([])
     const [newClass, setNewClass] = useState({ Class_Start_Time: '', Class_End_Time: '', Class_Date: '', Class_Type: '', Section_Id: '', Module_Id: '', Teacher_Id: '' ,userRole:userRole});
-    const [showCompletedClasses, setShowCompletedClasses] = useState(false);
+    const [showCompletedClasses, setShowCompletedClasses] = useState(false)
+    const [minTime, setMinTime] = useState('');
+    const [minDate, setMinDate] = useState('');
 
     const [isPopupOpen, setIsPopupOpen] = useState(false)
     const [attendnaceExists, setAttendanceExists] = useState(false)
@@ -51,7 +53,8 @@ const Classes = ({ userRole, userId }) => {
         try {
             const endClassData = { Class_Id: classDetail.Class_Id }
             const response = await axios.post('http://localhost:3000/classes/endClass', endClassData)
-            getClassDetails();
+            toast.success(response.data.message)
+            getClassDetails()
 
         } catch (e) {
             console.error('Error while getting the sections', e)
@@ -85,6 +88,20 @@ const Classes = ({ userRole, userId }) => {
             toast.error("Error while getting tecahers")
         }
     }
+    useEffect(() => {
+        const today = new Date()
+        const yyyy = today.getFullYear()
+
+        const mm = String(today.getMonth() + 1).padStart(2, '0')
+        const dd = String(today.getDate()).padStart(2, '0')
+        setMinDate(`${yyyy}-${mm}-${dd}`)
+
+        const hours = String(today.getHours()).padStart(2, '0')
+        const minutes = String(today.getMinutes()).padStart(2, '0')
+        setMinTime(`${hours}:${minutes}`)
+    }, [])
+
+   
 
     const addNewClass = async (e) => {
        
@@ -127,6 +144,13 @@ const Classes = ({ userRole, userId }) => {
         return () => clearInterval(interval)
     }, [])
 
+    const getMinEndTime = () => {
+        const { Class_Date, Class_Start_Time } = newClass
+        if (Class_Start_Time) {
+            return Class_Start_Time
+        }
+        return Class_Date === minDate ? minTime : undefined
+    }
 
     const isClassLive = (classDetail) => {
         const { Class_Date: classDateISO, Class_Start_Time: startTime, Class_End_Time: endTime } = classDetail;
@@ -362,7 +386,7 @@ const Classes = ({ userRole, userId }) => {
                             }
                         </tbody>
                     </table>
-                    {userRole === 'admin' || userRole === 'teacher' && (
+                    {(userRole === 'admin' || userRole === 'teacher') && (
                         <button className="btn btn-success" onClick={() => setIsPopupOpen(true)}>
                             Add Class
                         </button>
@@ -469,6 +493,16 @@ const Classes = ({ userRole, userId }) => {
 
 
                             <div className="modal-body">
+                            <div className="form-group mb-3">
+                                    <label className="form-label">Class Date:</label>
+                                    <input
+                                        type="date" required
+                                        min={minDate}
+                                        className="form-control"
+                                        name="Class_Date"
+                                        onChange={handleChanges}
+                                    />
+                                </div>
                                 <div className="form-group mb-3">
                                     <label className="form-label">Class Start Time:</label>
                                     <input
@@ -476,26 +510,22 @@ const Classes = ({ userRole, userId }) => {
                                         className="form-control"
                                         name="Class_Start_Time" required
                                         onChange={handleChanges}
+                                        min={newClass.Class_Date === minDate ? minTime : undefined}
+
                                     />
                                 </div>
                                 <div className="form-group mb-3">
                                     <label className="form-label">Class End Time:</label>
                                     <input
                                         type="time"
+                                        min={getMinEndTime()}
+
                                         className="form-control" required
                                         name="Class_End_Time"
                                         onChange={handleChanges}
                                     />
                                 </div>
-                                <div className="form-group mb-3">
-                                    <label className="form-label">Class Date:</label>
-                                    <input
-                                        type="date" required
-                                        className="form-control"
-                                        name="Class_Date"
-                                        onChange={handleChanges}
-                                    />
-                                </div>
+                                
                                 <div className="form-group mb-3">
                                     <label className="form-label">Class Type:</label>
                                     <select name="Class_Type" onChange={handleChanges} required

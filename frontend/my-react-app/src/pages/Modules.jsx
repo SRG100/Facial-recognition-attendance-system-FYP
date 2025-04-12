@@ -8,12 +8,28 @@ import toast from 'react-hot-toast'
 import PageNotFound from '../components/PageNotFound'
 
 const Modules = ({ userId, userRole }) => {
-  if(userRole==="teacher"){
-    return <PageNotFound/>
+  if (userRole === "teacher") {
+    return <PageNotFound />
   }
   const navigate = useNavigate()
   const [modules, setModules] = useState([])
   const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [isPopupOpenPredict, setIsPopupOpenPredict] = useState(false)
+  const [predictedGrade, setPredictedGrade] = useState("")
+  const [isLoadingPrediction, setIsLoadingPrediction] = useState(true)
+  useEffect(() => {
+    if (isPopupOpenPredict) {
+      setIsLoadingPrediction(true)
+      const timer = setTimeout(() => {
+        setIsLoadingPrediction(false)
+      }, 1000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [isPopupOpenPredict])
+
+
+
   const [course, setCourse] = useState([])
   const [moduleValues, setModuleValues] = useState({
     moduleId: '',
@@ -28,15 +44,16 @@ const Modules = ({ userId, userRole }) => {
       getModuleDetails()
       getCourse()
     }
-  }, [userId, userRole]);
+  }, [userId, userRole])
+
   const getCourse = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/courses/getCourseDetails`);
-      setCourse(Array.isArray(response.data) ? response.data : []);
+      setCourse(Array.isArray(response.data) ? response.data : [])
     } catch (err) {
-      console.log('Error while getting the student', err);
+      console.log('Error while getting the student', err)
 
-      toast.error('Error while getting the student');
+      toast.error('Error while getting the student')
     }
   }
 
@@ -97,6 +114,30 @@ const Modules = ({ userId, userRole }) => {
     } catch (error) {
       toast.error("Error while getting the teachers")
     }
+  }
+  const handlePredictResult = async (moduleId) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/attendance/getAttendnaceDetails?Id=${userId}&From=${userRole}&Module_id=${moduleId}`)
+      const data = Array.isArray(response.data) ? response.data : []
+      setIsPopupOpenPredict(true)
+      if (data && data.length > 0) {
+        const studentAttendance = data.find(item => item.Student_ID === userId)
+        if (studentAttendance) {
+          const percentage = studentAttendance.Attendance_Percentage
+          let grade = "Concerning";
+
+          if (percentage >= 80) grade = "A";
+          else if (percentage >= 60) grade = "B";
+          else if (percentage >= 40) grade = "C";
+          else if (percentage >= 20) grade = "D";
+
+          setPredictedGrade(grade);
+        }
+      }
+
+    } catch (err) {
+      console.error("Error predicting result:", err);
+    }
   };
 
   return (
@@ -117,7 +158,9 @@ const Modules = ({ userId, userRole }) => {
                 <th scope="col" >Module Credits  </th>
 
                 <th scope="col" >Review </th>
-
+                {userRole === "student" && (
+                  <th scope="col" >Predict Result </th>
+                )}
 
               </tr>
             </thead>
@@ -135,14 +178,22 @@ const Modules = ({ userId, userRole }) => {
                       <td className="align-middle">
                         {userRole == "student" ? (
                           <>
-                            <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: module.Module_id, userRole, ReviewOf: "Module" } })}>Review Module</button>
+                            <button className="btn btn-outline-warning" onClick={() => navigate("/ReviewForm", { state: { Id: module.Module_id, userRole, ReviewOf: "Module", fromNavigate: true } })}>Review Module</button>
                           </>
                         ) : (
                           <>
-                            <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: module.Module_id, ReviewOf: "Module" } })}>View Reviews</button>
+                            <button className="btn btn-outline-warning" onClick={() => navigate("/ViewReview", { state: { Id: module.Module_id, ReviewOf: "Module", fromNavigate: true } })}>View Reviews</button>
                           </>
                         )}
                       </td>
+
+                      {userRole == "student" && (
+                        <>
+                          <td className="align-middle">
+                            <button className="btn btn-outline-success" onClick={() => handlePredictResult(module.Module_id)}  >Predict Result</button>
+                          </td>
+                        </>
+                      )}
 
                     </tr>
                   )
@@ -244,6 +295,46 @@ const Modules = ({ userId, userRole }) => {
           </form>
         </div>
 
+      </Popup>
+      <Popup
+        open={isPopupOpenPredict}
+        closeOnDocumentClick
+        onClose={() => setIsPopupOpenPredict(false)}
+      >
+        <div className="card border-0 shadow">
+          <div className="card-header bg-primary text-white">
+            <h5 className="card-title mb-0">Grade Prediction Results</h5>
+          </div>
+
+          <div className="card-body" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+            <p className="text-muted mb-3">
+              This is a simple prediction system based on your attendance. Your actual academic qualification may be higher than predicted.
+            </p>
+
+            {isLoadingPrediction ? (
+              <div className="d-flex flex-column align-items-center justify-content-center mt-4">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3 text-muted">Predicting grade...</p>
+              </div>
+            ) : (
+              <div className="alert alert-success mt-4">
+                <h6 className="mb-2">Predicted Grade for this module based on your attendance rate:</h6>
+                <div className="display-4 font-weight-bold text-success text-center">{predictedGrade || "N/A"}</div>
+              </div>
+            )}
+
+            <div className="text-end mt-4">
+              <button
+                className="btn btn-primary"
+                onClick={() => setIsPopupOpenPredict(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       </Popup>
     </div>
   )

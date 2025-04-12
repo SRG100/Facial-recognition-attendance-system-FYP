@@ -6,7 +6,8 @@ const router = express.Router()
 
 router.get('/getAttendnaceDetails', async (req, res) => {
     try {
-        const { Id, From ,userRole,userId} = req.query
+        const { Id, From ,userRole,userId,Module_id} = req.query
+        console.log(Id, From ,userRole,userId,Module_id)
         const db = await connectDatabase()
         let query = `
             SELECT s.Student_ID, s.Student_Name, COUNT(a.Attendance_Id) AS Total_Classes, SUM(CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present_Count,
@@ -17,11 +18,12 @@ router.get('/getAttendnaceDetails', async (req, res) => {
         `
         if (From === "class") query += ` AND aa.Class_ID = '${Id}'`
         if (From === "student") query += ` AND aa.Student_ID = '${Id}'`
+        if(From ==="teacher") query += ` AND aa.Student_ID = '${Id}'`
         if (userRole === "teacher") query += ` AND aa.Teacher_id = '${userId}'`
-
-        // if (startDate && endDate) query += ` AND a.Attendance_Date BETWEEN '${startDate}' AND '${endDate}'`;
+        if (Module_id!=undefined) query+= `And aa.Module_id = '${Module_id}'`
 
         query += " GROUP BY s.Student_ID, s.Student_Name"
+        console.log(query)
 
         const [results] = await db.execute(query)
         console.log("Got the attendnace")

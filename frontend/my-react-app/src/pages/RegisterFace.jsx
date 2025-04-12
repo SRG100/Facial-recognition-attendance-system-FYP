@@ -4,11 +4,15 @@ import axios from 'axios'
 import Nav from '../components/Nav.jsx'
 import SidebarComponent from '../components/SideBar.jsx'
 import { useLocation } from 'react-router-dom'
+import PageNotFound from '../components/PageNotFound.jsx'
 
 const RegisterFace = ({userId,userRole}) => {
   const [image, setImage] = useState("")
   const location = useLocation()
   const fromNavigate = location.state?.fromNavigate
+  if(!fromNavigate){
+    return <PageNotFound/>
+  }
 
 
   const base64ToFile = (base64String) => {

@@ -1,6 +1,6 @@
 import React from 'react'
 import PageNotFoundImg from '../assets/NotFound.jpg'
-import 'bootstrap/dist/css/bootstrap.min.css'
+// import 'bootstrap/dist/css/bootstrap.min.css'
 import { useNavigate } from 'react-router-dom'
 
 const PageNotFound = () => {

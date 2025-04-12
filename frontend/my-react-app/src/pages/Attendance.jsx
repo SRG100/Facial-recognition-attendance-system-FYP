@@ -45,6 +45,8 @@ const Attendance = ({ userId, userRole }) => {
       console.error('Error while getting the student overall attendnace', error);
     }
   }
+  
+  
   const getAttendanceByDate = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/attendance/getAttendnaceByDate?Id=${Id}&userRole=student`);
@@ -83,6 +85,7 @@ const Attendance = ({ userId, userRole }) => {
       const pdfUrl = URL.createObjectURL(blob)
       toast.success(response)
       window.open(pdfUrl, "_blank")
+      window.location.reload()
     } catch (error) {
       console.error('Error while getting the student absence by month', error)
     }
@@ -217,8 +220,6 @@ const Attendance = ({ userId, userRole }) => {
                   <div>
                     <p className="mb-1"><strong>Student ID:</strong> {studentData[0]?.Student_ID}</p>
                     <p className="mb-1"><strong>Name:</strong> {studentData[0]?.Student_Name}</p>
-                    <button className='btn btn-outline-primary mt-2'>Predict Result</button>
-
                   </div>
                   <div>
                     <p className="mb-1"><strong>Attendance Rate:</strong> {studentData[0]?.Attendance_Percentage}%</p>

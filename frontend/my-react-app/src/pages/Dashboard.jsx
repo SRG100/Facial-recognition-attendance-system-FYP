@@ -166,7 +166,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
               <div className="col-md-6 grid-margin stretch-card">
                 <div className="card dashboard tale-bg">
                   <div className="card-people mt-auto">
-                    <img src={attendanceImage} alt="people" />
+                    {/* <img src={attendanceImage} alt="people" /> */}
                     <div className="weather-info">
                       <div className="d-flex">
 

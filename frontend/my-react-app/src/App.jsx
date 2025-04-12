@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
 
 import axios from 'axios';
 import Register from './pages/Register';
@@ -13,7 +13,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Classes from './pages/Classes'
 import VerifyCode from './pages/VerifyCode';
 import VerifyLocation from './pages/VerifyLocation';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import ReviewForm from './pages/ReviewForm';
 import RegisterTeacher from './pages/RegisterTeacher';
 import Sections from './pages/Sections';
