@@ -4,46 +4,59 @@ import Nav from '../components/Nav'
 import SidebarComponent from '../components/SideBar'
 import attendanceImage from "../assets/attendance.jpg";
 import { Line } from 'react-chartjs-2'
+// import { SidebarProvider,useSidebar } from '../Context/SideBarContext';
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import '../assets/SideBar-light.css'
 
+import Badge from '../Ui/Badge';
+// import {
+//   ArrowDownIcon,
+//   ArrowUpIcon,
+//   BoxIconLine,
+//   GroupIcon,
+// } from "../assets/Icons";
 
 import '../assets/Dashboard.css'
 import 'chart.js/auto'
+import Header from '../components/Header';
 
 
-const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
+const Dashboard = ({ isLoggedIn, userRole, userId , userName}) => {
 
   const [attendanceData, setAttendanceData] = useState([])
   const [dashboardData, setDashboardData] = useState([])
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
+  // const userName="Shreyash"
   const [hasFiltered, setHasFiltered] = useState(false)
   const [dateFilters, setDateFilters] = useState({ fromDate: '', toDate: '' })
+  // const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+
 
   useEffect(() => {
     getAttendanceByDate()
     getDashboardDetails()
   }, [userId, userRole]);
-  
+
   useEffect(() => {
     if (hasFiltered) {
       getAttendanceByDate();
     }
   }, [dateFilters])
-  
+
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: true
   }
-  
+
   const getAttendanceByDate = async () => {
     try {
       let url = `http://localhost:3000/attendance/getAttendnaceByDate?Id=${userId}&userRole=${userRole}`;
-      
+
       if (dateFilters.fromDate) url += `&fromDate=${dateFilters.fromDate}`
       if (dateFilters.toDate) url += `&toDate=${dateFilters.toDate}`
-      
+
       const response = await axios.get(url);
       setAttendanceData(Array.isArray(response.data) ? response.data : [])
 
@@ -52,17 +65,17 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
       toast.error("Failed to fetch attendance data")
     }
   }
-  
+
   const handleDateFilter = (e) => {
     e.preventDefault()
     setDateFilters({ fromDate, toDate })
     setHasFiltered(true)
   };
-  
-  
+
+
   const getDashboardDetails = async () => {
     try {
-      console.log(userId, String(userRole))
+      console.log(userId, String(userRole), userName)
       const response = await axios.get(`http://localhost:3000/crud/getDashboardDetails?userId=${userId}&userRole=${userRole}`);
       console.log(response.data.data)
 
@@ -97,7 +110,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
       ]
     };
   }
-  
+
   const ChartCard = ({ title, children }) => (
     <div className="card dashboard mt-4">
       <div className="card-body">
@@ -106,24 +119,24 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
           <form className="d-flex" onSubmit={handleDateFilter}>
             <div className="me-2">
               <label className="form-label">From:</label>
-              <input 
-                type="date" 
-                className="form-control" 
-                value={fromDate} 
-                onChange={(e) => setFromDate(e.target.value)} 
+              <input
+                type="date"
+                className="form-control"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
               />
             </div>
             <div className="me-2">
               <label className="form-label">To:</label>
-              <input 
-                type="date" 
-                className="form-control " 
-                value={toDate} 
-                onChange={(e) => setToDate(e.target.value)} 
+              <input
+                type="date"
+                className="form-control "
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
               />
             </div>
             <div className="d-flex align-items-end mb-2">
-              <button type="submit" className="btn btn-primary  "><i className='bx bx-filter-alt' style={{scale:"1.5"}}></i>
+              <button type="submit" className="btn btn-primary  "><i className='bx bx-filter-alt' style={{ scale: "1.5" }}></i>
               </button>
             </div>
           </form>
@@ -136,11 +149,16 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
   )
 
   return (
-    <div>
+    <div className="min-h-screen xl:flex">
       {/* <Nav /> */}
-      <SidebarComponent userRole={userRole} />
+      
+        <SidebarComponent userRole={userRole} />
 
-      <div className='home-section'>
+
+
+
+
+      {/* <div className='home-section'>
         <div className="main-panel">
           <div className="content-wrapper">
             <div className="row">
@@ -166,7 +184,6 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
               <div className="col-md-6 grid-margin stretch-card">
                 <div className="card dashboard tale-bg">
                   <div className="card-people mt-auto">
-                    {/* <img src={attendanceImage} alt="people" /> */}
                     <div className="weather-info">
                       <div className="d-flex">
 
@@ -281,12 +298,137 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
                       </ChartCard>
                     </div>
                     <div className="bg-gray-200 p-4 text-center">Sales Chart Placeholder</div>
-                  </div>
+                  </div
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div> */}
+      <div className='home-section'>
+        <Header userName={userName} userRole={userRole}/>
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+
+<div
+        className={`flex-1 transition-all duration-300 ease-in-out `}
+      >
+        {/* <AppHeader /> */}
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+
+
+        </div>
+
+      <div className="grid grid-cols-12 gap-4 md:gap-6">
+        <div className="col-span-12 space-y-6 xl:col-span-7">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
+            {/* <!-- Metric Item Start --> */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                {/* <GroupIcon className="text-gray-800 size-6 dark:text-white/90" /> */}
+              </div>
+
+              <div className="flex items-end justify-between mt-5">
+                <div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Customers
+                  </span>
+                  <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                    3,782
+                  </h4>
+                </div>
+                <Badge color="success">
+                  {/* <ArrowUpIcon /> */}
+                  11.01%
+                </Badge>
+              </div>
+            </div>
+            {/* <!-- Metric Item End --> */}
+
+            {/* <!-- Metric Item Start --> */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                {/* <BoxIconLine className="text-gray-800 size-6 dark:text-white/90" /> */}
+              </div>
+              <div className="flex items-end justify-between mt-5">
+                <div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Orders
+                  </span>
+                  <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                    5,359
+                  </h4>
+                </div>
+
+                <Badge color="error">
+                  {/* <ArrowDownIcon /> */}
+                  9.05%
+                </Badge>
+              </div>
+            </div>
+            {/* <!-- Metric Item End --> */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                {/* <BoxIconLine className="text-gray-800 size-6 dark:text-white/90" /> */}
+              </div>
+              <div className="flex items-end justify-between mt-5">
+                <div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Orders
+                  </span>
+                  <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                    5,359
+                  </h4>
+                </div>
+
+                <Badge color="error">
+                  {/* <ArrowDownIcon /> */}
+                  9.05%
+                </Badge>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                {/* <BoxIconLine className="text-gray-800 size-6 dark:text-white/90" /> */}
+              </div>
+              <div className="flex items-end justify-between mt-5">
+                <div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Orders
+                  </span>
+                  <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                    5,359
+                  </h4>
+                </div>
+
+                <Badge color="error">
+                  {/* <ArrowDownIcon /> */}
+                  9.05%
+                </Badge>
+              </div>
+            </div>
+          </div>
+          </div>
+
+          {/* <MonthlySalesChart /> */}
+        </div>
+
+        {/* <div className="col-span-12 xl:col-span-5">
+          <MonthlyTarget />
+        </div>
+
+        <div className="col-span-12">
+          <StatisticsChart />
+        </div> */}
+        {/* 
+        <div className="col-span-12 xl:col-span-5">
+          <DemographicCard />
+        </div>
+
+        <div className="col-span-12 xl:col-span-7">
+          <RecentOrders />
+        </div> */}
+      </div>
+      </div>
       </div>
     </div>
   )

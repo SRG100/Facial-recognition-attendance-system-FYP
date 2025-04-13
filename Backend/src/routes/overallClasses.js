@@ -17,6 +17,7 @@ router.get('/scheduledClass', async (req, res) => {
                     t.Teacher_Id, 
                     c.Class_Status,
                     t.Teacher_Name,
+                    c.Class_Date,
                     c.Class_Completion
                 FROM student s
                 JOIN student_association sa ON s.Student_Id = sa.Student_Id
@@ -67,6 +68,7 @@ router.get('/scheduledClass', async (req, res) => {
                                         c.Class_End_Time, 
                                         c.Class_Type, 
                                         c.Class_Status, 
+                                        
                                         c.Class_Day,
                                         c.Class_Date,
                                         c.Class_Completion
@@ -104,6 +106,7 @@ router.get('/completedClass', async (req, res) => {
                     t.Teacher_Id, 
                     c.Class_Status,
                     t.Teacher_Name,
+                    c.Class_Date,
                     c.Class_Completion
                 FROM student s
                 JOIN student_association sa ON s.Student_Id = sa.Student_Id
@@ -131,6 +134,7 @@ router.get('/completedClass', async (req, res) => {
                                                 c.Class_Type, 
                                                 c.Class_Status, 
                                                 c.Class_Day,
+                                                c.Class_Date,
                                                 c.Class_Completion
                                             FROM teacher t
                                             JOIN teacher_association ta ON t.Teacher_Id = ta.Teacher_Id
@@ -153,6 +157,7 @@ router.get('/completedClass', async (req, res) => {
                                         c.Class_End_Time, 
                                         c.Class_Type, 
                                         c.Class_Status, 
+                                        c.Class_Date,
                                         c.Class_Day,
                                         c.Class_Completion
                                     FROM teacher t
@@ -334,13 +339,14 @@ router.post('/addClass', async (req, res) => {
         let associations=[]
         if(userRole==="teacher"){
             [associations] = await db.execute("Select Course_id, Module_id ,Academic_Year_id from section_association where Teacher_id=? and Section_Id =?", [Teacher_Id, Section_Id])
+            Module_Id=associations[0].Module_id
+
         }
         else{
             [associations] = await db.execute("Select Course_id, Academic_Year_id from section_association where Module_Id=? and Section_Id =?", [Module_Id, Section_Id])
         }
         const Academic_Year_id = associations[0].Academic_Year_id
         const Course_id = associations[0].Course_id
-        Module_Id=associations[0].Module_id
         console.log(Class_Start_Time, Class_End_Time, Class_Date, Class_Type, Section_Id, Module_Id, Teacher_Id ,userRole)
         await db.execute("INSERT INTO `class` (`Class_id`, `Class_Start_Time`, `Class_End_Time`, `Class_Day`, `Class_Date`, `Class_Type`) VALUES (?, ?, ?, ?, ?, ?)", [Class_Id, Class_Start_Time, Class_End_Time, Class_Day, Class_Date, Class_Type])
         await db.execute(`INSERT INTO class_association (Module_id, Academic_Year_id, Course_id, Teacher_id, Section_id, Class_id) VALUES (?,?,?,?,?,?)`, [Module_Id, Academic_Year_id, Course_id, Teacher_Id, Section_Id, Class_Id])

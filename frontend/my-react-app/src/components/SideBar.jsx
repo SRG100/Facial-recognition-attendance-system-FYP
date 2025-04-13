@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import "boxicons/css/boxicons.min.css";
-import fras from '../assets/Fras.png'
+import '../assets/SideBar-light.css';
+import fras from '../assets/Fras.png';
+
 const BoxIcon = ({ iconName, className = "" }) => (
   <i className={`bx ${iconName} ${className} text-2xl`}></i>
 );
 
 const SideBar = ({ userId, userRole }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   const location = useLocation();
@@ -61,7 +61,7 @@ const SideBar = ({ userId, userRole }) => {
       }
     };
 
-    checkAuthorization();
+    checkAuthorization()
   }, []);
 
   const handleLogout = async () => {
@@ -83,8 +83,7 @@ const SideBar = ({ userId, userRole }) => {
   };
 
   const toggleSidebar = () => {
-    setIsExpanded(!isExpanded);
-    setIsMobileOpen(!isMobileOpen);
+    setIsOpen(!isOpen);
   };
 
   const isActive = useCallback(
@@ -95,93 +94,51 @@ const SideBar = ({ userId, userRole }) => {
   if (!isLoggedIn) return null;
 
   return (
-    <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-        ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
-        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0`}
-      onMouseEnter={() => !isExpanded && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className={`py-8 flex lg:justify-center `}>
+    <>
+      <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="logo-details">
-          
-          {isExpanded || isHovered || isMobileOpen ? (
-            <div className="flex w-full">
-              <img
-                className="dark:hidden"
-                src={fras}
-                alt="Logo"
-                width={50}
-                height={40}
-              />
-                          <div className="logo-name text-2xl text-center" style={{ color: "#4a48ac" }}>GCA</div>
-
-            </div>
+          {/* <img src={fras} alt="Logo" className="icon" /> */}
+          <div className="logo-name">Menu</div>
+          {isOpen ? (
+            <i className='bx bx-x' onClick={toggleSidebar}></i>
           ) : (
-            <img
-              src={fras}
-              alt="Logo"
-              width={32}
-              height={32}
-            />
+            <i className='bx bx-menu' onClick={toggleSidebar}></i>
           )}
         </div>
-      </div>
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
-        <nav className="mb-6">
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-              }`}>
-                {isExpanded || isHovered || isMobileOpen ? "Menu" : <BoxIcon iconName="bx-dots-horizontal" className="size-6" />}
-              </h2>
-              <ul className="flex flex-col gap-4">
-                {menuItems[userRole]?.map((item, index) => (
-                  <li key={index}>
-                    <NavLink
-                      to={item.path}
-                      className={({ isActive }) => `menu-item group ${
-                        isActive ? "menu-item-active" : "menu-item-inactive"
-                      } cursor-pointer ${
-                        !isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"
-                      }`}
-                    >
-                      <span className={`menu-item-icon-size ${
-                        isActive(item.path) ? "menu-item-icon-active" : "menu-item-icon-inactive"
-                      }`}>
-                        {item.icon}
-                      </span>
-                      {(isExpanded || isHovered || isMobileOpen) && (
-                        <span className="menu-item-text">{item.name}</span>
-                      )}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </nav>
-{/*         
-        {(isExpanded || isHovered || isMobileOpen) && (
-          <div className="profile mt-auto mb-4 p-3 border-t border-gray-200 dark:border-gray-800">
-            <div className="profile-details flex items-center justify-between">
+        
+        <ul className="nav-list">
+          {menuItems[userRole]?.map((item, index) => (
+            <li key={index}>
+              <NavLink 
+                to={item.path} 
+                className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+              >
+                <i className={`bx ${item.icon.props.iconName}`}></i>
+                <span className="links-name">{item.name}</span>
+              </NavLink>
+              {!isOpen && <span className="tooltip">{item.name}</span>}
+            </li>
+          ))}
+          
+          <li className="profile">
+            <div className="profile-details">
               <div className="name-job">
-                <div className="name font-semibold">{userName}</div>
-                <div className="job text-sm text-gray-500 capitalize">{userRole}</div>
+                <div className="name">{userName}</div>
+                <div className="job">{userRole}</div>
               </div>
               <button 
-                className="logout-btn p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800" 
-                onClick={handleLogout}
-              >
-                <BoxIcon iconName="bx-log-out" />
-              </button>
+            className="logout-btn p-2 rounded-full hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900 dark:hover:text-red-300 transition-colors"
+            onClick={handleLogout}
+            aria-label="Logout"
+            title="Logout"
+          >
+            <i className='bx bx-log-out text-xl'></i>
+          </button>
             </div>
-          </div>
-        )} */}
+          </li>
+        </ul>
       </div>
-    </aside>
+    </>
   );
 };
 

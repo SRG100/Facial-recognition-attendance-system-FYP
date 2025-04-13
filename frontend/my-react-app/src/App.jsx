@@ -42,6 +42,7 @@ function App() {
         const response = await axios.get('http://localhost:3000/auth/isAuthorized', { withCredentials: true });
         setUserId(response.data.userId)
         console.log(response.data.role)
+        console.log(response.data.userName)
         setUserRole(response.data.role)
         setUsername(response.data.userName)
         setIsLoggedIn(response.data.success)
@@ -57,6 +58,7 @@ function App() {
 
   if (loading) return <p>Loading...</p>;
   console.log(userRole)
+  console.log(userName)
 
   return (
     
@@ -69,22 +71,22 @@ function App() {
             <Route path="/register" element={ <Register userId={userId} userRole={userRole}/>  } />
             <Route path="/registerTeacher" element={<RegisterTeacher userRole={userRole} />  } />
            {/* ---common access-- */}
-            <Route path="/" element={<Dashboard isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} userName={userName}/>} />
-            <Route path="/checkface" element={<CheckFace userId={userId} userRole={userRole}/>} />
-            <Route path="/classes" element={<Classes isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} />} />
-            <Route path="/registerface" element={<RegisterFace userId={userId} userRole={userRole} />} />
-            <Route path="/verifycode" element={<VerifyCode userId={userId} userRole={userRole} />} />
-            <Route path="/verifylocation" element={<VerifyLocation userId={userId} userRole={userRole} />} />
+            <Route path="/" element={<Dashboard isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} userName={userName}/>}  />
+            <Route path="/checkface" element={<CheckFace userId={userId} userRole={userRole} userName={userName}/>} />
+            <Route path="/classes" element={<Classes isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} userName={userName} />} />
+            <Route path="/registerface" element={<RegisterFace userId={userId} userRole={userRole} userName={userName} />} />
+            <Route path="/verifycode" element={<VerifyCode userId={userId} userRole={userRole} userName={userName} />} />
+            <Route path="/verifylocation" element={<VerifyLocation userId={userId} userRole={userRole} userName={userName} />} />
 
-            <Route path="/viewAttendance" element={<Attendance userId={userId} userRole={userRole}/>} />
-            <Route path="/viewModules" element={<Modules isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} />} />
-            <Route path="/viewStudents" element={<Students userId={userId} userRole={userRole} />} />
-            <Route path="/viewTeachers" element={<Teachers userId={userId} userRole={userRole} />} />
-            <Route path="/viewSections" element={<Sections userId={userId} userRole={userRole} />} />
-            <Route path="/ReviewForm" element={<ReviewForm userId={userId} userRole={userRole} />} />
-            <Route path="/ViewReview" element={<ViewReview userId={userId} userRole={userRole} />} />
-            <Route path="/example" element={<Examples userId={userId} userRole={userRole} />} />
-            <Route path="/ViewClassAttendance" element={<ClassAttendance userId={userId} userRole={userRole}/>} />
+            <Route path="/viewAttendance" element={<Attendance userId={userId} userRole={userRole} userName={userName}/>} />
+            <Route path="/viewModules" element={<Modules isLoggedIn={isLoggedIn} userRole={userRole} userId={userId}  userName={userName}/>} />
+            <Route path="/viewStudents" element={<Students userId={userId} userRole={userRole} userName={userName}/>} />
+            <Route path="/viewTeachers" element={<Teachers userId={userId} userRole={userRole} userName={userName} />} />
+            <Route path="/viewSections" element={<Sections userId={userId} userRole={userRole} userName={userName}/>} />
+            <Route path="/ReviewForm" element={<ReviewForm userId={userId} userRole={userRole} userName={userName}/>} />
+            <Route path="/ViewReview" element={<ViewReview userId={userId} userRole={userRole} userName={userName}/>} />
+            <Route path="/example" element={<Examples userId={userId} userRole={userRole} userName={userName} />} />
+            <Route path="/ViewClassAttendance" element={<ClassAttendance userId={userId} userRole={userRole} userName={userName}/>} />
             <Route path="/login" element={<Navigate to="/" />} />
 
 

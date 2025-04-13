@@ -5,16 +5,21 @@ import Popup from 'reactjs-popup';
 import { useNavigate } from 'react-router-dom'
 import SidebarComponent from '../components/SideBar'
 import toast from 'react-hot-toast'
+import ComponentCard from '../components/ComponentCard.jsx'
+import Header from '../components/Header';
+import Breadcrumb from '../components/Breadcrumb.jsx'
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 
 
-const Classes = ({ userRole, userId }) => {
+const Classes = ({ userRole, userId, userName }) => {
     const [scheduledClasses, setScheduledClasses] = useState([])
     const [completedClass, setCompletedClass] = useState([])
     const [teachers, setTeachers] = useState([])
     const [sections, setSections] = useState([]);
     const [modules, setModules] = useState([])
-    const [newClass, setNewClass] = useState({ Class_Start_Time: '', Class_End_Time: '', Class_Date: '', Class_Type: '', Section_Id: '', Module_Id: '', Teacher_Id: '' ,userRole:userRole});
+    const [newClass, setNewClass] = useState({ Class_Start_Time: '', Class_End_Time: '', Class_Date: '', Class_Type: '', Section_Id: '', Module_Id: '', Teacher_Id: '', userRole: userRole });
     const [showCompletedClasses, setShowCompletedClasses] = useState(false)
     const [minTime, setMinTime] = useState('');
     const [minDate, setMinDate] = useState('');
@@ -32,7 +37,7 @@ const Classes = ({ userRole, userId }) => {
         }
     }, [userId, userRole])
 
-    
+
 
     useEffect(() => {
         if (userRole === 'teacher') {
@@ -70,6 +75,16 @@ const Classes = ({ userRole, userId }) => {
             toast.error('Error while getting the sections', error)
         }
     }
+    function formatDate(dateString) {
+        const targetDate = new Date(dateString);
+        return targetDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+
+    }
+
     const getModuleDetails = async () => {
         try {
             const response = await axios.get(`http://localhost:3000/modules/getModulesDetails?userId=${userId}&userRole=${userRole}`)
@@ -101,21 +116,20 @@ const Classes = ({ userRole, userId }) => {
         setMinTime(`${hours}:${minutes}`)
     }, [])
 
-   
+
 
     const addNewClass = async (e) => {
-       
+
         console.log("Well the data before sending is :", newClass)
         e.preventDefault()
         try {
             const response = await axios.post(`http://localhost:3000/classes/addClass`, newClass)
-            console.log(response.message)
+            console.log(response.data.message)
             if (response.data.success) {
                 toast.success(response.data.message)
 
             } else {
                 toast.error(response.data.message)
-
             }
             getClassDetails()
             setIsPopupOpen(false)
@@ -137,10 +151,10 @@ const Classes = ({ userRole, userId }) => {
     }
 
     useEffect(() => {
-          const  interval = setInterval(() => {
+        const interval = setInterval(() => {
             getClassDetails()
-            }, 1000)
-        
+        }, 1000)
+
         return () => clearInterval(interval)
     }, [])
 
@@ -207,29 +221,29 @@ const Classes = ({ userRole, userId }) => {
     const startClass = async (classDetail) => {
         try {
             toast.loading("Getting your location...")
-            
+
             const teacherLocation = await getUserLocation()
             console.log("The user location is :", teacherLocation)
-            
+
             toast.dismiss()
-            
+
             const startClassData = {
                 Section_Id: classDetail.Section_Id,
                 Class_Id: classDetail.Class_Id,
                 teacherLocation: teacherLocation
             }
             toast.loading("Starting class...")
-            
+
             const response = await axios.post('http://localhost:3000/classes/startAttendance', startClassData)
             const classCode = response.data.classCode
             console.log(classCode)
-            
+
             toast.dismiss();
-            
+
             if (response.data.classCode) {
                 toast.success(`Class started! The class code is: ${classCode}`);
             }
-            
+
             getClassDetails();
         } catch (err) {
             toast.dismiss(); // Dismiss any loading toasts
@@ -259,7 +273,7 @@ const Classes = ({ userRole, userId }) => {
 
             }
             else {
-                navigate("/verifycode", { state: { Class_Id, Attendance_id,fromNavigate: true  } })
+                navigate("/verifycode", { state: { Class_Id, Attendance_id, fromNavigate: true } })
             }
         } catch (err) {
             console.log(err)
@@ -273,10 +287,7 @@ const Classes = ({ userRole, userId }) => {
 
             setScheduledClasses(Array.isArray(upcomingClass.data) ? upcomingClass.data : []);
             const response = await axios.get(`http://localhost:3000/classes/completedClass?userId=${userId}&userRole=${userRole}`);
-            setCompletedClass(Array.isArray(response.data) ? response.data : []);
-
-
-            // setScheduledClasses(response.data);
+            setCompletedClass(Array.isArray(response.data) ? response.data : [])
 
         } catch (error) {
             console.error('Error while getting the scheduled Classes:', error);
@@ -284,6 +295,8 @@ const Classes = ({ userRole, userId }) => {
             setLoading(false);
         }
     };
+
+
 
 
     useEffect(() => {
@@ -299,249 +312,408 @@ const Classes = ({ userRole, userId }) => {
             <SidebarComponent userRole={userRole} />
 
             <div className='home-section'>
-                <h3 className="m-0 mb-3  text-start">Classes</h3>
+                <Header userName={userName} userRole={userRole} />
+                <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+                    <Breadcrumb pageTitle="Classes" />
 
-                <div className="card container p-0 m-0 table-responsive">
+                    <div className="space-y-6">
+                        <ComponentCard title="Ongoing Class" className="mt-6">
+                            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+                                <div className="max-w-full overflow-x-auto">
+                                    <table className="min-w-full divide-y">
+                                        <thead className=" ">
+                                            <tr>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Class ID
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Module Name
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Class Date
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Start Time
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    End Time
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Type
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Day
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    {userRole === "student" ? "Teacher Name" : "Section Name"}
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Actions
+                                                </th>
+                                                {userRole === "teacher" && (
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                        Class Code
+                                                    </th>
+                                                )}
+                                            </tr>
 
-                    <table className="table table-hover text-center m-2 ">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                        </thead>
 
-                            <tr>
-                                <th scope="col" >Class Id </th>
-                                <th scope="col" >Module Name </th>
-                                <th scope="col" >Class Start Time </th>
-                                <th scope="col" >Class End Time </th>
-                                <th scope="col" >Class Type </th>
-                                <th scope="col" >Class Day </th>
-                                {userRole === "student" ? (
-                                    <th scope="col">Teacher Name</th>
-                                ) : (<th scope="col">Section Name</th>)}
-                                <th scope="col" >
-                                    <span className="sr-only"> Class </span>
-                                </th>
-                            </tr>
+                                        <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                                            {scheduledClasses.map((classDetail, i) => (
+                                                <tr
+                                                    key={i}
+                                                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150"
+                                                >
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                                        {classDetail.Class_Id}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {classDetail.Module_Name}
+                                                    </td>
 
-                        </thead>
-                        <tbody>
-                            {
-                                scheduledClasses.map((classDetail, i) => {
-                                    return (
-
-                                        <tr scope="row" key={i}>
-                                            <td className="align-middle" >{classDetail.Class_Id}</td>
-                                            <td className="align-middle">{classDetail.Module_Name}</td>
-                                            <td className="align-middle">{classDetail.Class_Start_Time}</td>
-                                            <td className="align-middle">{classDetail.Class_End_Time}</td>
-                                            <td className="align-middle">{classDetail.Class_Type}</td>
-                                            <td className="align-middle">{classDetail.Class_Day}</td>
-
-                                            {userRole === "student" ? (
-                                                <td className="align-middle" >{classDetail.Teacher_Name}</td>
-                                            ) : (<td className="align-middle">{classDetail.Section_Id}</td>)}
-
-                                            
-                                            {userRole === "student" ? (
-                                                <td >
-                                                    {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
-                                                        <button className="btn btn-outline-success" onClick={() => joinClass(classDetail)}>Join Class</button>
-                                                    ) : classDetail.Class_Completion === 1 ? (
-                                                        <span className="text-primary">Class Completed</span>
-                                                    ) : (
-                                                        <span className="text-primary">Class not started</span>
-                                                    )}
-
-                                                </td>) : userRole === "teacher" ? (
-                                                    <td >
-                                                        {isClassLive(classDetail) ? (
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {formatDate(classDetail.Class_Date)}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {classDetail.Class_Start_Time}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {classDetail.Class_End_Time}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {classDetail.Class_Type}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {classDetail.Class_Day}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {userRole === "student" ? classDetail.Teacher_Name : classDetail.Section_Id}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                                                        {userRole === "student" ? (
                                                             <>
                                                                 {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
-                                                                    <button className="btn btn-outline-danger" onClick={() => endClass(classDetail)} > End Class</button>
-                                                                ) :(classDetail.Class_Status === 0 && classDetail.Class_Completion === 1 )? (
-                                                                    <span className="text-danger">Class Cancelled</span>
-                                                                ):(
-                                                                    <button className="btn btn-outline-success" onClick={() => startClass(classDetail)}>Start Class</button>
+                                                                    <button
+                                                                        onClick={() => joinClass(classDetail)}
+                                                                        className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:text-green-100 dark:hover:bg-green-800 transition-colors duration-150"
+                                                                    >
+                                                                        Join Class
+                                                                    </button>
+                                                                ) : classDetail.Class_Completion === 1 ? (
+                                                                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-md text-blue-700 bg-blue-100 dark:bg-blue-900 dark:text-blue-100">
+                                                                        Class Completed
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-100">
+                                                                        Class Not Started
+                                                                    </span>
+                                                                )}
+                                                            </>
+                                                        ) : userRole === "teacher" ? (
+                                                            <>
+                                                                {isClassLive(classDetail) ? (
+                                                                    <>
+                                                                        {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
+                                                                            <button
+                                                                                onClick={() => endClass(classDetail)}
+                                                                                className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:text-red-100 dark:hover:bg-red-800 transition-colors duration-150"
+                                                                            >
+                                                                                End Class
+                                                                            </button>
+                                                                        ) : classDetail.Class_Status === 0 && classDetail.Class_Completion === 1 ? (
+                                                                            <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-md text-red-700 bg-red-100 dark:bg-red-900 dark:text-red-100">
+                                                                                Class Cancelled
+                                                                            </span>
+                                                                        ) : (
+                                                                            <button
+                                                                                onClick={() => startClass(classDetail)}
+                                                                                className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:text-green-100 dark:hover:bg-green-800 transition-colors duration-150"
+                                                                            >
+                                                                                Start Class
+                                                                            </button>
+                                                                        )}
+                                                                    </>
+                                                                ) : (
+                                                                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-md text-gray-700 bg-gray-100 dark:bg-gray-800 dark:text-gray-300">
+                                                                        Class Not Started
+                                                                    </span>
                                                                 )}
                                                             </>
                                                         ) : (
-                                                            <span className="text-gray-400">Class not started</span>
-                                                        )}
-                                                    </td>) : (<td>
-                                                        {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
-                                                            <button className="btn btn-outline-success" >Class Ongoing</button>
-
-
-                                                        ) : (
-                                                            <button className="btn btn-outline-success" >No Class Yet</button>
-                                                        )}
-                                                    </td>)}
-                                                    {userRole==="teacher" && classDetail.Class_Code!=null &&(
-                                            <td className="align-middle" >{classDetail.Class_Code}</td>
-
-                                            )}
-
-
-                                        </tr>
-                                    )
-                                })
-                            }
-                        </tbody>
-                    </table>
-                    {(userRole === 'admin' || userRole === 'teacher') && (
-                        <button className="btn btn-success" onClick={() => setIsPopupOpen(true)}>
-                            Add Class
-                        </button>
-                    )}
-
-
-                </div>
-
-                <div className="card container p-0 mt-5 table-responsive">
-                    <div
-                        className="d-flex justify-content-between align-items-center p-3 cursor-pointer"
-                        onClick={() => setShowCompletedClasses(!showCompletedClasses)}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        <h5 className="m-0">Completed Classes</h5>
-                        <i className={`fas fa-chevron-${showCompletedClasses ? 'up' : 'down'}`}></i>
-                    </div>
-                    {showCompletedClasses && (
-                        <div >
-                            <table className="table table-hover text-center " >
-                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-
-                                    <tr>
-                                        <th scope="col" >Class Id </th>
-                                        <th scope="col" >Module Name </th>
-                                        <th scope="col" >Class Start Time </th>
-                                        <th scope="col" >Class End Time </th>
-                                        <th scope="col" >Class Type </th>
-                                        <th scope="col" >Class Day </th>
-                                        {userRole === "student" ? (
-                                            <th scope="col">Teacher Name</th>
-                                        ) : (<th scope="col">Section Name</th>)}
-                                        <th scope="col" >
-                                            <span className="sr-only"> Class </span>
-                                        </th>
-                                    </tr>
-
-                                </thead>
-                                <tbody>
-                                    {
-                                        completedClass.map((classDetail, i) => {
-                                            return (
-
-                                                <tr scope="row" key={i}>
-                                                    <td className="align-middle" >{classDetail.Class_Id}</td>
-                                                    <td className="align-middle">{classDetail.Module_Name}</td>
-                                                    <td className="align-middle">{classDetail.Class_Start_Time}</td>
-                                                    <td className="align-middle">{classDetail.Class_End_Time}</td>
-                                                    <td className="align-middle">{classDetail.Class_Type}</td>
-                                                    <td className="align-middle">{classDetail.Class_Day}</td>
-
-                                                    {userRole === "student" ? (
-                                                        <td className="align-middle" >{classDetail.Teacher_Name}</td>
-                                                    ) : (<td className="align-middle">{classDetail.Section_Id}</td>)}
-
-                                                    {userRole === "student" ? (
-                                                        <td >
-                                                            {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
-                                                                <button className="btn btn-outline-success" onClick={() => joinClass(classDetail)}>Join Class</button>
-                                                            ) : classDetail.Class_Completion === 1 ? (
-                                                                <span className="text-primary">Class Completed</span>
-                                                            ) : (
-                                                                <span className="text-danger">Class Cancelled</span>
-                                                            )}
-
-                                                        </td>) : userRole === "teacher" ? (<td >
                                                             <>
                                                                 {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
-                                                                    <button className="btn btn-outline-danger" onClick={() => endClass(classDetail)} > End Class</button>
-                                                                ) :(classDetail.Class_Status === 0 && classDetail.Class_Completion === 1 )? (
-                                                                    <span className="text-danger">Class Cancelled</span>
-                                                                ):(
-                                                                    <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class", fromNavigate:true } })}>View Attendance</button>
+                                                                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-md text-green-700 bg-green-100 dark:bg-green-900 dark:text-green-100">
+                                                                        Class Ongoing
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-md text-gray-700 bg-gray-100 dark:bg-gray-800 dark:text-gray-300">
+                                                                        No Class Yet
+                                                                    </span>
                                                                 )}
                                                             </>
-
-                                                        </td>) : (<td>
-                                                            {classDetail.Class_Status === 1 ? (
-                                                                <button className="btn btn-outline-success" onClick={() => navigate("/ViewClassAttendance", { state: { Id: classDetail.Class_Id, From: "class",fromNavigate:true } })}>View Attendance</button>
-
+                                                        )}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {userRole === "teacher" ? (
+                                                            classDetail.Class_Code ? (
+                                                                <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                                                                    {classDetail.Class_Code}
+                                                                </span>
                                                             ) : (
-                                                                <span className="text-danger">Class Cancelled</span>
-                                                            )}
-                                                        </td>)}
+                                                                <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">N/A</span>
+                                                            )
+                                                        ) : null}
+                                                    </td>
 
                                                 </tr>
-                                            )
-                                        })
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </div>
-            </div>
-            <Popup open={isPopupOpen} closeOnDocumentClick onClose={() => setIsPopupOpen(false)}>
-                <div className='card'>
-                    <form onSubmit={addNewClass}>
+                                            ))}
+                                        </tbody>
+                                    </table>
 
-                        <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-                            <div className="modal-header mb-3">
-                                <h3 className="modal-title">Add New Class</h3>
+                                </div>
                             </div>
+                            {(userRole === 'admin' || userRole === 'teacher') && (
+                                <button type="button"
+                                    class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                                    onClick={() => setIsPopupOpen(true)}
+
+                                >
+
+                                    Add Class</button>
+
+                            )}
+
+                        </ComponentCard>
+                    </div>
+                    <div className="space-y-6  relative top-10">
+                        <ComponentCard title="Completed Classes" className="mt-6">
+                            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+                                <div className="max-w-full overflow-x-auto">
+                                    <table className="min-w-full divide-y">
+                                        <thead className=" ">
+                                            <tr>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Class ID
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Module Name
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Class Date
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Start Time
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    End Time
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Type
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Day
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    {userRole === "student" ? "Teacher Name" : "Section Name"}
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                    Actions
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                                            {completedClass.map((classDetail, i) => (
+                                                <tr
+                                                    key={i}
+                                                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150"
+                                                >
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                                        {classDetail.Class_Id}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {classDetail.Module_Name}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {formatDate(classDetail.Class_Date)}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {classDetail.Class_Start_Time}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {classDetail.Class_End_Time}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {classDetail.Class_Type}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {classDetail.Class_Day}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                        {userRole === "student" ? classDetail.Teacher_Name : classDetail.Section_Id}
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                                                        {userRole === "student" ? (
+                                                            <>
+                                                                {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
+                                                                    <button
+                                                                        onClick={() => joinClass(classDetail)}
+                                                                        className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:text-green-100 dark:hover:bg-green-800 transition-colors duration-150"
+                                                                    >
+                                                                        Join Class
+                                                                    </button>
+                                                                ) : classDetail.Class_Completion === 1 ? (
+                                                                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-md text-blue-700 bg-blue-100 dark:bg-blue-900 dark:text-blue-100">
+                                                                        Class Completed
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-md text-red-700 bg-red-100 dark:bg-red-900 dark:text-red-100">
+                                                                        Class Cancelled
+                                                                    </span>
+                                                                )}
+                                                            </>
+                                                        ) : userRole === "teacher" ? (
+                                                            <>
+                                                                {classDetail.Class_Status === 1 && classDetail.Class_Completion === 0 ? (
+                                                                    <button
+                                                                        onClick={() => endClass(classDetail)}
+                                                                        className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:text-red-100 dark:hover:bg-red-800 transition-colors duration-150"
+                                                                    >
+                                                                        End Class
+                                                                    </button>
+                                                                ) : classDetail.Class_Status === 0 && classDetail.Class_Completion === 1 ? (
+                                                                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-md text-red-700 bg-red-100 dark:bg-red-900 dark:text-red-100">
+                                                                        Class Cancelled
+                                                                    </span>
+                                                                ) : (
+                                                                    <button
+                                                                        onClick={() => navigate("/ViewClassAttendance", {
+                                                                            state: {
+                                                                                Id: classDetail.Class_Id,
+                                                                                From: "class",
+                                                                                fromNavigate: true
+                                                                            }
+                                                                        })}
+                                                                        className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800 transition-colors duration-150"
+                                                                    >
+                                                                        View Attendance
+                                                                    </button>
+                                                                )}
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                {classDetail.Class_Status === 1 ? (
+                                                                    <button
+                                                                        onClick={() => navigate("/ViewClassAttendance", {
+                                                                            state: {
+                                                                                Id: classDetail.Class_Id,
+                                                                                From: "class",
+                                                                                fromNavigate: true
+                                                                            }
+                                                                        })}
+                                                                        className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800 transition-colors duration-150"
+                                                                    >
+                                                                        View Attendance
+                                                                    </button>
+                                                                ) : (
+                                                                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-md text-red-700 bg-red-100 dark:bg-red-900 dark:text-red-100">
+                                                                        Class Cancelled
+                                                                    </span>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </ComponentCard>
+                    </div>
+                </div>
 
 
-                            <div className="modal-body">
-                            <div className="form-group mb-3">
-                                    <label className="form-label">Class Date:</label>
+
+            </div>
+            <Popup
+                open={isPopupOpen}
+                closeOnDocumentClick
+                onClose={() => setIsPopupOpen(false)}
+            >
+                <div className="fixed inset-0 z-50 flex items-center justify-center  transition-opacity duration-300">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 sm:mx-auto overflow-hidden animate-fade-in">
+                        <form onSubmit={addNewClass} className="flex flex-col max-h-[90vh]">
+                            {/* Header */}
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white sticky top-0 z-10">
+                                <h3 className="text-xl font-semibold text-gray-800">Add New Class</h3>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsPopupOpen(false)}
+                                    className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                            <div className="overflow-y-auto px-6 py-4 space-y-5">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Class Date</label>
                                     <input
-                                        type="date" required
+                                        type="date"
+                                        required
                                         min={minDate}
-                                        className="form-control"
                                         name="Class_Date"
                                         onChange={handleChanges}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                     />
                                 </div>
-                                <div className="form-group mb-3">
-                                    <label className="form-label">Class Start Time:</label>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Class Start Time</label>
                                     <input
                                         type="time"
-                                        className="form-control"
-                                        name="Class_Start_Time" required
+                                        required
+                                        name="Class_Start_Time"
                                         onChange={handleChanges}
                                         min={newClass.Class_Date === minDate ? minTime : undefined}
-
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                     />
                                 </div>
-                                <div className="form-group mb-3">
-                                    <label className="form-label">Class End Time:</label>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Class End Time</label>
                                     <input
                                         type="time"
+                                        required
                                         min={getMinEndTime()}
-
-                                        className="form-control" required
                                         name="Class_End_Time"
                                         onChange={handleChanges}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                     />
                                 </div>
-                                
-                                <div className="form-group mb-3">
-                                    <label className="form-label">Class Type:</label>
-                                    <select name="Class_Type" onChange={handleChanges} required
-                                        className="form-select">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Class Type</label>
+                                    <select
+                                        required
+                                        name="Class_Type"
+                                        onChange={handleChanges}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    >
                                         <option value="">-- Select a Class Type --</option>
                                         <option value="Lecture">Lecture</option>
                                         <option value="Tutorial">Tutorial</option>
                                         <option value="Lab">Lab</option>
-
                                     </select>
                                 </div>
 
-                                <div className="form-group mb-3">
-                                    <label className="form-label">Section:</label>
-                                    <select name="Section_Id" onChange={handleChanges} required
-                                        className="form-select">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                                    <select
+                                        required
+                                        name="Section_Id"
+                                        onChange={handleChanges}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    >
                                         <option value="">-- Select a Section --</option>
                                         {sections.map((section) => (
                                             <option key={section.Section_id} value={section.Section_id}>
@@ -552,12 +724,14 @@ const Classes = ({ userRole, userId }) => {
                                 </div>
                                 {userRole === "admin" && (
                                     <>
-                                        <div className="form-group mb-3">
-                                            <label className="form-label">Module:</label>
-                                            <select required
-                                                className="form-select"
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Module</label>
+                                            <select
+                                                required
                                                 name="Module_Id"
-                                                onChange={handleChanges}>
+                                                onChange={handleChanges}
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            >
                                                 <option value="">-- Select a Module --</option>
                                                 {modules.map((module) => (
                                                     <option key={module.Module_id} value={module.Module_id}>
@@ -566,15 +740,19 @@ const Classes = ({ userRole, userId }) => {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="form-group mb-3">
-                                            <label className="form-label">Teacher:</label>
-                                            <select required
-                                                className="form-select"
+
+                                        {/* Teacher */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Teacher</label>
+                                            <select
+                                                required
                                                 name="Teacher_Id"
-                                                onChange={handleChanges}>
+                                                onChange={handleChanges}
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            >
                                                 <option value="">-- Select a Teacher --</option>
                                                 {teachers.map((teacher) => (
-                                                    <option key={teacher.Teacher_id} value={teacher.Teacher_id} >
+                                                    <option key={teacher.Teacher_id} value={teacher.Teacher_id}>
                                                         {teacher.Teacher_Name}
                                                     </option>
                                                 ))}
@@ -582,19 +760,19 @@ const Classes = ({ userRole, userId }) => {
                                         </div>
                                     </>
                                 )}
-
-
-                                <div className="mt-4">
-                                    <button className="btn btn-primary">
-                                        Add Class
-                                    </button>
-                                </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
 
+                            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 sticky bottom-0">
+                                <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200"
+                                >
+                                    Add Class
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </Popup>
+
         </div>
 
     )
