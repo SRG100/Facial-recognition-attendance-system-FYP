@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import SidebarComponent from '../components/SideBar';
@@ -29,6 +29,7 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
   })
 
   const [openDropdownId, setOpenDropdownId] = useState(null);
+  const dropdownRef = useRef(null);
 
   const canEdit = ['teacher', 'admin'].includes(userRole);
 
@@ -38,15 +39,19 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
     }
   }, [classId]);
 
-  // Close dropdown when clicking outside
+  // Handle clicks outside dropdown
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (openDropdownId && !event.target.closest('.dropdown')) {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpenDropdownId(null);
       }
-    };
+    }
 
-    document.addEventListener('mousedown', handleClickOutside);
+    // Add event listener only if dropdown is open
+    if (openDropdownId !== null) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -82,12 +87,15 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
   };
 
   // Toggle dropdown visibility
-  const toggleDropdown = (id) => {
-    setOpenDropdownId(openDropdownId === id ? null : id);
+  const toggleDropdown = (id, e) => {
+    e.stopPropagation(); // Stop event from bubbling up
+    setOpenDropdownId(prevId => prevId === id ? null : id);
   };
 
   // Handle attendance status change
-  const handleStatusChange = (attendanceId, studentId, newStatus) => {
+  const handleStatusChange = (attendanceId, studentId, newStatus, e) => {
+    e.stopPropagation(); // Stop event from bubbling
+    
     // Close the dropdown
     setOpenDropdownId(null);
 
@@ -163,20 +171,6 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
     });
   };
 
-  // Get status badge class
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'Present':
-        return 'badge bg-success';
-      case 'Absent':
-        return 'badge bg-danger';
-      case 'Late':
-        return 'badge bg-warning text-dark';
-      default:
-        return 'badge bg-secondary';
-    }
-  };
-
   // the colors for the chart
   const chartData = {
     labels: ['Present', 'Absent', 'Late'],
@@ -186,6 +180,7 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
       borderWidth: 0
     }]
   };
+  
   //overall options for the chart
   const chartOptions = {
     responsive: true,
@@ -205,6 +200,7 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
       }
     }
   };
+  
   const StatusBadge = ({ status }) => {
     switch (status) {
       case 'Present':
@@ -351,10 +347,10 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
                                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatTime(student.Attendance_Time)}</td>
                                   {canEdit && (
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                      <div className="relative">
+                                      <div className="relative" ref={openDropdownId === student.Attendance_Id ? dropdownRef : null}>
                                         <button
-                                          className="inline-flex items-center px-3 py-1.5 border border-gray-300 bg-white text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                          onClick={() => toggleDropdown(student.Attendance_Id)}
+                                          className="dropdown-button inline-flex items-center px-3 py-1.5 border border-gray-300 bg-white text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                          onClick={(e) => toggleDropdown(student.Attendance_Id, e)}
                                         >
                                           Change Status
                                           <svg className="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -363,11 +359,14 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
                                         </button>
 
                                         {openDropdownId === student.Attendance_Id && (
-                                          <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                                          <div 
+                                            className="dropdown-menu origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
                                             <div className="py-1" role="menu" aria-orientation="vertical">
                                               <button
                                                 className={`w-full text-left px-4 py-2 text-sm flex items-center ${student.Attendance_Status === 'Present' ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'text-green-700 hover:bg-gray-100'}`}
-                                                onClick={() => handleStatusChange(student.Attendance_Id, student.Student_ID, 'Present')}
+                                                onClick={(e) => student.Attendance_Status !== 'Present' && handleStatusChange(student.Attendance_Id, student.Student_ID, 'Present', e)}
                                                 disabled={student.Attendance_Status === 'Present'}
                                               >
                                                 <svg className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -377,7 +376,7 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
                                               </button>
                                               <button
                                                 className={`w-full text-left px-4 py-2 text-sm flex items-center ${student.Attendance_Status === 'Late' ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'text-amber-700 hover:bg-gray-100'}`}
-                                                onClick={() => handleStatusChange(student.Attendance_Id, student.Student_ID, 'Late')}
+                                                onClick={(e) => student.Attendance_Status !== 'Late' && handleStatusChange(student.Attendance_Id, student.Student_ID, 'Late', e)}
                                                 disabled={student.Attendance_Status === 'Late'}
                                               >
                                                 <svg className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -387,7 +386,7 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
                                               </button>
                                               <button
                                                 className={`w-full text-left px-4 py-2 text-sm flex items-center ${student.Attendance_Status === 'Absent' ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'text-red-700 hover:bg-gray-100'}`}
-                                                onClick={() => handleStatusChange(student.Attendance_Id, student.Student_ID, 'Absent')}
+                                                onClick={(e) => student.Attendance_Status !== 'Absent' && handleStatusChange(student.Attendance_Id, student.Student_ID, 'Absent', e)}
                                                 disabled={student.Attendance_Status === 'Absent'}
                                               >
                                                 <svg className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -426,12 +425,8 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
           </div>
         </div>
       </div>
-
-
     </div>
-
-
   );
 };
 
-export default ClassAttendance;
+export default ClassAttendance

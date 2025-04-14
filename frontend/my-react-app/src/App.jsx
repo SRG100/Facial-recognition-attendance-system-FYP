@@ -25,7 +25,6 @@ import ViewReview from './pages/ViewReview';
 import ClassAttendance from './pages/ClassAttendance';
 import PageNotFound from './components/PageNotFound';
 
-import Examples from './pages/Example';
 import './assets/MyPopup.css'
 
 
@@ -68,8 +67,8 @@ function App() {
           <Route path="/login" element={isLoggedIn ?  <Navigate to="/" /> : <Login /> } />
 
           <Route element={<ProtectedRoute isLoggedIn={isLoggedIn} />}>
-            <Route path="/register" element={ <Register userId={userId} userRole={userRole}/>  } />
-            <Route path="/registerTeacher" element={<RegisterTeacher userRole={userRole} />  } />
+            <Route path="/register" element={ <Register userId={userId} userRole={userRole} userName={userName}/>  } />
+            <Route path="/registerTeacher" element={<RegisterTeacher userRole={userRole} userName={userName} />  } />
            {/* ---common access-- */}
             <Route path="/" element={<Dashboard isLoggedIn={isLoggedIn} userRole={userRole} userId={userId} userName={userName}/>}  />
             <Route path="/checkface" element={<CheckFace userId={userId} userRole={userRole} userName={userName}/>} />
@@ -85,7 +84,6 @@ function App() {
             <Route path="/viewSections" element={<Sections userId={userId} userRole={userRole} userName={userName}/>} />
             <Route path="/ReviewForm" element={<ReviewForm userId={userId} userRole={userRole} userName={userName}/>} />
             <Route path="/ViewReview" element={<ViewReview userId={userId} userRole={userRole} userName={userName}/>} />
-            <Route path="/example" element={<Examples userId={userId} userRole={userRole} userName={userName} />} />
             <Route path="/ViewClassAttendance" element={<ClassAttendance userId={userId} userRole={userRole} userName={userName}/>} />
             <Route path="/login" element={<Navigate to="/" />} />
 

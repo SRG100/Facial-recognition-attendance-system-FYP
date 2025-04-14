@@ -9,7 +9,7 @@ from PIL import Image
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "http://localhost:5174"]}})
 
 def base64_to_image(base64_string):
     if base64_string.startswith('data:image/jpeg;base64,'):

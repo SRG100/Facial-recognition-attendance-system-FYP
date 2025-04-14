@@ -23,7 +23,6 @@ router.get('/getAttendnaceDetails', async (req, res) => {
         if (Module_id!=undefined) query+= `And aa.Module_id = '${Module_id}'`
 
         query += " GROUP BY s.Student_ID, s.Student_Name"
-        console.log(query)
 
         const [results] = await db.execute(query)
         console.log("Got the attendnace")
@@ -130,14 +129,23 @@ router.get('/generateReport', async (req, res) => {
 })
 router.get('/getAttendanceBySubject', async (req, res) => {
     try {
-        const { Id } = req.query
+        const { Id ,userRole} = req.query
         const db = await connectDatabase()
-        const [results] = await db.execute(`SELECT aa.Module_id,m.Module_name, SUM(CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present_Count, 
+        let query = `SELECT aa.Module_id,m.Module_name, SUM(CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present_Count, 
             SUM(CASE WHEN a.Attendance_Status = 'Late' THEN 1 ELSE 0 END) AS Late_Count, 
             SUM(CASE WHEN a.Attendance_Status = 'Absent' THEN 1 ELSE 0 END) AS Absent_Count 
             FROM attendance a JOIN attendance_association aa ON a.Attendance_Id = aa.Attendance_Id
-            Join module m on aa.Module_id= m.Module_id WHERE aa.Student_ID = ? GROUP BY m.Module_id,m.Module_Name 
-            ORDER BY m.Module_id`, [Id])
+            Join module m on aa.Module_id= m.Module_id WHERE 1=1 `
+            
+            if(userRole==="teacher") query += ` AND aa.Teacher_id = '${Id}'`
+            // if(userRole==="admin") query += ` AND aa.Teacher_id = '${Id}'`
+            if(userRole==="student" ) query += ` AND aa.Student_id = '${Id}'`
+
+            query += ` GROUP BY m.Module_id,m.Module_Name
+            ORDER BY m.Module_id`
+
+
+        const [results] = await db.execute(query)
         console.log("Got the present by  module")
         res.json(results)
 

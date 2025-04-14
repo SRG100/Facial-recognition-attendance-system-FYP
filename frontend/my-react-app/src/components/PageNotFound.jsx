@@ -7,26 +7,23 @@ const PageNotFound = () => {
     const navigate = useNavigate();
   
   return (
-    <div className="container-fluid d-flex flex-column justify-content-center align-items-center min-vh-100 text-center">
-      <div className="row">
-        <div className="col-12">
-          <h1 className="display-1 fw-bold text-danger mb-4">404</h1>
-          <h2 className="mb-4">Oops! Page Not Found</h2>
-          <div className="mb-5 mx-auto" style={{ maxWidth: '500px' }}>
-            <img 
-              src={PageNotFoundImg} 
-              alt="Page not found" 
-              className="img-fluid rounded shadow" 
-              style={{ maxHeight: '350px', width: 'auto' }}
-            />
-          </div>
-          <p className="lead mb-5">We can't seem to find the page you're looking for.</p>
-          {/* <a href="./" className="btn btn-danger">
-            Go to Dashboard
-          </a> */}
-          <button className='btn btn-danger' onClick={() => navigate("/")}>Go to dashboard</button>
-        </div>
+    <div className="flex flex-col justify-center items-center min-h-screen text-center px-4">
+      <h1 className="text-8xl font-bold text-red-600 mb-4">404</h1>
+      <h2 className="text-2xl font-semibold mb-4">Oops! Page Not Found</h2>
+      <div className="mb-10 mx-auto max-w-md">
+        {/* <img 
+          src={PageNotFoundImg}
+          alt="Page not found" 
+          className="rounded-lg shadow-lg max-h-80 w-auto mx-auto"
+        /> */}
       </div>
+      <p className="text-lg text-gray-600 mb-8">We can't seem to find the page you're looking for.</p>
+      <button 
+        className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-md transition-colors"
+        onClick={() => navigate("/")}
+      >
+        Go to Dashboard
+      </button>
     </div>
   )
 }

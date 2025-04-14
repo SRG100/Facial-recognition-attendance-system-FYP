@@ -4,13 +4,17 @@ import Popup from 'reactjs-popup';
 import { useLocation } from 'react-router-dom';
 import SidebarComponent from '../components/SideBar';
 import { Doughnut, Line, Bar } from 'react-chartjs-2';
+import Chart from "react-apexcharts";
+
 import 'chart.js/auto';
 import 'boxicons/css/boxicons.min.css'
 import toast from 'react-hot-toast'
 import PageNotFound from '../components/PageNotFound';
+import Header from '../components/Header';
+import Breadcrumb from '../components/Breadcrumb';
 
 
-const Attendance = ({ userId, userRole }) => {
+const Attendance = ({ userId, userRole, userName }) => {
   const location = useLocation()
   const Id = location.state?.Id || userId
   const From = location.state?.From || "student"
@@ -45,8 +49,8 @@ const Attendance = ({ userId, userRole }) => {
       console.error('Error while getting the student overall attendnace', error);
     }
   }
-  
-  
+
+
   const getAttendanceByDate = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/attendance/getAttendnaceByDate?Id=${Id}&userRole=student`);
@@ -101,7 +105,7 @@ const Attendance = ({ userId, userRole }) => {
     labels: ['Present', 'Absent', 'Late'],
     datasets: [{
       data: [studentData[0]?.Present_Count, studentData[0]?.Absent_Count, studentData[0]?.Late_Count],
-      backgroundColor: ['#4CAF50', '#F44336', '#FFC107'],
+      backgroundColor: ['#98D8C8', '#F6A6A6', '#D9D9F3'],
       borderWidth: 0
     }]
   };
@@ -133,17 +137,17 @@ const Attendance = ({ userId, userRole }) => {
         {
           label: 'Present',
           data: presentData,
-          backgroundColor: '#4caf50',
+          backgroundColor: '#98D8C8',
         },
         {
           label: 'Late',
           data: lateData,
-          backgroundColor: '#ff9800',
+          backgroundColor: '#D9D9F3',
         },
         {
           label: 'Absent',
           data: absentData,
-          backgroundColor: '#f44336',
+          backgroundColor: '#F6A6A6',
         }
       ]
     };
@@ -165,8 +169,8 @@ const Attendance = ({ userId, userRole }) => {
         {
           label: 'Present',
           data: data,
-          borderColor: '#3f51b5',
-          backgroundColor: 'rgba(63, 81, 181, 0.2)',
+          borderColor: '#009688',
+          backgroundColor: 'rgba(0, 150, 136, 0.2)',
           fill: true,
           tension: 0.1
         }
@@ -179,7 +183,7 @@ const Attendance = ({ userId, userRole }) => {
       datasets: [{
         label: 'Monthly Absences',
         data: absenceData.map(entry => entry.Absent_Count),
-        backgroundColor: '#f44336',
+        backgroundColor: '#F6A6A6',
       }]
     }
   }
@@ -205,57 +209,57 @@ const Attendance = ({ userId, userRole }) => {
       <SidebarComponent userRole={userRole} />
 
       <div className="home-section">
-        <div className="content-wrapper">
-          {/* Header */}
-          <div className="page-header">
-            <h3 className="page-title">Attendance Dashboard</h3>
-          </div>
+        <Header userName={userName} userRole={userRole} />
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+          <Breadcrumb pageTitle="Attendance" />
+          
 
-          {/* Student Info Summary */}
-          <div className="student-info-card mb-4">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Student Information</h4>
-                <div className="d-flex justify-content-between align-items-center flex-wrap">
+          <div className="mb-6">
+            <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]
+">
+              <div className="p-6">
+                <h4 className="text-xl font-semibold text-gray-700 mb-4">Student Information</h4>
+                <div className="flex flex-wrap justify-between items-center">
                   <div>
-                    <p className="mb-1"><strong>Student ID:</strong> {studentData[0]?.Student_ID}</p>
-                    <p className="mb-1"><strong>Name:</strong> {studentData[0]?.Student_Name}</p>
+                    <p className="mb-2"><span className="font-semibold">Student ID:</span> {studentData[0]?.Student_ID}</p>
+                    <p className="mb-2"><span className="font-semibold">Name:</span> {studentData[0]?.Student_Name}</p>
                   </div>
                   <div>
-                    <p className="mb-1"><strong>Attendance Rate:</strong> {studentData[0]?.Attendance_Percentage}%</p>
-                    <p className="mb-1"><strong>Total Classes:</strong> {studentData[0]?.Total_Classes}</p>
-                    <button className='btn btn-outline-primary mt-2' onClick={() => setIsPopupOpen(true)} >Generate Report</button>
-
+                    <p className="mb-2"><span className="font-semibold">Attendance Rate:</span> {studentData[0]?.Attendance_Percentage}%</p>
+                    <p className="mb-2"><span className="font-semibold">Total Classes:</span> {studentData[0]?.Total_Classes}</p>
+                    <button
+                      className="mt-3 px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onClick={() => setIsPopupOpen(true)}
+                    >
+                      Generate Report
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Popup for Report Generation */}
           <Popup open={isPopupOpen} closeOnDocumentClick onClose={() => setIsPopupOpen(false)}>
-            <div className='card'>
-
-
-              <div className="modal-content p-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+            <div className="bg-white rounded-lg shadow-xl">
+              <div className="p-6 max-h-screen overflow-y-auto">
                 <form onSubmit={generateReport}>
-
-
-                  <div className="modal-header mb-3">
-                    <h3 className="modal-title">Generate Attendance Report</h3>
-
+                  <div className="mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">Generate Attendance Report</h3>
                   </div>
 
-                  <div className="modal-body">
-                    <h5>Select creterias</h5>
+                  <div>
+                    <h5 className="text-lg font-medium text-gray-700 mb-3">Select criteria</h5>
                     {(userRole === "admin" || userRole === "student") && (
-                      <div className="form-group mb-3">
-                        <label className="form-label">Modules:</label>
-                        <select required
-                          className="form-select"
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Modules:</label>
+                        <select
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                           onChange={(e) => setReportCredit({ ...reportCredit, Module: e.target.value })}
                         >
-                          <option value="">-- Selelct Module --</option>
+                          <option value="">-- Select Module --</option>
                           <option value="All">All</option>
-
                           {attendanceBySubject.map((module) => (
                             <option key={module.Module_id} value={module.Module_id}>
                               {module.Module_name}
@@ -265,74 +269,82 @@ const Attendance = ({ userId, userRole }) => {
                       </div>
                     )}
 
-
-                    <div className="form-group mb-3">
-                      <label className="form-label"   >From:</label>
-                      <input type="date" required
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">From:</label>
+                      <input
+                        type="date"
+                        required
                         value={reportCredit.From}
                         onChange={(e) => {
                           setReportCredit((prev) => ({ ...prev, From: e.target.value }));
-                        }} className="form-control" />
-                      <label className="form-label"   >To:</label>
-                      <input type="date" required
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+
+                      <label className="block text-sm font-medium text-gray-700 mt-3 mb-1">To:</label>
+                      <input
+                        type="date"
+                        required
                         value={reportCredit.To}
                         onChange={(e) => {
                           setReportCredit((prev) => ({ ...prev, To: e.target.value }));
                         }}
-                        className="form-control" />
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
                     </div>
-                    <button className='btn btn-outline-primary'>Generate Report</button>
-
-
+                    <button
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      Generate Report
+                    </button>
                   </div>
                 </form>
               </div>
             </div>
           </Popup>
 
-          <div className="row mt-2">
-
-            <div className="col-lg-6 grid-margin mx-auto">
-              <ChartCard title="Attendance Summary">
-                <div className="d-flex justify-content-center">
-                  <div style={{ position: 'relative', height: '230px', width: '250px' }}>
-                    <Doughnut data={doughnutChart} options={chartOptions} />
-                  </div>
+          {/* Charts - First Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Attendance Summary Chart */}
+            <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
+              <h4 className="text-lg font-semibold text-gray-700 mb-4">Attendance Summary</h4>
+              <div className="flex justify-center">
+                <div className="relative h-60 w-64">
+                  <Doughnut data={doughnutChart} options={chartOptions} />
                 </div>
-              </ChartCard>
+              </div>
             </div>
 
-
-
-            <div className="col-lg-6 grid-margin ml-1">
-              <ChartCard title="Subject-wise Attendance">
-                <div style={{ position: 'relative', height: '230px' }}>
-                  <Bar data={subjectBarChartConfig(attendanceBySubject)} options={chartOptions} />
-                </div>
-              </ChartCard>
+            {/* Subject-wise Attendance Chart */}
+            <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
+              <h4 className="text-lg font-semibold text-gray-700 mb-4">Subject-wise Attendance</h4>
+              <div className="relative h-60">
+                <Bar data={subjectBarChartConfig(attendanceBySubject)} options={chartOptions} />
+              </div>
             </div>
           </div>
-          <div className="row">
 
-            <div className="col-lg-6 grid-margin ml-1">
-
-              <ChartCard title="Overall Attendnace Present Data">
-                <div style={{ position: 'relative', height: '230px' }}>
-                  <Line data={lineChartConfig(attendanceData)} options={chartOptions} />
-                </div>
-              </ChartCard>
+          {/* Charts - Second Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Overall Attendance Chart */}
+            <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
+              <h4 className="text-lg font-semibold text-gray-700 mb-4">Overall Attendance Present Data</h4>
+              <div className="relative h-60">
+                <Line data={lineChartConfig(attendanceData)} options={chartOptions} />
+              </div>
             </div>
-            <div className="col-lg-6 grid-margin">
-              <ChartCard title="Monthly Absence Report">
-                <div style={{ position: 'relative', height: '230px' }}>
-                  <Bar data={monthlyAttendanceChartConfig(absenceData)} options={chartOptions} />
-                </div>
-              </ChartCard>
+
+            {/* Monthly Absence Report Chart */}
+            <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
+              <h4 className="text-lg font-semibold text-gray-700 mb-4">Monthly Absence Report</h4>
+              <div className="relative h-60">
+                <Bar data={monthlyAttendanceChartConfig(absenceData)} options={chartOptions} />
+              </div>
             </div>
           </div>
-        </div>
       </div>
-    </div>
+      </div>
+      </div>
   );
 };
 

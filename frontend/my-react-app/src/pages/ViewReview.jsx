@@ -3,8 +3,11 @@ import axios from 'axios';
 import SidebarComponent from '../components/SideBar';
 import { useLocation } from 'react-router-dom';
 import PageNotFound from '../components/PageNotFound';
+import Header from '../components/Header';
+import Breadcrumb from '../components/Breadcrumb';
+import ComponentCard from '../components/ComponentCard';
 
-const ViewReview = ({ userId, userRole }) => {
+const ViewReview = ({ userId, userRole,userName }) => {
   const location = useLocation();
 
   const ReviewOf = location.state?.ReviewOf;
@@ -99,11 +102,13 @@ const ViewReview = ({ userId, userRole }) => {
   return (
     <div className="flex">
       <SidebarComponent userRole={userRole} />
-      <div className="flex-1 min-h-screen bg-gray-50">
-        <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
+      <div className='home-section'>
+        <Header userRole={userRole} userName={userName} />
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+        <Breadcrumb Title={ReviewOf}  pageTitle="Review" />
+        <div className="max-w mx-auto  px-4 sm:px-6 lg:px-8">
+          <div className="max">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              {/* Header */}
               <div className="bg-blue-600 px-6 py-4 text-white">
                 <h2 className="text-2xl font-bold">{ReviewOf} Review Summary</h2>
                 {reviewData.review.length > 0 && ReviewOf === "Module" && (
@@ -120,14 +125,11 @@ const ViewReview = ({ userId, userRole }) => {
               <div className="p-6">
                 {reviewData.totalReviews === 0 ? (
                   <div className="text-center py-16">
-                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 15.585l7.066 4.3a1 1 0 001.479-1.03l-1.84-8.02L22.97 5.33a1 1 0 00-.555-1.695l-8.323-.648L10.598.415a1 1 0 00-1.795 0L5.582 2.987l-8.323.648a1 1 0 00-.555 1.695l6.084 5.505-1.84 8.02a1 1 0 001.479 1.03L10 15.585z" clipRule="evenodd" />
-                    </svg>
+                    <i className='bx bxs-star text-8xl text-gray-500'></i>
                     <h3 className="text-xl font-semibold text-gray-700">No Reviews Yet</h3>
                   </div>
                 ) : (
                   <>
-                    {/* Summary Section */}
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
                       <div className="md:col-span-5">
                         <div className="bg-gray-50 rounded-lg shadow-sm p-6 h-full">
@@ -179,7 +181,6 @@ const ViewReview = ({ userId, userRole }) => {
                       </div>
                     </div>
 
-                    {/* Review List */}
                     <div>
                       <h3 className="text-lg font-semibold mb-4">All Reviews</h3>
                       <div className="space-y-4">
@@ -229,7 +230,11 @@ const ViewReview = ({ userId, userRole }) => {
             </div>
           </div>
         </div>
+      
+        </div>
+        
       </div>
+      
     </div>
   );
 };

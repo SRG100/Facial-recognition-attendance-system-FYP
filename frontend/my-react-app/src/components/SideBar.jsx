@@ -8,6 +8,7 @@ import fras from '../assets/Fras.png';
 
 const BoxIcon = ({ iconName, className = "" }) => (
   <i className={`bx ${iconName} ${className} text-2xl`}></i>
+  
 );
 
 const SideBar = ({ userId, userRole }) => {
@@ -18,7 +19,7 @@ const SideBar = ({ userId, userRole }) => {
 
   const menuItems = {
     admin: [
-      { name: "Dashboard", icon: <BoxIcon iconName="bx-grid-alt" />, path: "/" },
+      { name: "Dashboard", icon: <BoxIcon iconName="bx-home-alt" />, path: "/" },
       { name: "Classes", icon: <BoxIcon iconName="bxs-chalkboard" />, path: "/classes" },
       { name: "View Teachers", icon: <BoxIcon iconName="bxs-user-rectangle" />, path: "/viewTeachers" },
       { name: "View Students", icon: <BoxIcon iconName="bxs-user-account" />, path: "/viewStudents" },
@@ -26,15 +27,15 @@ const SideBar = ({ userId, userRole }) => {
       { name: "View Sections", icon: <BoxIcon iconName="bxs-checkbox-minus" />, path: "/viewSections" }
     ],
     teacher: [
-      { name: "Dashboard", icon: <BoxIcon iconName="bx-grid-alt" />, path: "/" },
+      { name: "Dashboard", icon: <BoxIcon iconName="bx-home-alt" />, path: "/" },
       { name: "Classes", icon: <BoxIcon iconName="bxs-chalkboard" />, path: "/classes" },
-      { name: "View Sections", icon: <BoxIcon iconName="bx-transfer-alt" />, path: "/viewSections" },
+      { name: "View Sections", icon: <BoxIcon iconName="bxs-checkbox-minus" />, path: "/viewSections" },
     ],
     student: [
-      { name: "Dashboard", icon: <BoxIcon iconName="bx-grid-alt" />, path: "/" },
+      { name: "Dashboard", icon: <BoxIcon iconName="bx-home-alt" />, path: "/" },
       { name: "Classes", icon: <BoxIcon iconName="bxs-chalkboard" />, path: "/classes" },
-      { name: "View Teachers", icon: <BoxIcon iconName="bx-transfer-alt" />, path: "/viewTeachers" },
-      { name: "View Modules", icon: <BoxIcon iconName="bx-user" />, path: "/viewModules" },
+      { name: "View Teachers", icon: <BoxIcon iconName="bxs-user-rectangle" />, path: "/viewTeachers" },
+      { name: "View Modules", icon: <BoxIcon iconName="bxs-book" />, path: "/viewModules" },
       { name: "View Attendance", icon: <BoxIcon iconName="bx-book-open" />, path: "/viewAttendance" }
     ]
   };
@@ -70,8 +71,8 @@ const SideBar = ({ userId, userRole }) => {
       if (response.data.success) {
         toast.success(response.data.message || "Logged out successfully.");
         setTimeout(() => {
-          window.location.reload();
-        }, 500);
+          window.location.reload()
+        }, 500)
       } else {
         console.error("Logout failed:", response.data.message);
         toast.error("Logout failed. Please try again.");
@@ -127,7 +128,7 @@ const SideBar = ({ userId, userRole }) => {
                 <div className="job">{userRole}</div>
               </div>
               <button 
-            className="logout-btn p-2 rounded-full hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900 dark:hover:text-red-300 transition-colors"
+            className="logout-btn p-2 rounded-full hover:bg-red-100 hover:text-red-600 hover:bg-red-900 dark:hover:text-red-300 transition-colors"
             onClick={handleLogout}
             aria-label="Logout"
             title="Logout"

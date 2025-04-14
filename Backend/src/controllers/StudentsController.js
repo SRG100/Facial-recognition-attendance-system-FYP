@@ -9,6 +9,8 @@ const router = express.Router()
 //to register students 
 router.post('/registerStudent', async (req, res) => {
     const { studentId, studentName, studentEmail, studentAddress, studentDOB, studentPassword, section,studentGender } = req.body;
+    if(!studentId || !studentName || !studentEmail || !studentAddress || !studentDOB || !studentPassword || !section) {
+        return res.status(400).json({ message: "All fields are required",success:false })}
     console.log(section,studentGender)
     try {
         
@@ -18,7 +20,11 @@ router.post('/registerStudent', async (req, res) => {
 
         const [rows] = await db.query('SELECT * FROM student WHERE Student_Email=?', [studentEmail])
         if (rows.length > 0) {
-            return res.status(409).json({ message: "Student with this email already exists" })
+            return res.json({ message: "Student with this email already exists" ,success:false})
+        }
+        const [rowsId] = await db.query('SELECT * FROM student WHERE Student_Id=?', [studentId])
+        if (rowsId.length > 0) {
+            return res.json({ message: "Student with this Id already exists",success:false })
         }
 
         const hashPassword = await bcrypt.hash(studentPassword, 10)

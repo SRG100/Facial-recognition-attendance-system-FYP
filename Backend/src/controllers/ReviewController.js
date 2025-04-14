@@ -6,7 +6,7 @@ const router = express.Router()
 router.post('/studentReview', async (req, res) => {
 
     try {
-        const { Id, userId, rating, Suggestions } = req.body
+        const { Id, userId, rating, suggestions } = req.body
         const Student_id = Id
 
         const db = await connectDatabase()
@@ -19,11 +19,11 @@ router.post('/studentReview', async (req, res) => {
         const Course_id = rows[0].Course_id
         const Section_id = rows[0].Section_id
         console.log(Section_id, Course_id, Academic_Year_id, Module_id)
-        console.log(rating,Suggestions)
+        console.log(rating,suggestions)
 
         const [result] = await db.execute(
             "INSERT INTO `Student_Review` ( `Rating`, `Suggestions`) VALUES ( ?, ?)",
-            [rating, Suggestions]
+            [rating, suggestions]
         )
 
         const Student_review_id = result.insertId
@@ -47,6 +47,7 @@ router.post('/moduleReview', async (req, res) => {
         console.log(Id, userId, rating, suggestions)
         const Module_id = Id
         const db = await connectDatabase()
+
         console.log("Database connected successfully in module review!");
 
         const [rows] = await db.query('SELECT DISTINCT mca.* FROM  module_course_academic mca JOIN student_association sa ON mca.Course_id = sa.Course_id WHERE mca.Module_id=? and sa.student_id=?  ', [Module_id, userId])
@@ -76,8 +77,8 @@ router.post('/moduleReview', async (req, res) => {
 
 router.post('/teacherReview', async (req, res) => {
     try {
-        const { Id, userId, rating, Suggestions } = req.body
-        console.log(Id, userId, rating, Suggestions)
+        const { Id, userId, rating, suggestions } = req.body
+        console.log(Id, userId, rating, suggestions)
         const Teacher_id = Id
         const db = await connectDatabase()
         console.log("Database connected successfully in teacher review!");
@@ -94,7 +95,7 @@ router.post('/teacherReview', async (req, res) => {
 
         const [result] = await db.execute(
             "INSERT INTO `teacher_review` ( `Rating`, `Suggestions`) VALUES ( ?, ?)",
-            [rating, Suggestions]
+            [rating, suggestions]
         )
 
         const Teacher_review_id = result.insertId

@@ -3,28 +3,26 @@ import { Link, useNavigate } from 'react-router-dom'
 import Nav from '../components/Nav'
 import SidebarComponent from '../components/SideBar'
 import attendanceImage from "../assets/attendance.jpg";
-import { Line } from 'react-chartjs-2'
+
+import { Line, Bar } from 'react-chartjs-2'
 // import { SidebarProvider,useSidebar } from '../Context/SideBarContext';
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import '../assets/SideBar-light.css'
+import ComponentCard from '../components/ComponentCard'
 
 import Badge from '../Ui/Badge';
-// import {
-//   ArrowDownIcon,
-//   ArrowUpIcon,
-//   BoxIconLine,
-//   GroupIcon,
-// } from "../assets/Icons";
 
 import '../assets/Dashboard.css'
 import 'chart.js/auto'
 import Header from '../components/Header';
 
 
-const Dashboard = ({ isLoggedIn, userRole, userId , userName}) => {
+const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
 
   const [attendanceData, setAttendanceData] = useState([])
+  const [attendanceBySubject, setAttendanceBySubject] = useState([])
+
   const [dashboardData, setDashboardData] = useState([])
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -37,6 +35,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId , userName}) => {
   useEffect(() => {
     getAttendanceByDate()
     getDashboardDetails()
+    getAbsenceBySubject()
   }, [userId, userRole]);
 
   useEffect(() => {
@@ -49,7 +48,49 @@ const Dashboard = ({ isLoggedIn, userRole, userId , userName}) => {
     responsive: true,
     maintainAspectRatio: true
   }
+  const getAbsenceBySubject = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/attendance/getAttendanceBySubject?Id=${userId}&userRole=${userRole}`);
+      setAttendanceBySubject(Array.isArray(response.data) ? response.data : [])
 
+    } catch (error) {
+      console.error('Error while getting the student absence by month', error)
+    }
+  }
+  const subjectBarChartConfig = (attendanceBySubject) => {
+    const labels = [];
+    const presentData = [];
+    const lateData = [];
+    const absentData = [];
+
+    attendanceBySubject.forEach(entry => {
+      labels.push(entry.Module_name);
+      presentData.push(entry.Present_Count);
+      lateData.push(entry.Late_Count);
+      absentData.push(entry.Absent_Count);
+    });
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Present',
+          data: presentData,
+          backgroundColor: '#98D8C8',
+        },
+        {
+          label: 'Late',
+          data: lateData,
+          backgroundColor: '#D9D9F3',
+        },
+        {
+          label: 'Absent',
+          data: absentData,
+          backgroundColor: '#F6A6A6',
+        }
+      ]
+    };
+  };
   const getAttendanceByDate = async () => {
     try {
       let url = `http://localhost:3000/attendance/getAttendnaceByDate?Id=${userId}&userRole=${userRole}`;
@@ -86,6 +127,9 @@ const Dashboard = ({ isLoggedIn, userRole, userId , userName}) => {
       toast.error("Failed to fetch dashboard data");
     }
   }
+  const BoxIcon = ({ iconName, className = "" }) => (
+    <i className={`bx ${iconName} ${className} text-3xl text-gray-500`}></i>
+  );
 
   const lineChartConfig = (attendanceData) => {
     const labels = []
@@ -112,324 +156,222 @@ const Dashboard = ({ isLoggedIn, userRole, userId , userName}) => {
   }
 
   const ChartCard = ({ title, children }) => (
-    <div className="card dashboard mt-4">
-      <div className="card-body">
-        <div className=" justify-content-between align-items-center mb-3">
-          <h4 className="card-title">{title}</h4>
-          <form className="d-flex" onSubmit={handleDateFilter}>
-            <div className="me-2">
-              <label className="form-label">From:</label>
-              <input
-                type="date"
-                className="form-control"
-                value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
-              />
-            </div>
-            <div className="me-2">
-              <label className="form-label">To:</label>
-              <input
-                type="date"
-                className="form-control "
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-              />
-            </div>
-            <div className="d-flex align-items-end mb-2">
-              <button type="submit" className="btn btn-primary  "><i className='bx bx-filter-alt' style={{ scale: "1.5" }}></i>
-              </button>
-            </div>
-          </form>
-        </div>
-        <div className="chart-container">
-          {children}
-        </div>
+    <div className="">
+      <div className="flex flex-col gap-4">
+        <form className="flex flex-wrap gap-4" onSubmit={handleDateFilter}>
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-700 mb-1">From:</label>
+            <input
+              type="date"
+              className=" appearance-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 "
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-700 mb-1">To:</label>
+            <input
+              type="date"
+              className=" appearance-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            >
+              <i className="bx bx-filter-alt text-lg"></i>
+            </button>
+          </div>
+        </form>
+        <h4 className="text-xl font-semibold text-gray-800">{title}</h4>
+      </div>
+
+      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mt-4">
+        {children}
       </div>
     </div>
   )
 
   return (
     <div className="min-h-screen xl:flex">
-      {/* <Nav /> */}
-      
-        <SidebarComponent userRole={userRole} />
-
-
-
-
-
-      {/* <div className='home-section'>
-        <div className="main-panel">
-          <div className="content-wrapper">
-            <div className="row">
-              <div className="col-md-12 grid-margin">
-                <div className="row">
-                  <div className="col-12 col-xl-8 mb-4 text-start">
-                    <h3 className="font-weight-bold">Welcome {userName}</h3>
-                  </div>
-                  <div className="col-12 col-xl-4">
-                    <div className="justify-content-end d-flex">
-                      <div className="dropdown flex-md-grow-1 flex-xl-grow-0">
-                        <button className="btn btn-sm btn-light bg-white" type="button" >
-                          <i className='bx bxs-calendar'></i> {new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit' }).replace(' ', ' - ')}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="row">
-              <div className="col-md-6 grid-margin stretch-card">
-                <div className="card dashboard tale-bg">
-                  <div className="card-people mt-auto">
-                    <div className="weather-info">
-                      <div className="d-flex">
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-md-6 grid-margin transparent">
-                <div className="row">
-                  <div className="col-md-6 mb-1 stretch-card transparent">
-                    <div className="card dashboard card-tale" style={{ background: "#7da0fa", color: "white" }}>
-                      <div className="card-body">
-                        {userRole === 'student' ? (
-                          <>
-                            <p className="mb-2">Upcoming Class</p>
-                            <h2 className="fs-30 mb-2">{dashboardData.upComingClass}</h2>
-                            <p>Classes remaining</p>
-                          </>
-                        ) : (
-                          <>
-                            <>
-                              <p className="mb-2">Total Students</p>
-                              <h2 className="fs-30 mb-2">{dashboardData.totalStudents}</h2>
-                              <p>The total students </p>
-                            </>
-                          </>
-                        )}
-
-                      </div>
-                      
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-4 stretch-card transparent">
-                    <div className="card dashboard card-dark-blue " style={{ background: "#4746a0", color: "white" }}>
-                      <div className="card-body">
-                        {userRole === 'teacher' ? (
-                          <>
-                            <p className="mb-2">Completed Classes</p>
-                            <h2 className="fs-30 mb-2 font-weight-bold">{dashboardData.completedClass}</h2>
-                            <p>2.00% (30 days)</p>
-                          </>
-                        ) : (
-                          <>
-                            <p className="mb-2">Total Teachers</p>
-                            <h2 className="fs-30 mb-2">{dashboardData.totalTeachers}</h2>
-                            <p>Number of teachers</p>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                 
-                </div>
-
-                <div className="row">
-                  <div className="col-md-6 mb-4 mb-lg-0 stretch-card transparent">
-                    <div className="card dashboard card-light-blue" style={{ background: "#7979e8", color: "white" }}>
-                      <div className="card-body">
-                        {userRole === 'teacher' ? (
-                          <>
-                            <p className="mb-2">Upcoming Class</p>
-                            <h2 className="fs-30 mb-2 font-weight-bold">{dashboardData.upComingClass}</h2>
-                            <p>Number of upcoming class</p>
-                          </>
-                        ) : (
-                          <>
-                            <p className="mb-2">Total Modules</p>
-                            <h2 className="fs-30 mb-2 font-weight-bold">{dashboardData.totalModules}</h2>
-                            <p>Number of modules</p>
-                          </>
-                        )}
-
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-6 stretch-card transparent">
-                    <div className="card dashboard card-light-danger" style={{ background: "#f47c7c", color: "white" }}>
-                      <div className="card-body">
-                        <>
-                          <p className="mb-2">Total Courses</p>
-                          <h2 className="fs-30 mb-2 font-weight-bold">{dashboardData.totalCourses}</h2>
-                          <p>Number of total courses </p>
-                        </>
-                        
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            <div className="row mt-4">
-              <div className="col-md-12 grid-margin stretch-card">
-                <div className="card dashboard">
-                  <div className="card-body">
-
-                    <div id="sales-chart-legend" className="chartjs-legend mt-4 mb-2">
-
-                      <ChartCard title="Overall Attendance Present Data">
-
-                        <div style={{ position: 'relative' }}>
-                          {attendanceData.length > 0 ? (
-                            <Line data={lineChartConfig(attendanceData)} options={chartOptions} />
-                          ) : (
-                            <div className="text-center p-4">No attendance data available for the selected date range</div>
-                          )}
-                        </div>
-                      </ChartCard>
-                    </div>
-                    <div className="bg-gray-200 p-4 text-center">Sales Chart Placeholder</div>
-                  </div
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> */}
+      <SidebarComponent userRole={userRole} />
       <div className='home-section'>
-        <Header userName={userName} userRole={userRole}/>
+        <Header userName={userName} userRole={userRole} />
         <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
 
-<div
-        className={`flex-1 transition-all duration-300 ease-in-out `}
-      >
-        {/* <AppHeader /> */}
-        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+          <div
+            className={`flex-1 transition-all duration-300 ease-in-out `}
+          >
+
+            <div className="grid grid-cols-12 gap-4 md:gap-6">
+              <div className="col-span-12 space-y-6 xl:col-span-7">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                      {/* <GroupIcon className="text-gray-800 size-6 dark:text-white/90" /> */}
+                      {userRole === "student" ? (<BoxIcon iconName="bxs-chalkboard" />) : (<BoxIcon iconName="bx-group" />)}
 
 
-        </div>
+                    </div>
 
-      <div className="grid grid-cols-12 gap-4 md:gap-6">
-        <div className="col-span-12 space-y-6 xl:col-span-7">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
-            {/* <!-- Metric Item Start --> */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-                {/* <GroupIcon className="text-gray-800 size-6 dark:text-white/90" /> */}
-              </div>
+                    <div className="flex items-end justify-between mt-5">
+                      <div>
+                        {userRole === 'student' ? (<>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            Upcoming Class
+                          </span>
+                          <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                            {dashboardData.upComingClass}
+                          </h4>
 
-              <div className="flex items-end justify-between mt-5">
-                <div>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    Customers
-                  </span>
-                  <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-                    3,782
-                  </h4>
+                        </>
+                        ) : (<>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            Total Students
+                          </span>
+                          <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                            {dashboardData.totalStudents}
+                          </h4>
+                        </>)}
+                      </div>
+                      <Badge color="success">
+                        Fras Dashboard
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                      {/* <BoxIconLine className="text-gray-800 size-6 dark:text-white/90" /> */}
+                      {userRole === "teacher" ? (<BoxIcon iconName="bxs-chalkboard" />) : (<BoxIcon iconName="bx-group" />)}
+
+
+                    </div>
+                    <div className="flex items-end justify-between mt-5">
+                      <div>
+                        {userRole === 'teacher' ? (<>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            Completed Classes
+                          </span>
+                          <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                            {dashboardData.completedClass}
+                          </h4>
+
+                        </>
+                        ) : (<>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            Total Teachers
+                          </span>
+                          <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                            {dashboardData.totalTeachers}
+                          </h4>
+                        </>)}
+                      </div>
+
+                      <Badge color="error">
+                        Fras Dashboard
+                      </Badge>
+                    </div>
+                  </div>
+
+
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                      <BoxIcon iconName="bxs-book" />
+
+
+                    </div>
+                    <div className="flex items-end justify-between mt-5">
+                      <div>
+                        {userRole === 'teacher' ? (<>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            Upcoming Class
+                          </span>
+                          <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                            {dashboardData.upComingClass}
+                          </h4>
+
+                        </>
+                        ) : (<>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            Total Modules
+                          </span>
+                          <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                            {dashboardData.totalModules}
+                          </h4>
+                        </>)}
+                      </div>
+
+                      <Badge color="error">
+
+                        Fras Dashboard
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                      <BoxIcon iconName="bx-grid-alt" />
+                    </div>
+                    <div className="flex items-end justify-between mt-5">
+                      <div>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          Courses
+                        </span>
+                        <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                          {dashboardData.totalCourses}
+                        </h4>
+                      </div>
+                      <Badge color="success">
+
+                        Fras Dashboard
+                      </Badge>
+
+                    </div>
+                  </div>
                 </div>
-                <Badge color="success">
-                  {/* <ArrowUpIcon /> */}
-                  11.01%
-                </Badge>
+              </div>
+              <div className="col-span-12 xl:col-span-5">
+                <ComponentCard title="Subject Wise Attendance" >
+                  <div className="card-body">
+                    <div id="sales-chart-legend" className="chartjs-legend mt-4 mb-2">
+                      <div className="relative h-60">
+                        <Bar data={subjectBarChartConfig(attendanceBySubject)} options={chartOptions} />
+                      </div>
+                    </div>
+                  </div>
+                </ComponentCard>
               </div>
             </div>
-            {/* <!-- Metric Item End --> */}
 
-            {/* <!-- Metric Item Start --> */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-                {/* <BoxIconLine className="text-gray-800 size-6 dark:text-white/90" /> */}
-              </div>
-              <div className="flex items-end justify-between mt-5">
-                <div>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    Orders
-                  </span>
-                  <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-                    5,359
-                  </h4>
+
+
+            <div className="col-span-12 mt-10">
+              <ComponentCard title="Overall Attendance Present Data" >
+                <div className="card-body">
+
+                  <div id="sales-chart-legend" className="chartjs-legend mt-4 mb-2">
+
+                    <ChartCard>
+
+                      <div style={{ position: 'relative' }}>
+                        {attendanceData.length > 0 ? (
+                          <Line data={lineChartConfig(attendanceData)} options={chartOptions} />
+                        ) : (
+                          <div className="text-center p-4">No attendance data available for the selected date range</div>
+                        )}
+                      </div>
+                    </ChartCard>
+                  </div>
                 </div>
-
-                <Badge color="error">
-                  {/* <ArrowDownIcon /> */}
-                  9.05%
-                </Badge>
-              </div>
-            </div>
-            {/* <!-- Metric Item End --> */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-                {/* <BoxIconLine className="text-gray-800 size-6 dark:text-white/90" /> */}
-              </div>
-              <div className="flex items-end justify-between mt-5">
-                <div>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    Orders
-                  </span>
-                  <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-                    5,359
-                  </h4>
-                </div>
-
-                <Badge color="error">
-                  {/* <ArrowDownIcon /> */}
-                  9.05%
-                </Badge>
-              </div>
-            </div>
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-                {/* <BoxIconLine className="text-gray-800 size-6 dark:text-white/90" /> */}
-              </div>
-              <div className="flex items-end justify-between mt-5">
-                <div>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    Orders
-                  </span>
-                  <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-                    5,359
-                  </h4>
-                </div>
-
-                <Badge color="error">
-                  {/* <ArrowDownIcon /> */}
-                  9.05%
-                </Badge>
-              </div>
+              </ComponentCard>
             </div>
           </div>
-          </div>
-
-          {/* <MonthlySalesChart /> */}
         </div>
-
-        {/* <div className="col-span-12 xl:col-span-5">
-          <MonthlyTarget />
-        </div>
-
-        <div className="col-span-12">
-          <StatisticsChart />
-        </div> */}
-        {/* 
-        <div className="col-span-12 xl:col-span-5">
-          <DemographicCard />
-        </div>
-
-        <div className="col-span-12 xl:col-span-7">
-          <RecentOrders />
-        </div> */}
       </div>
-      </div>
-      </div>
+      
+
     </div>
   )
 }

@@ -19,7 +19,7 @@ router.post('/registerTeacher', async (req, res) => {
 
         const [rows] = await db.query('SELECT * FROM teacher WHERE Teacher_Email=?', [teacherEmail])
         if (rows.length > 0) {
-            return res.status(409).json({ message: "Teacher with this email already exists" })
+            return res.json({ message: "Teacher with this email already exists" ,success:false})
         }
         const hashPassword = await bcrypt.hash(teacherPassword, 10)
         await db.query("INSERT INTO teacher (Teacher_id,Teacher_Name,Teacher_Address,Teacher_DOB,Teacher_Email,Teacher_Gender,Password) VALUES (?,?,?,?,?,?,?)",
@@ -33,7 +33,7 @@ router.post('/registerTeacher', async (req, res) => {
             await db.query(`INSERT INTO teacher_association (Module_id, Academic_Year_id, Course_id, Teacher_id) VALUES ${values}`);
         }
 
-        res.status(201).json({ message: "Teacher Added successfully" })
+        res.status(201).json({ message: "Teacher Added successfully",success:true })
     } catch (err) {
         res.status(500).json(err)
 

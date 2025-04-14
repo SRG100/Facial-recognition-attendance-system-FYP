@@ -5,10 +5,15 @@ import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Breadcrumb from '../components/Breadcrumb';
 import ComponentCard from '../components/ComponentCard';
+import PageNotFound from '../components/PageNotFound';
 
 const Teachers = ({ userRole, userId, userName }) => {
     const navigate = useNavigate()
     const [teachers, setTeachers] = useState([])
+    if(userRole === "teacher"){
+        return <PageNotFound/>
+
+    }
 
     useEffect(() => {
         if (userId) {
@@ -34,6 +39,7 @@ const Teachers = ({ userRole, userId, userName }) => {
                     <Breadcrumb pageTitle="Teachers" />
                     <div className="space-y-6">
                         <ComponentCard title="Teachers" className="mt-6">
+                            
                             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
                                 <div className="max-w-full overflow-x-auto">
                                     <table className="min-w-full divide-y">
@@ -119,7 +125,7 @@ const Teachers = ({ userRole, userId, userName }) => {
                             </div>
                             {userRole === "admin" && (
                                 <button
-                                    class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                                    className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                                     onClick={() => navigate("/RegisterTeacher")}>Add Teacher</button>
                             )}
 

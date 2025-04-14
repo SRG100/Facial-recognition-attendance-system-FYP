@@ -31,7 +31,7 @@ const Header = ({ userName, userRole }) => {
   const formattedRole = formatRole(userRole);
 
   return (
-    <header className="sticky top-0 flex w-full bg-white border-gray-200 z-40 shadow-sm dark:border-gray-800 dark:bg-gray-900 ">
+    <header className="sticky top-0 flex w-full bg-white border-gray-200 z-40 dark:border-gray-800 dark:bg-gray-900 " style={{ borderBottom: '1px solid #e9e7eb' }}>
       <div className="flex items-center justify-between w-full px-4 py-2 top-2 lg:px-6">
         <div className="flex items-center gap-3">
           <button

@@ -3,14 +3,19 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import SidebarComponent from '../components/SideBar'
 import PageNotFound from '../components/PageNotFound'
+import Header from '../components/Header'
+import ComponentCard from '../components/ComponentCard'
 
-const VerifyCode = ({ userId, userRole }) => {
+const VerifyCode = ({ userId, userRole, userName }) => {
     const navigate = useNavigate()
     const location = useLocation()
 
     const Class_Id = location.state?.Class_Id
     const Attendance_id = location.state?.Attendance_id
     const fromNavigate = location.state?.fromNavigate
+    if (!fromNavigate) {
+        return <PageNotFound />
+    }
 
     const [code, setCode] = useState({ classCode: '' })
     const [loading, setLoading] = useState(false)
@@ -49,7 +54,7 @@ const VerifyCode = ({ userId, userRole }) => {
 
                     if (seconds <= 0) {
                         clearInterval(timer)
-                        navigate("/checkface", { state: { Class_Id, Attendance_id ,fromNavigate:true} })
+                        navigate("/checkface", { state: { Class_Id, Attendance_id, fromNavigate: true } })
                     }
                 }, 1000)
             } else {
@@ -62,71 +67,76 @@ const VerifyCode = ({ userId, userRole }) => {
             console.error("Error while verifying class:", err)
         }
     }
-    if (!fromNavigate){
-        return <PageNotFound/>
-    }
+
 
     return (
         <div className="d-flex min-vh-100 bg-light">
             <SidebarComponent userRole={userRole} />
+            <div className='home-section'>
+                <Header userName={userName} userRole={userRole} />
+                <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+                    <div className="max-w mx-auto  px-4 sm:px-6 lg:px-8"></div>
+                    <ComponentCard title="Attendance Verification" description="Verify your attendance using the code provided by your teacher.">
 
-            <div className="container d-flex align-items-center justify-content-center">
-                <div className="col-md-6 col-lg-5 shadow p-5 bg-white rounded-4">
-                    <h2 className="text-center text-primary mb-4">Attendance Verification</h2>
+                        <div className="flex items-center justify-center w-full">
+                            <div className="w-full md:w-1/2 lg:w-2/ p-8 bg-white ">
+                                <h2 className="text-center text-blue-600 font-bold text-xl mb-4">Code Verification</h2>
 
-                    {countdown !== null ? (
-                        <div className="text-center py-4">
-                            <div className="text-success fs-4 mb-3">✓ Code verified successfully!</div>
-                            <div className="fs-5">
-                                Redirecting to face verification in {countdown} second{countdown !== 1 ? 's' : ''}...
-                            </div>
-                            <div className="mt-3 text-muted">
-                                Please prepare your camera for the next step.
+                                {countdown !== null ? (
+                                    <div className="text-center py-4">
+                                        <div className="text-green-600 text-xl font-medium mb-3">✓ Code verified successfully!</div>
+                                        <div className="text-lg">
+                                            Redirecting to face verification in {countdown} second{countdown !== 1 ? 's' : ''}...
+                                        </div>
+                                        <div className="mt-3 text-gray-500">
+                                            Please prepare your camera for the next step.
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="text-center text-gray-600 mb-4">
+                                            <p>Please enter the verification code provided by your teacher.</p>
+                                            <small className="text-gray-500">This is required to confirm your attendance.</small>
+                                        </div>
+
+                                        <form onSubmit={verifyClassCode}>
+                                            <div className="mb-3">
+                                                
+                                                <input
+                                                    id="classCode"
+                                                    type="text"
+                                                    name="classCode"
+                                                    value={code.classCode}
+                                                    onChange={handleChanges}
+                                                    placeholder="Enter Class code"
+                                                    className={`form-control text-center text-lg w-full p-2 border rounded ${error ? 'border-red-500' : 'border-gray-300'}`}
+                                                    autoComplete="off"
+                                                    autoFocus
+                                                />
+                                                {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                disabled={loading}
+                                                className={`w-full py-2 bg-blue-600 text-white font-medium rounded ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'}`}
+                                            >
+                                                {loading ? 'Verifying...' : 'Verify Code'}
+                                            </button>
+                                        </form>
+
+                                        <div className="text-center text-gray-500 mt-4 text-sm">
+                                            Having trouble? Please ask your teacher for assistance.
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
-                    ) : (
-                        <>
-                            <div className="text-center text-secondary mb-4">
-                                <p>Please enter the verification code provided by your teacher.</p>
-                                <small className="text-muted">This is required to confirm your attendance.</small>
-                            </div>
-
-                            <form onSubmit={verifyClassCode}>
-                                <div className="mb-3">
-                                    <label htmlFor="classCode" className="form-label fw-medium">
-                                        Class Code
-                                    </label>
-                                    <input
-                                        id="classCode"
-                                        type="text"
-                                        name="classCode"
-                                        value={code.classCode}
-                                        onChange={handleChanges}
-                                        placeholder="Enter 6-digit code"
-                                        className={`form-control text-center fs-5 ${error ? 'is-invalid' : ''}`}
-                                        autoComplete="off"
-                                        autoFocus
-                                    />
-                                    {error && <div className="invalid-feedback">{error}</div>}
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className={`btn w-100 btn-primary ${loading ? 'disabled' : ''}`}
-                                >
-                                    {loading ? 'Verifying...' : 'Verify Code'}
-                                </button>
-                            </form>
-
-                            <div className="text-center text-muted mt-4 small">
-                                Having trouble? Please ask your teacher for assistance.
-                            </div>
-                        </>
-                    )}
+                    </ComponentCard>
                 </div>
             </div>
         </div>
+
     )
 }
 

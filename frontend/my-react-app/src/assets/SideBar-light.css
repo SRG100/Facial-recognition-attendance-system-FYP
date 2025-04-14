@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #304674;
+    --primary-color: skyblue;
     --secondary-color: #6c757d;
     --light-bg: #f8f9fa;
     --dark-text: #333;
@@ -16,7 +16,8 @@
     background-color: white;
     transition: all 0.5s ease;
     z-index: 10;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: #e9e7eb 1px solid;
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 }
 
 .sidebar.open {
@@ -161,7 +162,7 @@
     position: fixed;
     bottom: 0;
     width: 78px;
-    background: var(--light-bg);
+    /* background: var(--light-bg); */
     padding: 15px;
     display: flex;
     flex-direction: column;
@@ -242,12 +243,13 @@
 }
 
 .sidebar .nav-list li .nav-link.active {
-    background: var(--primary-color);
+    background: #ecf2fe;
+
 }
   
 .sidebar .nav-list li .nav-link.active i,
 .sidebar .nav-list li .nav-link.active .links-name {
-    color: white;
+    color: #5976fc;
 }
 
 @media (max-width: 768px) {
