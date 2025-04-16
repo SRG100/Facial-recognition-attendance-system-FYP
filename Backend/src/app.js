@@ -1,11 +1,11 @@
 import express from 'express'
 import cors from 'cors'
 import authRouter from './routes/authRoutes.js'
-import faceRoutes from './routes/face.js'
-import classDetails from './routes/overallClasses.js'
+import Faces from './controllers/FaceController.js'
+import classDetails from './controllers/ClassController.js'
 import cookieParser from "cookie-parser";
-import verifications from './routes/verification.js'
-import crud from './routes/adminCRUD.js'
+import verifications from './controllers/VerificationController.js'
+import crud from './controllers/AdminCRUDCOntroller.js'
 import teacher from './controllers/TeachersController.js'
 import module from './controllers/ModuleController.js'
 import student from './controllers/StudentsController.js'
@@ -26,7 +26,7 @@ app.use(cors({
 app.use(express.json())
 
 app.use('/auth',authRouter)
-app.use('/face',faceRoutes)
+app.use('/face',Faces)
 app.use('/classes',classDetails)
 app.use('/verification',verifications)
 app.use('/crud',crud)

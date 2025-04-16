@@ -2,13 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import "boxicons/css/boxicons.min.css";
 import '../assets/SideBar-light.css';
-import fras from '../assets/Fras.png';
 
 const BoxIcon = ({ iconName, className = "" }) => (
   <i className={`bx ${iconName} ${className} text-2xl`}></i>
-  
+
 );
 
 const SideBar = ({ userId, userRole }) => {
@@ -81,21 +79,17 @@ const SideBar = ({ userId, userRole }) => {
       console.log("error while logging out", err);
       toast.error("Something went wrong during logout.");
     }
-  };
+  }
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
-  };
+  }
 
-  const isActive = useCallback(
-    (path) => location.pathname === path,
-    [location.pathname]
-  );
 
   if (!isLoggedIn) return null;
 
   return (
-    <>
+    
       <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="logo-details">
           {/* <img src={fras} alt="Logo" className="icon" /> */}
@@ -106,12 +100,12 @@ const SideBar = ({ userId, userRole }) => {
             <i className='bx bx-menu' onClick={toggleSidebar}></i>
           )}
         </div>
-        
+
         <ul className="nav-list">
           {menuItems[userRole]?.map((item, index) => (
             <li key={index}>
-              <NavLink 
-                to={item.path} 
+              <NavLink
+                to={item.path}
                 className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
               >
                 <i className={`bx ${item.icon.props.iconName}`}></i>
@@ -120,26 +114,26 @@ const SideBar = ({ userId, userRole }) => {
               {!isOpen && <span className="tooltip">{item.name}</span>}
             </li>
           ))}
-          
+
           <li className="profile">
             <div className="profile-details">
               <div className="name-job">
                 <div className="name">{userName}</div>
                 <div className="job">{userRole}</div>
               </div>
-              <button 
-            className="logout-btn p-2 rounded-full hover:bg-red-100 hover:text-red-600 hover:bg-red-900 dark:hover:text-red-300 transition-colors"
-            onClick={handleLogout}
-            aria-label="Logout"
-            title="Logout"
-          >
-            <i className='bx bx-log-out text-xl'></i>
-          </button>
+              <button
+                className="logout-btn p-2 rounded-full hover:bg-red-100 hover:text-red-600 hover:bg-red-900 dark:hover:text-red-300 transition-colors"
+                onClick={handleLogout}
+                aria-label="Logout"
+                title="Logout"
+              >
+                <i className='bx bx-log-out text-xl'></i>
+              </button>
             </div>
           </li>
         </ul>
       </div>
-    </>
+    
   );
 };
 

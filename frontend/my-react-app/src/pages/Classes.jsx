@@ -305,8 +305,12 @@ const Classes = ({ userRole, userId, userName }) => {
 
     if (loading) {
         return (
-            <div>Loading...</div>)
-    }
+          <div className="flex items-center justify-center h-40">
+            <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+          </div>
+        );
+      }
+      
     return (
         <div>
             <SidebarComponent userRole={userRole} />
