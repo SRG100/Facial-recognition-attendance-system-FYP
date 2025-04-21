@@ -41,7 +41,7 @@ router.post('/registerStudent', async (req, res) => {
         }
         console.log("Sucessfully  student associations")
 
-        res.status(201).json({ message: "Student Added successfully" })
+        res.status(201).json({ message: "Student Added successfully" ,success:true})
     } catch (err) {
         res.status(500).json(err)
 

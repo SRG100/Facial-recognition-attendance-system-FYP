@@ -29,7 +29,7 @@ router.get('/faceVerified', async (req, res) => {
         console.log(Attendance_id)
         await db.query(
             "UPDATE attendance SET Face_Verified = 1 WHERE Attendance_Id = ?",
-            [ Attendance_id]
+            [Attendance_id]
         )
         res.json({
             success: true,
@@ -59,6 +59,8 @@ router.get('/locationVerification', async (req, res) => {
         const [result] = await db.query("SELECT * FROM `class` WHERE Class_id=?", [Class_Id])
         const teacherLongitude = result[0].Teacher_Longitude
         const teacherLatitude = result[0].Teacher_Latitude
+        const Class_Start_Time = result[0].Class_Start_Time
+        const gracePeriod = 10 * 60 * 1000;
 
         console.log("The student longitude is:", studentLongitude)
         console.log("The student latitude is:", studentLatitude)
@@ -67,8 +69,10 @@ router.get('/locationVerification', async (req, res) => {
 
         const distance = calculateDistance(studentLatitude, studentLongitude, teacherLatitude, teacherLongitude)
         console.log("The distance between teacher and student is:", distance)
+        const attendanceTime = new Date(Attendance_Time);
+        const classStartTime = new Date(Class_Start_Time);
         const [attendnaceData] = await db.query("SELECT Geolocation_Status, Face_Verified, Code, Warnings FROM attendance WHERE attendance_id = ?", [Attendance_id]);
-        let Warnings=attendnaceData[0]?.Warnings || 0
+        let Warnings = attendnaceData[0]?.Warnings || 0
 
         // If the distance is less than 50m or zero
         if (distance < 50 || distance === 0) {
@@ -77,20 +81,33 @@ router.get('/locationVerification', async (req, res) => {
                 [studentLatitude, studentLongitude, Attendance_id]
             );
 
-            const [finalVerification] = await db.query("SELECT Geolocation_Status, Face_Verified, Code FROM attendance WHERE attendance_id = ?", [Attendance_id]);
-            const { Face_Verified, Code, Geolocation_Status } = finalVerification[0]
+            const [finalVerification] = await db.query("SELECT Geolocation_Status, Face_Verified, Code, Attendance_Time FROM attendance WHERE attendance_id = ?", [Attendance_id]);
+            const { Face_Verified, Code, Geolocation_Status, Attendance_Time } = finalVerification[0]
 
-            if ( Face_Verified===1 && Code === 1 && Geolocation_Status === 1) {
+            if (Face_Verified === 1 && Code === 1 && Geolocation_Status === 1 && attendanceTime - classStartTime <= gracePeriod) {
+
                 await db.query(
                     "UPDATE attendance SET Attendance_Status = 'Present' WHERE Attendance_Id = ?",
                     [Attendance_id]
                 );
                 return res.json({
                     success: true,
-                    message: "Location is authorized",
+                    message: "Attendance is marked as present",
                     verified: true,
                     distance: distance
                 });
+            } else {
+                await db.query(
+                    "UPDATE attendance SET Attendance_Status = 'Late' WHERE Attendance_Id = ?",
+                    [Attendance_id]
+                );
+                return res.json({
+                    success: true,
+                    message: "Attendance is marked as Late",
+                    verified: true,
+                    distance: distance
+                });
+
             }
 
 

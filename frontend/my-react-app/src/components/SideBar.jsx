@@ -17,7 +17,7 @@ const SideBar = ({ userId, userRole }) => {
 
   const menuItems = {
     admin: [
-      { name: "Dashboard", icon: <BoxIcon iconName="bx-home-alt" />, path: "/" },
+      { name: "Dashboard", icon: <BoxIcon iconName="bxs-home-circle" />, path: "/" },
       { name: "Classes", icon: <BoxIcon iconName="bxs-chalkboard" />, path: "/classes" },
       { name: "View Teachers", icon: <BoxIcon iconName="bxs-user-rectangle" />, path: "/viewTeachers" },
       { name: "View Students", icon: <BoxIcon iconName="bxs-user-account" />, path: "/viewStudents" },
@@ -25,12 +25,12 @@ const SideBar = ({ userId, userRole }) => {
       { name: "View Sections", icon: <BoxIcon iconName="bxs-checkbox-minus" />, path: "/viewSections" }
     ],
     teacher: [
-      { name: "Dashboard", icon: <BoxIcon iconName="bx-home-alt" />, path: "/" },
+      { name: "Dashboard", icon: <BoxIcon iconName="bxs-home-circle" />, path: "/" },
       { name: "Classes", icon: <BoxIcon iconName="bxs-chalkboard" />, path: "/classes" },
       { name: "View Sections", icon: <BoxIcon iconName="bxs-checkbox-minus" />, path: "/viewSections" },
     ],
     student: [
-      { name: "Dashboard", icon: <BoxIcon iconName="bx-home-alt" />, path: "/" },
+      { name: "Dashboard", icon: <BoxIcon iconName="bxs-home-circle" />, path: "/" },
       { name: "Classes", icon: <BoxIcon iconName="bxs-chalkboard" />, path: "/classes" },
       { name: "View Teachers", icon: <BoxIcon iconName="bxs-user-rectangle" />, path: "/viewTeachers" },
       { name: "View Modules", icon: <BoxIcon iconName="bxs-book" />, path: "/viewModules" },

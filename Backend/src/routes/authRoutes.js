@@ -134,7 +134,7 @@ router.get('/logout', async (req, res) => {
         res.status(500).json({ success: false, message: "Logout failed" });
 
     }
-});
+})
 
 export default router;
 

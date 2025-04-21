@@ -238,7 +238,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
                         </>)}
                       </div>
                       <Badge color="success">
-                        Fras Dashboard
+                        GCA Dashboard
                       </Badge>
                     </div>
                   </div>
@@ -271,7 +271,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
                       </div>
 
                       <Badge color="error">
-                        Fras Dashboard
+                        GCA Dashboard
                       </Badge>
                     </div>
                   </div>
@@ -306,7 +306,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
 
                       <Badge color="error">
 
-                        Fras Dashboard
+                        GCA Dashboard
                       </Badge>
                     </div>
                   </div>
@@ -325,7 +325,7 @@ const Dashboard = ({ isLoggedIn, userRole, userId, userName }) => {
                       </div>
                       <Badge color="success">
 
-                        Fras Dashboard
+                        GCA Dashboard
                       </Badge>
 
                     </div>

@@ -71,12 +71,12 @@ router.get('/getSpecificModules', async (req, res) => {
 router.post('/addModules', async (req, res) => {
     try {
         const { moduleId, moduleName, moduleDetails, moduleCredit, year, courses } = req.body
-        console.log("successfully in add moduels !", [moduleId, moduleName, moduleDetails, moduleCredit, year, courses])
+        console.log("Successfully in add moduels !", [moduleId, moduleName, moduleDetails, moduleCredit, year, courses])
         const db = await connectDatabase()
         const [existingModule] = await db.query("SELECT * FROM module WHERE Module_id = ?", [moduleId]);
 
         if (existingModule.length > 0) {
-            return res.status(400).json({
+            return res.json({
                 success: false,
                 message: "Module with this ID already exists",
             })

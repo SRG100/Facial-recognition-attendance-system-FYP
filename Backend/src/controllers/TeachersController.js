@@ -37,7 +37,7 @@ router.post('/registerTeacher', async (req, res) => {
     } catch (err) {
         res.status(500).json(err)
 
-        console.log("Database connected FAILED!", err);
+        console.log("Database connected FAILED!", err)
     }
 
 })

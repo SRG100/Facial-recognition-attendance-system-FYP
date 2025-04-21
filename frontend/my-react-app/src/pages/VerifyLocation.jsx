@@ -21,6 +21,9 @@ const VerifyLocation = ({ userId, userRole, userName }) => {
     const Class_Id = location.state?.Class_Id
     const Attendance_id = location.state?.Attendance_id
     const fromNavigate = location.state?.fromNavigate
+    if (!fromNavigate) {
+        return <PageNotFound />
+    }
 
 
     useEffect(() => {
@@ -42,14 +45,14 @@ const VerifyLocation = ({ userId, userRole, userName }) => {
     }, [verificationActive, classCompletion])
 
     const getUserLocation = async () => {
-        setLoading(true);
+        setLoading(true)
         return new Promise((resolve, reject) => {
-            // if (!navigator.geolocation) {
-            //     setLoading(false);
-            //     toast.error("Geolocation not supported");
-            //     reject(new Error("Geolocation not supported"));
-            //     return;
-            // }
+            if (!navigator.geolocation) {
+                setLoading(false);
+                toast.error("Geolocation not supported");
+                reject(new Error("Geolocation not supported"));
+                return;
+            }
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -100,12 +103,14 @@ const VerifyLocation = ({ userId, userRole, userName }) => {
             setMessage(response.data?.message)
 
             if (response.data?.verified) {
-                toast.success(response.data.message || "Verified Successfully")
+                // toast.success(response.data.message || "Verified Successfully")
+                console.log("Location verified")
             } else {
                 toast.error(response.data.message || "Verification failed")
             }
         } catch (err) {
-            toast.error("Error verifying location");
+            console.error("Error verifying location:", err);
+            toast.error("Error verifying location. Please try again later.");
         }
     };
 
@@ -114,9 +119,7 @@ const VerifyLocation = ({ userId, userRole, userName }) => {
         verifyLocation()
         checkClassCompletion()
     }
-    if (!fromNavigate) {
-        return <PageNotFound />
-    }
+    
 
     return (
         <div className="d-flex">

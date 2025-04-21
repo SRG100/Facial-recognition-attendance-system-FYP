@@ -161,7 +161,11 @@ const Classes = ({ userRole, userId, userName }) => {
     const getMinEndTime = () => {
         const { Class_Date, Class_Start_Time } = newClass
         if (Class_Start_Time) {
-            return Class_Start_Time
+            const start = new Date(`${Class_Date}T${Class_Start_Time}`)
+            const minEnd = new Date(start.getTime() + 60 * 60 * 1000)
+            const hours = minEnd.getHours().toString().padStart(2, '0');
+            const minutes = minEnd.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
         }
         return Class_Date === minDate ? minTime : undefined
     }

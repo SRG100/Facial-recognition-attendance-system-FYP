@@ -103,8 +103,6 @@ const Modules = ({ userId, userRole, userName }) => {
       toast.error("Please fill all the fields.")
       return
     }
-
-    console.log("Well the data before sending is :", moduleValues)
     setIsPopupOpen(false)
     getModuleDetails()
 
@@ -117,7 +115,8 @@ const Modules = ({ userId, userRole, userName }) => {
         toast.error(response.data.message)
       }
     } catch (error) {
-      toast.error("Error while getting the teachers")
+      console.error("Error while adding the module:", error);
+      toast.error("An error occurred while adding the module. Please try again later.");
     }
   }
   const handlePredictResult = async (moduleId) => {

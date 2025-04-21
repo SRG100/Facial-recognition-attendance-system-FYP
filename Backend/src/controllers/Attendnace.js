@@ -20,6 +20,7 @@ router.get('/getAttendnaceDetails', async (req, res) => {
         if (From === "student") query += ` AND aa.Student_ID = '${Id}'`
         if(From ==="teacher") query += ` AND aa.Student_ID = '${Id}'`
         if (userRole === "teacher") query += ` AND aa.Teacher_id = '${userId}'`
+        if (userRole === "admin") query +=  ` AND aa.Student_ID = '${Id}'`
         if (Module_id!=undefined) query+= `And aa.Module_id = '${Module_id}'`
 
         query += " GROUP BY s.Student_ID, s.Student_Name"
@@ -35,7 +36,7 @@ router.get('/getAttendnaceDetails', async (req, res) => {
 })
 router.get('/getAttendnaceByDate', async (req, res) => {
     try {
-        const { Id, userRole, fromDate, toDate } = req.query
+        const { Id, userRole, fromDate, toDate ,from} = req.query
         const db = await connectDatabase()
         let query = `
             SELECT c.Class_date, SUM(CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present_Count, 
@@ -48,7 +49,9 @@ router.get('/getAttendnaceByDate', async (req, res) => {
         `
         if (userRole === "student") query += ` AND aa.Student_ID = '${Id}'`
         if (userRole === "teacher") query += ` AND aa.Teacher_id = '${Id}'`
-        
+        if (userRole === "admin" && from == "student") query += ` AND aa.Student_ID = '${Id}'`
+
+
         if (fromDate) query += ` AND c.Class_date >= '${fromDate}'`
         if (toDate) query += ` AND c.Class_date <= '${toDate}'`
 
@@ -129,7 +132,10 @@ router.get('/generateReport', async (req, res) => {
 })
 router.get('/getAttendanceBySubject', async (req, res) => {
     try {
-        const { Id ,userRole} = req.query
+        const { Id ,userRole, from} = req.query
+        console.log(Id ,userRole, from)
+        
+        console.log("Got the attendance by subject")
         const db = await connectDatabase()
         let query = `SELECT aa.Module_id,m.Module_name, SUM(CASE WHEN a.Attendance_Status = 'Present' THEN 1 ELSE 0 END) AS Present_Count, 
             SUM(CASE WHEN a.Attendance_Status = 'Late' THEN 1 ELSE 0 END) AS Late_Count, 
@@ -137,9 +143,10 @@ router.get('/getAttendanceBySubject', async (req, res) => {
             FROM attendance a JOIN attendance_association aa ON a.Attendance_Id = aa.Attendance_Id
             Join module m on aa.Module_id= m.Module_id WHERE 1=1 `
             
-            if(userRole==="teacher") query += ` AND aa.Teacher_id = '${Id}'`
-            // if(userRole==="admin") query += ` AND aa.Teacher_id = '${Id}'`
+            if(userRole==="teacher" && (from ===undefined || from ===null)) query += ` AND aa.Teacher_id = '${Id}'`
+            if(userRole==="admin" && from==='student') query += ` AND aa.Student_id = '${Id}'`
             if(userRole==="student" ) query += ` AND aa.Student_id = '${Id}'`
+            if(userRole==="teacher" && from==='student') query += ` AND aa.Student_id = '${Id}'`
 
             query += ` GROUP BY m.Module_id,m.Module_Name
             ORDER BY m.Module_id`
@@ -155,11 +162,6 @@ router.get('/getAttendanceBySubject', async (req, res) => {
     }
 })
 
-
-// Add this endpoint to your existing attendance router file
-// Add these endpoints to your existing attendance router file
-
-// Update attendance status
 router.post('/updateAttendanceStatus', async (req, res) => {
     try {
         const { changes, classId, updatedBy } = req.body;
@@ -214,7 +216,6 @@ router.post('/updateAttendanceStatus', async (req, res) => {
     }
 });
 
-// Update the getClassAttendance endpoint to include the Attendance_Id
 router.get('/getClassAttendance', async (req, res) => {
     try {
         const { classId } = req.query;

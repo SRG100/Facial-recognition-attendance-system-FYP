@@ -36,9 +36,6 @@ def verify_face(registeredFace,providedFace):
         print(result)
 
         return result[0], "Face match" if result[0] else "Face does not match"
-    # except Exception as e:
-    #     return False, str(e)
-
 
 @app.route("/verifyFace", methods=['POST'])
 

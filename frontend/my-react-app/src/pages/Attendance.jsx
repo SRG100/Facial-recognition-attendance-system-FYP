@@ -37,8 +37,7 @@ const Attendance = ({ userId, userRole, userName }) => {
     getAttendanceByDate()
     getAbsenceByMonth()
     getAbsenceBySubject()
-
-  }, [Id]);
+  }, [Id])
 
   const getAttendnaceDetails = async () => {
     try {
@@ -62,7 +61,7 @@ const Attendance = ({ userId, userRole, userName }) => {
   }
   const getAbsenceByMonth = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/attendance/getAbsenceMonth?Id=${Id}`);
+      const response = await axios.get(`http://localhost:3000/attendance/getAbsenceMonth?Id=${Id}&userRole=${userRole}`);
       setAbsenceData(Array.isArray(response.data) ? response.data : [])
 
     } catch (error) {
@@ -71,7 +70,7 @@ const Attendance = ({ userId, userRole, userName }) => {
   }
   const getAbsenceBySubject = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/attendance/getAttendanceBySubject?Id=${Id}`);
+      const response = await axios.get(`http://localhost:3000/attendance/getAttendanceBySubject?Id=${Id}&from=student&userRole=${userRole}`);
       setAttendanceBySubject(Array.isArray(response.data) ? response.data : [])
 
     } catch (error) {

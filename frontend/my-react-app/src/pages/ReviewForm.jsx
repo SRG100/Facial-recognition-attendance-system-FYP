@@ -37,7 +37,6 @@ function ReviewForm({ userId, userRole, userName }) {
     userId: userId,
   }
 
-  // Reset form function
   const resetForm = () => {
     setValues({
       suggestions: '',
@@ -47,8 +46,6 @@ function ReviewForm({ userId, userRole, userName }) {
     document.querySelectorAll('input[type="radio"]').forEach(radio => {
       radio.checked = false
     })
-
-    document.querySelector('textarea[name="Suggestions"]').value = ''
   }
 
   const validateForm = () => {
@@ -62,7 +59,6 @@ function ReviewForm({ userId, userRole, userName }) {
   const handleSubmitTeacherReview = async (e) => {
     e.preventDefault()
 
-    // Validate before submission
     if (!validateForm()) return
 
     try {
@@ -75,7 +71,7 @@ function ReviewForm({ userId, userRole, userName }) {
       else{
         toast.error(response.data.message)
       }
-      resetForm() // Reset form after successful submission
+      resetForm()
     } catch (err) {
       console.log(err)
       toast.error(response?.data?.message || 'An error occurred')
@@ -91,7 +87,7 @@ function ReviewForm({ userId, userRole, userName }) {
       const response = await axios.post('http://localhost:3000/reviews/studentReview', reviewData)
       console.log(response.message)
       toast.success(response.data.message)
-      resetForm() // Reset form after successful submission
+      resetForm() 
     } catch (err) {
       console.log(err)
       toast.error(err.response?.data?.message || 'An error occurred')
@@ -107,7 +103,7 @@ function ReviewForm({ userId, userRole, userName }) {
       const response = await axios.post('http://localhost:3000/reviews/moduleReview', reviewData)
       console.log(response.message)
       toast.success(response.data.message)
-      resetForm() // Reset form after successful submission
+      resetForm() 
     } catch (err) {
       console.log(err)
       toast.error(err.response?.data?.message || 'An error occurred')
@@ -127,7 +123,6 @@ function ReviewForm({ userId, userRole, userName }) {
                 <ComponentCard title={`Review ${ReviewOf}`} className="mt-6" >
                   <form className="w-full">
                     <div className="flex flex-col items-center text-center w-full">
-                      {/* Stars Rating - Keeping original CSS */}
                       <div className="w-full mb-6">
                         <label className="block text-center mb-2">{ReviewOf} Ratings<span className="text-red-500"> *</span></label>
                         <div className="star-rating text-center">
@@ -144,9 +139,8 @@ function ReviewForm({ userId, userRole, userName }) {
                         </div>
                       </div>
 
-                      {/* Suggestions Textarea */}
                       <div className="w-100 mb-6">
-                        <label className="block text-center mb-2 px-3">Suggestions for {ReviewOf}</label>
+                        <label className="block text-center mb-2 px-3">Comments for {ReviewOf}</label>
                         <div className="flex justify-center">
                           <textarea
                             type="text"
@@ -154,7 +148,7 @@ function ReviewForm({ userId, userRole, userName }) {
                             className="w-3/5 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             onChange={handleChanges}
                             value={values.suggestions}
-                            placeholder="Suggestions"
+                            placeholder="Comments"
                           />
                         </div>
                       </div>
