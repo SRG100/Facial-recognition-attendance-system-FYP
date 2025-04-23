@@ -1,19 +1,24 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import FaceCapture from '../components/FaceCapture.jsx'
 import axios from 'axios'
 import Nav from '../components/Nav.jsx'
 import SidebarComponent from '../components/SideBar.jsx'
-import { useLocation } from 'react-router-dom'
 import PageNotFound from '../components/PageNotFound.jsx'
-
+import { toast } from "react-hot-toast";
 import Header from '../components/Header'
 
 const RegisterFace = ({ userId, userRole, userName }) => {
   const [image, setImage] = useState("")
-  const location = useLocation()
-  const fromNavigate = location.state?.fromNavigate
-  if(!fromNavigate){
-    return <PageNotFound/>
+  const navigate = useNavigate()
+  const fromNavigate = localStorage.getItem("fromNavigate") === "true"
+  console.log("the from navigate is:", fromNavigate)
+  console.log("the user id is:", userId)
+
+  if (!fromNavigate) {
+    return <PageNotFound />
+  } else {
+    localStorage.removeItem("fromNavigate")
   }
 
   const base64ToFile = (base64String) => {
@@ -40,8 +45,15 @@ const RegisterFace = ({ userId, userRole, userName }) => {
           userId: userId
         }
       })
-      console.log(response.status)
+      if (response.data.success) {
+        toast.success("Face registered successfully")
+        navigate("/")
+      }
+      else {
+        toast.error("Face registration failed")
+      }
       console.log(response.data.message)
+
 
     } catch (err) {
       console.log(err)

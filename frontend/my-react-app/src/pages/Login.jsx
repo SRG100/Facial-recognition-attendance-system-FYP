@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import AttendanceImage from '../assets/Attendance.png'
@@ -25,16 +26,20 @@ const Login = () => {
             const response = await axios.post('http://localhost:3000/auth/login', values, { withCredentials: true })
             if (response.status === 201) {
                 localStorage.setItem("justLoggedIn", "true")
+                localStorage.setItem("redirectAfterReload", response.data.redirect) 
                 if (response.data.success) {
                     toast.success(response.data.message)
-                    navigate(response.data.redirect, { replace: true })
-
                 } else {
+                    localStorage.setItem("fromNavigate","true") 
+
                     toast(response.data.message, { icon: '👏' })
-                    navigate("/ReviewForm", { state: { fromNavigate: true } })
+                    console.log(response.data.redirect)
 
                 }
                 setTimeout(() => window.location.reload(), 500)
+                console.log('The navigation is ',response.data.redirect)
+                navigate(response.data.redirect, { state: { fromNavigate: true } })
+
             } else {
                 toast.error(response.data.message)
             }

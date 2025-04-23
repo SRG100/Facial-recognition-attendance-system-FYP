@@ -24,22 +24,17 @@ router.post('/registerFace', upload.single("image"), async (req, res) => {
       "INSERT INTO face (Face_data) VALUES (?)",
       [imageBuffer]
     )
-
     const faceId = result.insertId;
-
     await db.execute("UPDATE student SET Face_id = ? WHERE Student_Id = ?", [
       faceId,
       userId,
-    ]);
-
-
+    ])
+    res.json({ message: "Face registered successfully",success: true })
+    console.log("Face registered successfully")
   } catch (err) {
-    res.status(500).json(err)
-
     console.log("Database connected FAILED! of face registration", err);
-  }
-
-})
+    res.json({ message: "Database connection failed",success: false })
+}})
 
 router.post('/getFace', async (req, res) => {
   const db = await connectDatabase()

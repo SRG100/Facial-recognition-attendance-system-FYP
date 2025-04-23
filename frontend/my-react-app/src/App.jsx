@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
+
 // import "bootstrap/dist/css/bootstrap.min.css";
 
 import axios from 'axios';
@@ -54,6 +55,14 @@ function App() {
     };
     checkAuthorization()
   }, []);
+
+  useEffect(() => {
+    const redirectPath = localStorage.getItem("redirectAfterReload")
+    if (redirectPath) {
+      localStorage.removeItem("redirectAfterReload")
+      window.location.href = redirectPath
+    }
+  }, [])
 
   if (loading) return <p>Loading...</p>;
   console.log(userRole)

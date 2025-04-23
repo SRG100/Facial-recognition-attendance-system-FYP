@@ -69,7 +69,6 @@ router.get('/locationVerification', async (req, res) => {
 
         const distance = calculateDistance(studentLatitude, studentLongitude, teacherLatitude, teacherLongitude)
         console.log("The distance between teacher and student is:", distance)
-        const attendanceTime = new Date(Attendance_Time);
         const classStartTime = new Date(Class_Start_Time);
         const [attendnaceData] = await db.query("SELECT Geolocation_Status, Face_Verified, Code, Warnings FROM attendance WHERE attendance_id = ?", [Attendance_id]);
         let Warnings = attendnaceData[0]?.Warnings || 0
@@ -83,6 +82,8 @@ router.get('/locationVerification', async (req, res) => {
 
             const [finalVerification] = await db.query("SELECT Geolocation_Status, Face_Verified, Code, Attendance_Time FROM attendance WHERE attendance_id = ?", [Attendance_id]);
             const { Face_Verified, Code, Geolocation_Status, Attendance_Time } = finalVerification[0]
+            const attendanceTime = new Date(Attendance_Time)
+
 
             if (Face_Verified === 1 && Code === 1 && Geolocation_Status === 1 && attendanceTime - classStartTime <= gracePeriod) {
 

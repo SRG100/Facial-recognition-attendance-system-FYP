@@ -41,22 +41,22 @@ const SideBar = ({ userId, userRole }) => {
   useEffect(() => {
     const checkAuthorization = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/auth/isAuthorized', { withCredentials: true });
-        const isVerified = response.data?.success;
-        const userName = response.data?.userName;
+        const response = await axios.get('http://localhost:3000/auth/isAuthorized', { withCredentials: true })
+        const isVerified = response.data?.success
+        const userName = response.data?.userName
 
-        setUserName(userName);
-        setIsLoggedIn(isVerified);
+        setUserName(userName)
+        setIsLoggedIn(isVerified)
 
-        const justLoggedIn = localStorage.getItem("justLoggedIn");
+        const justLoggedIn = localStorage.getItem("justLoggedIn")
         if (isVerified && justLoggedIn === "true") {
-          toast.success(`Welcome back, ${userName}!`);
-          localStorage.removeItem("justLoggedIn");
+          toast.success(`Welcome back, ${userName}!`)
+          localStorage.removeItem("justLoggedIn")
         }
       } catch (error) {
-        console.error('Error checking authorization:', error);
+        console.error('Error checking authorization:', error)
         setIsLoggedIn(false);
-        toast.error("Authorization failed. Please login.");
+        toast.error("Authorization failed. Please login.")
       }
     };
 

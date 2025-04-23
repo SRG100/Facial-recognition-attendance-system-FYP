@@ -60,19 +60,7 @@ const Sections = ({ userRole, userId, userName }) => {
     }
   }
 
-  const getModulesTeachers = async () => {
-    try {
-      if (!newSection.Course || !newSection.Year || !newSection.name === null) {
-        toast.error("Please fill all the fields.")
-        return
-      }
-      const response = await axios.get(`http://localhost:3000/modules/getSpecificModules?Course=${newSection.Course}&Year=${newSection.Year}`)
-      setModuleTeachers(response.data)
-      setGotTeachers(true)
-    } catch (err) {
-      console.error('Error while getting the modules and teachers', err);
-    }
-  }
+ 
 
   const getSectionDetails = async () => {
     try {
@@ -94,7 +82,20 @@ const Sections = ({ userRole, userId, userName }) => {
     } catch (error) {
       console.error('Error while getting the sections', error);
     }
-  };
+  }
+  const getModulesTeachers = async () => {
+    try {
+      if (!newSection.Course || !newSection.Year || !newSection.name === null) {
+        toast.error("Please fill all the fields.")
+        return
+      }
+      const response = await axios.get(`http://localhost:3000/modules/getSpecificModules?Course=${newSection.Course}&Year=${newSection.Year}`)
+      setModuleTeachers(response.data)
+      setGotTeachers(true)
+    } catch (err) {
+      console.error('Error while getting the modules and teachers', err);
+    }
+  }
 
   const handleAddSection = async () => {
     try {

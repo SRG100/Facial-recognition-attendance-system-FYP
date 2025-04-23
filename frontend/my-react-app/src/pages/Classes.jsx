@@ -644,11 +644,7 @@ const Classes = ({ userRole, userId, userName }) => {
 
 
             </div>
-            <Popup
-                open={isPopupOpen}
-                closeOnDocumentClick
-                onClose={() => setIsPopupOpen(false)}
-            >
+            <Popup  open={isPopupOpen} closeOnDocumentClick onClose={() => setIsPopupOpen(false)} >
                 <div className="fixed inset-0 z-50 flex items-center justify-center  transition-opacity duration-300">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 sm:mx-auto overflow-hidden animate-fade-in">
                         <form onSubmit={addNewClass} className="flex flex-col max-h-[90vh]">

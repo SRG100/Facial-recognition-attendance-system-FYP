@@ -15,7 +15,7 @@ router.get('/generateReport', async (req, res) => {
             const db = await connectDatabase();
             console.log("Database connected successfully");
             
-            // Handle teacher role - get their module
+            // Handle teacher role get their module
             if (UserRole === "teacher") {
                 try {
                     const [Modules] = await db.query(
