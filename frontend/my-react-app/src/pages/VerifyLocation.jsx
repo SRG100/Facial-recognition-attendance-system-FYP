@@ -32,7 +32,7 @@ const VerifyLocation = ({ userId, userRole, userName }) => {
             setTimeout(() => navigate("/"), 3000)
         }
     }, [success, message, navigate])
-
+//checking location every 10 second
     useEffect(() => {
         let interval
         if (verificationActive && classCompletion !== 1) {
@@ -64,7 +64,8 @@ const VerifyLocation = ({ userId, userRole, userName }) => {
                     setLoading(false);
                     toast.error("Error getting location: " + error.message);
                     reject(error);
-                },
+                }
+                ,
                 {
                     enableHighAccuracy: true,
                     timeout: 10000,
@@ -229,9 +230,9 @@ const VerifyLocation = ({ userId, userRole, userName }) => {
                                                     </svg>
                                                 </div>
                                                 <div className="ml-3">
-                                                    <p className="text-sm text-green-700">
+                                                    {/* <p className="text-sm text-green-700">
                                                         Location is being verified every 10 seconds
-                                                    </p>
+                                                    </p> */}
                                                     <div className="mt-2 flex items-center">
                                                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
                                                         <span className="text-xs text-green-600">Monitoring active</span>

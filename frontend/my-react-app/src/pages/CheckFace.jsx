@@ -16,13 +16,13 @@ const CheckFace = ({ userId, userRole, userName }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const fromNavigate = location.state?.fromNavigate
-  // if (!fromNavigate) {
-  //   return <PageNotFound />
-  // }
+  if (!fromNavigate) {
+    return <PageNotFound />
+  }
   const Class_Id = location.state?.Class_Id
   const Attendance_id = location.state?.Attendance_id
 
-  useEffect(() => {
+  useEffect(() => { 
     const getFaceDetails = async () => {
       try {
         const response = await axios.post(

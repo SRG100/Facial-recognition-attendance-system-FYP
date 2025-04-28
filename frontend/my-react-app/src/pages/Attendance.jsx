@@ -4,7 +4,6 @@ import Popup from 'reactjs-popup';
 import { useLocation } from 'react-router-dom';
 import SidebarComponent from '../components/SideBar';
 import { Doughnut, Line, Bar } from 'react-chartjs-2';
-import Chart from "react-apexcharts";
 
 import 'chart.js/auto';
 import 'boxicons/css/boxicons.min.css'

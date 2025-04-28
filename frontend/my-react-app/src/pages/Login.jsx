@@ -31,7 +31,6 @@ const Login = () => {
                     toast.success(response.data.message)
                 } else {
                     localStorage.setItem("fromNavigate","true") 
-
                     toast(response.data.message, { icon: '👏' })
                     console.log(response.data.redirect)
 

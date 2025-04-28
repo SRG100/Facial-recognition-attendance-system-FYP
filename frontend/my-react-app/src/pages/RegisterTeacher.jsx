@@ -11,9 +11,10 @@ import toast from 'react-hot-toast'
 
 
 const RegisterTeacher = ({ userId, userRole,userName }) => {
-    if (userRole === "student") {
+    if (userRole === "student" || userRole === "teacher") {
         return <PageNotFound />
     }
+
     const navigate = useNavigate()
 
     const [teacherValues, setTeacherValues] = useState({

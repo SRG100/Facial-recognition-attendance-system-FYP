@@ -31,8 +31,6 @@ const Modules = ({ userId, userRole, userName }) => {
     }
   }, [isPopupOpenPredict])
 
-
-
   const [course, setCourse] = useState([])
   const [moduleValues, setModuleValues] = useState({
     moduleId: '',
