@@ -37,9 +37,8 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
     if (classId) {
       getClassAttendance();
     }
-  }, [classId]);
+  }, [classId])
 
-  // Handle clicks outside dropdown
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -85,10 +84,8 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
       late: lateCount
     });
   };
-
-  // Toggle dropdown visibility
   const toggleDropdown = (id, e) => {
-    e.stopPropagation(); // Stop event from bubbling up
+    e.stopPropagation(); 
     setOpenDropdownId(prevId => prevId === id ? null : id);
   };
 
@@ -110,14 +107,11 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
     setAttendanceData(updatedData);
     updateSummary(updatedData);
 
-    // Track changes for batch saving
     setChangedRecords({
       ...changedRecords,
       [attendanceId]: { attendanceId, studentId, newStatus }
     });
   };
-
-  // Save all changes to the backend
   const saveChanges = async () => {
     if (Object.keys(changedRecords).length === 0) {
       toast.info('No changes to save');
@@ -138,8 +132,8 @@ const ClassAttendance = ({ userId, userRole, userName }) => {
 
       if (response.data.success) {
         toast.success('Attendance updated successfully', { id: saveToastId });
-        setChangedRecords({});
-        getClassAttendance(); // Refresh data to ensure consistency
+        setChangedRecords({})
+        getClassAttendance()
       } else {
         toast.error(response.data.message || 'Failed to update attendance', { id: saveToastId });
       }

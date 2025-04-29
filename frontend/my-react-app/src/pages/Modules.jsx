@@ -369,7 +369,6 @@ const Modules = ({ userId, userRole, userName }) => {
               <h2 className="text-2xl font-bold text-gray-800 text-center">Grade Prediction Results</h2>
             </div>
 
-            {/* Content */}
             <div className="space-y-4">
               <p className="text-gray-600 text-sm text-center">
                 This is a simple prediction system based on your attendance. Your actual academic qualification may be higher than predicted.
@@ -392,7 +391,6 @@ const Modules = ({ userId, userRole, userName }) => {
               )}
             </div>
 
-            {/* Footer with Button */}
             <div className="mt-6 text-center">
               <button
                 onClick={() => setIsPopupOpenPredict(false)}

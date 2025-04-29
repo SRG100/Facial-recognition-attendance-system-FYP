@@ -1,0 +1,34 @@
+# Facial Recognition Attendance System
+
+This is the final year project by **Shreyash Ghale** for Islington College and London Metropolitan University. It is a full-stack facial recognition-based attendance system that combines React (Vite) frontend, Node.js Express backend, and a Python Flask service for facial detection.
+
+---
+# For frontend install the following:
+    cd frontend/my-react-app
+    npm install       # or yarn
+    npm run dev
+
+# For backend
+    cd backend
+    npm install
+    npm start
+
+# for python (/backend-p)
+
+    Pre-requisites for Windows
+    Desktop development with C++ in Visual studio must be installed for dlib to be compined
+    pip install -r requirements.txt
+    python server.python
+
+# create the .evn file with the following details
+    DB_HOST="localhost"
+    DB_USER="root"
+    DB_PASSWORD=""
+    DB_NAME="fras_fyp"
+    PORT=3000
+    JWT_KEY="jwt-secret-key"
+
+# For database, mysql is used
+    install xaamp 
+    and create a database named "fras_fyp"
+    then import the database provided in database folder
